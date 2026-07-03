@@ -1,0 +1,151 @@
+﻿@{
+    ViewData["Title"] = "Leave Requests";
+}
+@if (TempData["Success"] != null)
+{
+    <div style="color:green;
+        text-align:center;
+        margin-bottom:15px;">
+        @TempData["Success"]
+    </div>
+}
+
+<div class="card shadow">
+
+    <div class="card-header bg-primary text-white">
+
+        <h4>Employee Leave Requests</h4>
+
+    </div>
+
+    <div class="card-body">
+
+        <table class="table table-bordered table-hover">
+
+            <thead>
+
+                <tr>
+
+                    <th>Employee</th>
+
+                    <th>Leave Type</th>
+
+                    <th>From</th>
+
+                    <th>To</th>
+
+                    <th>Days</th>
+
+                    <th>Reason</th>
+
+                    <th>Status</th>
+
+                    <th>Action</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                @foreach (var item in ViewBag.Leaves)
+                {
+                    <tr>
+
+                        <td>@item.EmployeeName</td>
+
+                        <td>@item.LeaveTypeName</td>
+
+                        <td>@item.FromDate</td>
+
+                        <td>@item.ToDate</td>
+
+                        <td>@item.TotalDays</td>
+
+                        <td>@item.Reason</td>
+
+                        <td>
+
+                            @if (item.Status == "Pending")
+                            {
+                                <span class="badge bg-warning">
+                                    Pending
+                                </span>
+                            }
+                            else if (item.Status == "Approved")
+                            {
+                                <span class="badge bg-success">
+                                    Approved
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger">
+                                    Rejected
+                                </span>
+                            }
+
+                        </td>
+
+                        <td>
+
+                            @if (item.Status == "Pending")
+                            {
+                                <form asp-action="ApproveLeave"
+                                      method="post">
+
+                                    <input type="hidden"
+                                           name="id"
+                                           value="@item.LeaveRequestId" />
+
+                                    <textarea class="form-control mb-2"
+                                              name="remarks"
+                                              rows="2"
+                                              placeholder="Enter remarks">
+                                   </textarea>
+
+                                    <button type="submit"
+                                            class="btn btn-success btn-sm">
+
+                                        Approve
+
+                                    </button>
+
+                                </form>
+
+                                <form asp-action="RejectLeave"
+                                      method="post"
+                                      class="mt-2">
+
+                                    <input type="hidden"
+                                           name="id"
+                                           value="@item.LeaveRequestId" />
+
+                                    <textarea class="form-control mb-2"
+                                              name="remarks"
+                                              rows="2"
+                                              placeholder="Enter remarks">
+                                   </textarea>
+
+                                    <button type="submit"
+                                            class="btn btn-danger btn-sm">
+
+                                        Reject
+
+                                    </button>
+
+                                </form>
+                            }
+
+                        </td>
+
+                    </tr>
+                }
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>

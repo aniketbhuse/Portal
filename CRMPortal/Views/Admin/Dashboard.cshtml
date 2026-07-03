@@ -1,0 +1,55 @@
+﻿<div class="card mt-4 shadow">
+
+    <div class="card-header bg-dark text-white">
+        Uploaded CD Files
+    </div>
+
+    <div class="card-body">
+
+        <table class="table table-bordered table-hover">
+
+            <thead>
+
+                <tr>
+                    <th>Employee</th>
+                    <th>File Name</th>
+                    <th>Uploaded Date</th>
+                    <th>Action</th>
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                @foreach (var item in ViewBag.Files)
+                {
+                    <tr>
+
+                        <td>@item.EmployeeName</td>
+
+                        <td>@item.FileName</td>
+
+                        <td>@item.UploadedDate</td>
+
+                        <td>
+
+                            <a asp-action="ViewFile"
+                               asp-route-id="@item.FileId"
+                               class="btn btn-primary btn-sm">
+
+                                View File
+
+                            </a>
+
+                        </td>
+
+                    </tr>
+                }
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>

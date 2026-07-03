@@ -1,0 +1,217 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - CRMPortal</title>
+
+    <script type="importmap"></script>
+
+    <link rel="stylesheet"
+          href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+
+    <link rel="stylesheet"
+          href="~/css/site.css"
+          asp-append-version="true" />
+
+    <link rel="stylesheet"
+          href="~/CRMPortal.styles.css"
+          asp-append-version="true" />
+</head>
+
+<body>
+
+    <header>
+
+        <nav class="navbar navbar-expand-sm navbar-light bg-white border-bottom box-shadow mb-3">
+
+            <div class="container-fluid">
+
+                <!-- BRAND -->
+                <a class="navbar-brand"
+                   asp-controller="Account"
+                   asp-action="Login">
+                    CRMPortal
+                </a>
+
+                <button class="navbar-toggler"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target=".navbar-collapse">
+
+                    <span class="navbar-toggler-icon"></span>
+
+                </button>
+
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+
+                    <!-- LEFT MENU -->
+                    <ul class="navbar-nav flex-grow-1">
+
+                        @if (Context.Session.GetInt32("UserId") == null)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark"
+                                   asp-controller="Home"
+                                   asp-action="Index">
+                                    Home
+                                </a>
+                            </li>
+                        }
+
+                        @if (Context.Session.GetInt32("RoleId") == 1 || Context.Session.GetInt32("RoleId") == 3)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark"
+                                   asp-controller="Admin"
+                                   asp-action="Dashboard">
+                                    Admin Dashboard
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link text-dark"
+                                   asp-controller="Admin"
+                                   asp-action="AddUser">
+                                    Add User
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark"
+                                   asp-controller="Admin"
+                                   asp-action="LeaveRequests">
+                                    Leaves Dashboard
+                                </a>
+                            </li>
+                        }
+                        @if (Context.Session.GetInt32("RoleId") == 5)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark"
+                                   asp-controller="HR"
+                                   asp-action="Dashboard">
+                                    HR Dashboard
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark"
+                                   asp-controller="HR"
+                                   asp-action="Employees">
+                                    Employees
+                                </a>
+                            </li>
+                            
+                        }
+                        @if (Context.Session.GetInt32("RoleId") == 3)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link"
+                                   asp-controller="Admin"
+                                   asp-action="ManageAdmins">
+                                    Manage Admins
+                                </a>
+                            </li>
+                        }
+
+                        @if (Context.Session.GetInt32("RoleId") == 2)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark"
+                                   asp-controller="Employee"
+                                   asp-action="Dashboard">
+                                    Employee Dashboard
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link text-dark"
+                                   asp-controller="Employee"
+                                   asp-action="ApplyLeave">
+                                    Apply Leave
+                                </a>
+                            </li>
+                        }
+                       
+                    </ul>
+
+                    <!-- RIGHT MENU -->
+                    <ul class="navbar-nav ms-auto align-items-center" >
+
+                        <!-- ✅ SEARCH BOX ONLY FOR ADMIN -->
+                        @if (Context.Session.GetInt32("UserId") != null
+                            && Context.Session.GetInt32("RoleId") == 1)
+                        {
+                            <li class="nav-item me-3" style="display: none;">
+
+                                <form class="d-flex search-box"
+                                      asp-controller="Admin"
+                                      asp-action="Search"
+                                      method="get">
+
+                                    <input type="text"
+                                           name="query"
+                                           class="search-input"
+                                           placeholder="Search users..." />
+
+                                    <button type="submit"
+                                            class="search-btn">
+                                        Search
+                                    </button>
+
+                                </form>
+
+                            </li>
+                        }
+
+                        <!-- USER INFO -->
+                        @if (Context.Session.GetInt32("UserId") != null)
+                        {
+                            <li class="nav-item">
+                                <span class="nav-link text-primary fw-bold">
+                                    Welcome,
+                                    @Context.Session.GetString("FullName")
+                                </span>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link text-danger"
+                                   asp-controller="Account"
+                                   asp-action="Logout">
+                                    Logout
+                                </a>
+                            </li>
+                        }
+
+                    </ul>
+
+                </div>
+
+            </div>
+
+        </nav>
+
+    </header>
+
+    <!-- BODY -->
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="border-top footer text-muted">
+        <div class="container">
+            &copy; 2026 - CRMPortal
+        </div>
+    </footer>
+
+    <!-- SCRIPTS -->
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+
+</body>
+</html>

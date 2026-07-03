@@ -1,0 +1,138 @@
+﻿
+@model CRMPortal.ViewModels.AddUserViewModel
+
+<link rel="stylesheet"
+      href="~/css/site.css" />
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+<script src="~/js/site.js" asp-append-version="true"></script>
+
+<div class="page-container">
+
+    <!-- Left Side -->
+
+    <div class="form-card">
+
+        <h2>Add New User</h2>
+        
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success">
+                @TempData["Success"]
+            </div>
+        }
+
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger">
+                @TempData["Error"]
+            </div>
+        }
+
+        @if (ViewBag.Error != null)
+        {
+            <div class="alert alert-danger">
+                @ViewBag.Error
+            </div>
+        }
+       
+
+        <form method="post" asp-action="AddUser" asp-controller="Admin">
+
+            <div class="form-group">
+                <label>Full Name</label>
+                <input asp-for="Users.FullName" id="FullName" />
+            </div>
+
+            <div class="form-group">
+                <label>Email</label>
+                <input asp-for="Users.Email" id="Email" />
+            </div>
+
+            <div class="form-group">
+                <label>Password</label>
+                <input asp-for="Users.Password" id="Password" type="password" />
+            </div>
+
+            <div class="form-group">
+                <label>Role</label>
+                <select asp-for="Users.RoleId" asp-items="Model.Roles" id="RoleId">
+                    <option value="">Select Role</option>
+                </select>
+            </div>
+
+            <button type="submit"
+                    id="btnAddUser"
+                    class="btn-save"
+                    disabled>
+                Add User
+            </button>
+
+        </form>
+
+    </div>
+
+    <!-- Right Side -->
+
+    <div class="user-section">
+
+        <div class="user-list-container">
+
+            <h2>Admin Users</h2>
+
+            <div class="scroll-container">
+
+                @foreach (var item in Model.AdminUsers)
+                {
+                    <div class="user-card">
+
+                        <div>
+                            <h4>@item.FullName</h4>
+                            <p>@item.Email</p>
+                        </div>
+
+                        <a asp-action="DeleteUser"
+                           asp-route-id="@item.UserId"
+                           class="btn-delete">
+                            Delete
+                        </a>
+
+                    </div>
+                }
+
+            </div>
+
+        </div>
+
+        <div class="user-list-container">
+
+            <h2 class="employee-heading">Employee Users</h2>
+
+            <div class="scroll-container">
+
+                @foreach (var item in Model.EmployeeUsers)
+                {
+                    <div class="user-card">
+
+                        <div>
+                            <h4>@item.FullName</h4>
+                            <p>@item.Email</p>
+                        </div>
+
+                        <a asp-action="DeleteUser"
+                           asp-route-id="@item.UserId"
+                           class="btn-delete">
+                            Delete
+                        </a>
+
+                    </div>
+                }
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
