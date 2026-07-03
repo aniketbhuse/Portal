@@ -1,4 +1,5 @@
 ﻿using CRMPortal.Data;
+using CRMPortal.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CRMPortal.Controllers
@@ -22,6 +23,23 @@ namespace CRMPortal.Controllers
                 {
                     return RedirectToAction("Login", "Account");
                 }
+
+                // Total Employees
+                ViewBag.TotalEmployees =
+                    _context.MasterEmployee
+                            .Count(x => x.IsDeleted == false);
+
+                // Active Employees
+                ViewBag.ActiveEmployees =
+                    _context.MasterEmployee
+                            .Count(x => x.EmployeeStatus == "Active"
+                                     && x.IsDeleted == false);
+
+                // Inactive Employees
+                ViewBag.InactiveEmployees =
+                    _context.MasterEmployee
+                            .Count(x => x.EmployeeStatus == "Inactive"
+                                     && x.IsDeleted == false);
 
                 return View();
             }
@@ -54,6 +72,74 @@ namespace CRMPortal.Controllers
                 return RedirectToAction("Dashboard");
             }
 
+        }
+
+        public IActionResult DeleteEmployee(int id)
+        {
+            try
+            {
+                var employee = _context.MasterEmployee
+                                       .FirstOrDefault(x => x.EmployeeId == id);
+
+                if (employee == null)
+                {
+                    TempData["Error"] = "Employee not found.";
+
+                    return RedirectToAction("Employees");
+                }
+
+                employee.IsDeleted = true;
+                employee.ModifiedDate = DateTime.Now;
+
+                _context.SaveChanges();
+
+                TempData["Success"] = "Employee deleted successfully.";
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = ex.Message;
+            }
+
+            return RedirectToAction("Employees");
+        }
+
+        [HttpPost]
+        public IActionResult AddEmployee(MasterEmployee model)
+        {
+            try
+            {
+                if (HttpContext.Session.GetInt32("RoleId") != 5)
+                {
+                    return RedirectToAction("Login", "Account");
+                }
+
+                if (!ModelState.IsValid)
+                {
+                    return View("Dashboard");
+                }
+
+                model.CreatedDate = DateTime.Now;
+
+                model.UpdatedDate = DateTime.Now;
+
+                model.ModifiedDate = DateTime.Now;
+
+                model.IsDeleted = false;
+
+                _context.MasterEmployee.Add(model);
+
+                _context.SaveChanges();
+
+                TempData["Success"] = "Employee Added Successfully.";
+
+                return RedirectToAction("Dashboard");
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = ex.Message;
+
+                return RedirectToAction("Dashboard");
+            }
         }
     }
 }

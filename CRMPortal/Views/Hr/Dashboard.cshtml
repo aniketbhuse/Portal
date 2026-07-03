@@ -1,7 +1,277 @@
-﻿@{
+﻿@model CRMPortal.Models.MasterEmployee
+
+@{
     ViewData["Title"] = "HR Dashboard";
 }
 
-<h2>HR Dashboard</h2>
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show">
 
-<p>Welcome HR</p>
+        @TempData["Success"]
+
+        <button class="btn-close"
+                data-bs-dismiss="alert">
+        </button>
+
+    </div>
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show">
+
+        @TempData["Error"]
+
+        <button class="btn-close"
+                data-bs-dismiss="alert">
+        </button>
+
+    </div>
+}
+
+<div class="container-fluid mt-3">
+
+    <!-- Summary Card -->
+
+    <div class="row mb-3">
+        <div class="col-md-8">
+
+            <!-- Dashboard Cards -->
+
+            <div class="row">
+
+                <div class="col-md-4">
+
+                    <div class="card shadow text-center">
+
+                        <div class="card-body">
+
+                            <h6>Total Employees</h6>
+
+                            <h2 class="text-primary">
+
+                                @ViewBag.TotalEmployees
+
+                            </h2>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="col-md-4">
+
+                    <div class="card shadow text-center">
+
+                        <div class="card-body">
+
+                            <h6>Active Employees</h6>
+
+                            <h2 class="text-success">
+
+                                @ViewBag.ActiveEmployees
+
+                            </h2>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="col-md-4">
+
+                    <div class="card shadow text-center">
+
+                        <div class="card-body">
+
+                            <h6>Inactive Employees</h6>
+
+                            <h2 class="text-danger">
+
+                                @ViewBag.InactiveEmployees
+
+                            </h2>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <div class="row">
+
+        <div class="col-md-4">
+
+            <!-- Employee Form -->
+            <div class="card shadow">
+
+                <div class="card-header bg-primary text-white">
+
+                    <h5>Add Employee</h5>
+
+                </div>
+
+                <div class="card-body">
+
+                    <form asp-action="AddEmployee"
+                          method="post">
+
+                        <div class="mb-3">
+
+                            <label>Employee Code</label>
+
+                            <input asp-for="EmployeeCode"
+                                   class="form-control" />
+
+                        </div>
+
+                        <div class="mb-3">
+
+                            <label>First Name</label>
+
+                            <input asp-for="FirstName"
+                                   class="form-control" />
+
+                        </div>
+
+                        <div class="mb-3">
+
+                            <label>Last Name</label>
+
+                            <input asp-for="LastName"
+                                   class="form-control" />
+
+                        </div>
+
+                        <div class="mb-3">
+
+                            <label>Full Name</label>
+
+                            <input asp-for="FullName"
+                                   class="form-control" />
+
+                        </div>
+
+                        <div class="mb-3">
+
+                            <label>Email</label>
+
+                            <input asp-for="Email"
+                                   class="form-control" />
+
+                        </div>
+
+                        <div class="mb-3">
+
+                            <label>Mobile Number</label>
+
+                            <input asp-for="MobileNumber"
+                                   class="form-control" />
+
+                        </div>
+
+                        <div class="mb-3">
+
+                            <label>Department</label>
+
+                            <input asp-for="Department"
+                                   class="form-control" />
+
+                        </div>
+
+                        <div class="mb-3">
+
+                            <label>Designation</label>
+
+                            <input asp-for="Designation"
+                                   class="form-control" />
+
+                        </div>
+
+                        <div class="mb-3">
+
+                            <label>Gender</label>
+
+                            <select asp-for="Gender"
+                                    class="form-control">
+
+                                <option>Male</option>
+
+                                <option>Female</option>
+
+                                <option>Other</option>
+
+                            </select>
+
+                        </div>
+
+                        <div class="mb-3">
+
+                            <label>Date Of Birth</label>
+
+                            <input asp-for="DateOfBirth"
+                                   type="date"
+                                   class="form-control" />
+
+                        </div>
+
+                        <div class="mb-3">
+
+                            <label>Joining Date</label>
+
+                            <input asp-for="JoiningDate"
+                                   type="date"
+                                   class="form-control" />
+
+                        </div>
+
+                        <div class="mb-3">
+
+                            <label>Salary</label>
+
+                            <input asp-for="Salary"
+                                   class="form-control" />
+
+                        </div>
+
+                        <div class="mb-3">
+
+                            <label>Status</label>
+
+                            <select asp-for="EmployeeStatus" class="form-control">
+
+                                <option>Active</option>
+
+                                <option>Inactive</option>
+
+                            </select>
+
+                        </div>
+
+                        <button class="btn btn-success w-100">
+
+                            Save Employee
+
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+       
+
+    </div>
+
+</div>
