@@ -30,7 +30,7 @@
 
 
 
-document.getElementById("globalSearch").addEventListener("keyup", function () {
+/*document.getElementById("globalSearch").addEventListener("keyup", function () {
     let value = this.value.toLowerCase();
 
     document.querySelectorAll(".user-card").forEach(card => {
@@ -39,4 +39,4 @@ document.getElementById("globalSearch").addEventListener("keyup", function () {
 
         card.style.display = text.includes(value) ? "flex" : "none";
     });
-});
+});*/

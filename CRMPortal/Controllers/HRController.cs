@@ -19,7 +19,7 @@ namespace CRMPortal.Controllers
         {
             try
             {
-                if (HttpContext.Session.GetInt32("RoleId") != 5)
+                if (HttpContext.Session.GetInt32("RoleId") != 4)
                 {
                     return RedirectToAction("Login", "Account");
                 }
@@ -53,7 +53,7 @@ namespace CRMPortal.Controllers
         {
             try
             {
-                if(HttpContext.Session.GetInt32("RoleId") != 5)
+                if(HttpContext.Session.GetInt32("RoleId") != 4)
                 {
                     return RedirectToAction("Login", "Account");
                 }
@@ -108,7 +108,7 @@ namespace CRMPortal.Controllers
         {
             try
             {
-                if (HttpContext.Session.GetInt32("RoleId") != 5)
+                if (HttpContext.Session.GetInt32("RoleId") != 4)
                 {
                     return RedirectToAction("Login", "Account");
                 }
