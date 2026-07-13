@@ -14,9 +14,9 @@ namespace CRMPortal.Data
         public DbSet<Roles> Roles { get; set; }
         public DbSet<LeaveTypes> LeaveTypes { get; set; }
         public DbSet<LeaveRequests> LeaveRequests { get; set; }
-
         public DbSet<EmployeeFiles> EmployeeFiles { get; set; }
         public DbSet<MasterEmployee> MasterEmployee { get; set; }
+        public DbSet<EmployeeAttendance> EmployeeAttendance { get; set; }
 
     }
 }

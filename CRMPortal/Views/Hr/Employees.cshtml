@@ -64,7 +64,12 @@
                 Employee Master List
 
             </h4>
+            <a asp-action="ExportEmployeesToExcel"
+               class="btn btn-success exporttoexcel">
 
+                Export to Excel
+
+            </a>
         </div>
 
         <div class="card-body p-0">
@@ -322,4 +327,8 @@
         margin-top: 70px;
     }
 
+    .exporttoexcel{
+        margin-left: 89%;
+        margin-top: -35px;
+    }
 </style>

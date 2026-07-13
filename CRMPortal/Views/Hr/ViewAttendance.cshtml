@@ -1,0 +1,377 @@
+﻿@model CRMPortal.ViewModels.AttendanceReportViewModel
+
+<div class="card shadow">
+
+    <div class="card-header bg-primary text-white">
+
+        <h4>Attendance Report</h4>
+
+    </div>
+
+    <div class="card-body">
+
+        <form asp-action="ViewAttendance"
+              method="post">
+
+            <div class="row">
+
+                <div class="col-md-4">
+
+                    <label>Employee</label>
+
+                    <select asp-for="EmployeeId"
+                            class="form-control">
+
+                        <option value="">Select Employee</option>
+
+                        @foreach (var emp in Model.EmployeeList)
+                        {
+                            <option value="@emp.EmployeeId">
+
+                                @emp.EmployeeCode -
+                                @emp.FullName
+
+                            </option>
+                        }
+
+                    </select>
+
+                </div>
+
+                <div class="col-md-3">
+
+                    <label>From Date</label>
+
+                    <input asp-for="FromDate"
+                           type="date"
+                           class="form-control" />
+
+                </div>
+
+                <div class="col-md-3">
+
+                    <label>To Date</label>
+
+                    <input asp-for="ToDate"
+                           type="date"
+                           class="form-control" />
+
+                </div>
+
+                <div class="col-md-2 d-flex align-items-end">
+
+                    <button class="btn btn-primary w-100">
+
+                        View
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+<div class="row mt-4">
+
+    <div class="col-md-3">
+
+        <div class="card shadow text-center border-primary">
+
+            <div class="card-body">
+
+                <h6>Total Days</h6>
+
+                <h2 class="text-primary">
+
+                    @Model.TotalDays
+
+                </h2>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-md-3">
+
+        <div class="card shadow text-center border-success">
+
+            <div class="card-body">
+
+                <h6>Present Days</h6>
+
+                <h2 class="text-success">
+
+                    @Model.PresentDays
+
+                </h2>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-md-3">
+
+        <div class="card shadow text-center border-danger">
+
+            <div class="card-body">
+
+                <h6>Absent Days</h6>
+
+                <h2 class="text-danger">
+
+                    @Model.AbsentDays
+
+                </h2>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-md-3">
+
+        <div class="card shadow text-center border-warning">
+
+            <div class="card-body">
+
+                <h6>Attendance %</h6>
+
+                <h2 class="text-warning">
+
+                    @Model.AttendancePercentage%
+
+                </h2>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<div class="row mt-4">
+
+    <div class="col-md-3">
+
+        <div class="card shadow border-start border-primary border-4">
+
+            <div class="card-body text-center">
+
+                <h6>Monthly Salary</h6>
+
+                <h3 class="text-primary">
+
+                    ₹ @Model.MonthlySalary.ToString("N2")
+
+                </h3>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-md-3">
+
+        <div class="card shadow border-start border-info border-4">
+
+            <div class="card-body text-center">
+
+                <h6>Per Day Salary</h6>
+
+                <h3 class="text-info">
+
+                    ₹ @Model.PerDaySalary.ToString("N2")
+
+                </h3>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-md-3">
+
+        <div class="card shadow border-start border-danger border-4">
+
+            <div class="card-body text-center">
+
+                <h6>Salary Deduction</h6>
+
+                <h3 class="text-danger">
+
+                    ₹ @Model.SalaryDeduction.ToString("N2")
+
+                </h3>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-md-3">
+
+        <div class="card shadow border-start border-success border-4">
+
+            <div class="card-body text-center">
+
+                <h6>Net Salary</h6>
+
+                <h3 class="text-success">
+
+                    ₹ @Model.NetSalary.ToString("N2")
+
+                </h3>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<div class="row mt-4">
+
+    <div class="col-md-3">
+        <div class="card text-center shadow">
+            <div class="card-body">
+                <h6>Total Days</h6>
+                <h3>@Model.TotalDays</h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card text-center shadow">
+            <div class="card-body">
+                <h6>Saturday</h6>
+                <h3>@Model.SaturdayCount</h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card text-center shadow">
+            <div class="card-body">
+                <h6>Sunday</h6>
+                <h3>@Model.SundayCount</h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card text-center shadow">
+            <div class="card-body">
+                <h6>Working Days</h6>
+                <h3>@Model.WorkingDays</h3>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="card mt-4 shadow">
+
+    <div class="card-header bg-success text-white">
+
+        Attendance History
+
+    </div>
+
+    <div class="card-body">
+
+        <table class="table table-bordered table-hover">
+
+            <thead>
+
+                <tr>
+
+                    <th>Date</th>
+
+                    <th>Status</th>
+
+                    <th>Remarks</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                @if (Model.AttendanceList.Any())
+                {
+                    foreach (var item in Model.AttendanceList)
+                    {
+                        <tr>
+
+                            <td>
+
+                                @item.AttendanceDate
+
+                            </td>
+
+                            <td>
+
+                                @if (item.Status == "Present")
+                                {
+                                    <span class="badge bg-success">
+
+                                        Present
+
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger">
+
+                                        Absent
+
+                                    </span>
+                                }
+
+                            </td>
+
+                            <td>
+
+                                @item.Remarks
+
+                            </td>
+
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+
+                        <td colspan="3"
+                            class="text-center">
+
+                            No Attendance Found
+
+                        </td>
+
+                    </tr>
+                }
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>

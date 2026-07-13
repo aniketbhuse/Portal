@@ -39,16 +39,17 @@ namespace CRMPortal.Controllers
         private void LoadAddUserData(AddUserViewModel model)
         {
             model.Roles = _context.Roles
-                .Select(x => new SelectListItem
-                {
-                    Value = x.RoleId.ToString(),
-                    Text = x.RoleName
-                })
-                .ToList();
+                  .Where(x => x.RoleId != 3)   // Hide Super Admin role
+                  .Select(x => new SelectListItem
+                  {
+                     Value = x.RoleId.ToString(),
+                      Text = x.RoleName
+                  })
+                  .ToList();
 
             model.AdminUsers = _context.Users
-    .Where(x => x.RoleId == 1 || x.RoleId == 3)
-    .ToList();
+                 .Where(x => x.RoleId == 1)       //|| x.RoleId == 3
+                 .ToList();
 
             model.EmployeeUsers = _context.Users
                 .Where(x => x.RoleId == 2)
@@ -123,9 +124,7 @@ namespace CRMPortal.Controllers
         }
 
         [HttpPost]
-        public IActionResult ApproveLeave(
-    int id,
-    string remarks)
+        public IActionResult ApproveLeave(int id, string remarks)
         {
             try
             {
@@ -260,6 +259,13 @@ namespace CRMPortal.Controllers
                 if (user == null)
                 {
                     TempData["Error"] = "User not found";
+                    return RedirectToAction("AddUser");
+                }
+
+                // Don't allow deleting Super Admin
+                if(user.RoleId == 3)
+                {
+                    TempData["Error"] = "Super Admin cannot be deleted.";
                     return RedirectToAction("AddUser");
                 }
 

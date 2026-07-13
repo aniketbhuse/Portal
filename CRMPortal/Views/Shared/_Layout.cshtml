@@ -100,6 +100,13 @@
                                     Employees
                                 </a>
                             </li>
+                            <li class="nav-item">
+                               <a asp-controller="HR"
+                                   asp-action="ViewAttendance"
+                                    class="nav-link">
+                                    Attendance
+                               </a>
+                            </li>
                             
                         }
                         @if (Context.Session.GetInt32("RoleId") == 3)
@@ -109,6 +116,20 @@
                                    asp-controller="Admin"
                                    asp-action="ManageAdmins">
                                     Manage Admins
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark"
+                                   asp-controller="HR"
+                                   asp-action="Employees">
+                                    Employees
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a asp-controller="HR"
+                                   asp-action="ViewAttendance"
+                                   class="nav-link">
+                                    Attendance
                                 </a>
                             </li>
                         }

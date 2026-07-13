@@ -26,12 +26,9 @@ namespace CRMPortal.Controllers
                     return RedirectToAction("Login", "Account");
                 }
 
-                int userId =
-            Convert.ToInt32(
-                HttpContext.Session.GetInt32("UserId"));
+                int userId = Convert.ToInt32(HttpContext.Session.GetInt32("UserId"));
 
-                ViewBag.Files =
-                    _context.EmployeeFiles
+                ViewBag.Files =  _context.EmployeeFiles
                     .Where(x => x.UserId == userId)
                     .OrderByDescending(x => x.UploadedDate)
                     .ToList(); 

@@ -1,4 +1,4 @@
-﻿@model CRMPortal.Models.MasterEmployee
+﻿@model CRMPortal.ViewModels.HRDashboardViewModel
 
 @{
     ViewData["Title"] = "HR Dashboard";
@@ -108,10 +108,10 @@
 
     <div class="row">
 
-        <div class="col-md-4">
+        <div class="col-lg-6">
 
             <!-- Employee Form -->
-            <div class="card shadow">
+            <div class="card shadow mb-4">
 
                 <div class="card-header bg-primary text-white">
 
@@ -120,125 +120,414 @@
                 </div>
 
                 <div class="card-body">
+                    <form asp-action="@(Model.MasterEmployee.EmployeeId == 0 ? "AddEmployee" : "UpdateEmployee")"
+                          method="post">
 
-                    <form asp-action="AddEmployee"
+                            <input type="hidden" asp-for="MasterEmployee.EmployeeId" />
+
+                            <div class="mb-3">
+
+                                <label>Employee Code</label>
+                                <input asp-for="MasterEmployee.EmployeeCode" placeholder="EMP0001" class="form-control" />
+
+                            </div>
+
+                            <div class="mb-3">
+
+                                <label>First Name</label>
+
+                                <input asp-for="MasterEmployee.FirstName" placeholder="Frist Name" class="form-control" />
+
+                            </div>
+
+                            <div class="mb-3">
+
+                                <label>Last Name</label>
+
+                                <input asp-for="MasterEmployee.LastName" placeholder="Last Name" class="form-control" />
+
+                            </div>
+
+                            <div class="mb-3">
+
+                                <label>Full Name</label>
+
+                                <input asp-for="MasterEmployee.FullName" placeholder="Full Name" class="form-control" />
+
+                            </div>
+
+                            <div class="mb-3">
+
+                                <label>Email</label>
+
+                                <input asp-for="MasterEmployee.Email" placeholder="Email" class="form-control" />
+
+                            </div>
+
+                            <div class="mb-3">
+
+                                <label>Mobile Number</label>
+
+                                <input asp-for="MasterEmployee.MobileNumber" class="form-control" maxlength="10" />
+
+                            </div>
+
+                            <div class="mb-3">
+
+                                <label>Department</label>
+
+                                <input asp-for="MasterEmployee.Department" class="form-control" />
+
+                            </div>
+
+                            <div class="mb-3">
+
+                                <label>Designation</label>
+
+                                <input asp-for="MasterEmployee.Designation" class="form-control" />
+
+                            </div>
+
+                            <div class="mb-3">
+
+                                <label>Gender</label>
+
+                                <select asp-for="MasterEmployee.Gender" class="form-control">
+
+                                    <option>Male</option>
+
+                                    <option>Female</option>
+
+                                    <option>Other</option>
+
+                                </select>
+
+                            </div>
+
+                            <div class="mb-3">
+
+                                <label>Date Of Birth</label>
+
+                                <input asp-for="MasterEmployee.DateOfBirth" type="date" class="form-control" />
+
+                            </div>
+
+                            <div class="mb-3">
+                                <label>Joining Date</label>
+                                <input asp-for="MasterEmployee.JoiningDate" type="date" class="form-control" />
+
+                            </div>
+
+                            <div class="mb-3">
+                                <label>Salary</label>
+                                <input asp-for="MasterEmployee.Salary" class="form-control" />
+
+                            </div>
+
+                            <div class="mb-3">
+
+                                <label>Status</label>
+
+                                <select asp-for="MasterEmployee.EmployeeStatus" class="form-control">
+
+                                    <option>Active</option>
+
+                                    <option>Inactive</option>
+
+                                </select>
+
+                            </div>
+
+                            <div class="mb-3">
+
+                                <label>Blood Group</label>
+
+                                <select asp-for="MasterEmployee.BloodGroup" class="form-control">
+
+                                    <option value="">--Select Blood Group--</option>
+
+                                    <option>A+</option>
+                                    <option>A-</option>
+                                    <option>B+</option>
+                                    <option>B-</option>
+                                    <option>AB+</option>
+                                    <option>AB-</option>
+                                    <option>O+</option>
+                                    <option>O-</option>
+
+                                </select>
+
+                            </div>
+
+                            <div class="mb-3">
+
+                                <label>Marital Status</label>
+
+                                <select asp-for="MasterEmployee.MaritalStatus" class="form-control">
+
+                                    <option value="">--Select Marital Status--</option>
+
+                                    <option>Single</option>
+                                    <option>Married</option>
+                                    <option>Divorced</option>
+                                    <option>Widowed</option>
+
+                                </select>
+
+                            </div>
+
+                            <div class="mb-3">
+
+                                <label>Alternate Mobile Number</label>
+
+                                <input asp-for="MasterEmployee.AlternateMobile" class="form-control" maxlength="10" />
+
+                            </div>
+
+                            <div class="mb-3">
+
+                                <label>Emergency Contact Name</label>
+
+                                <input asp-for="MasterEmployee.EmergencyContactName"
+                                       class="form-control" />
+
+                            </div>
+
+                            <div class="mb-3">
+
+                                <label>Emergency Contact Number</label>
+
+                                <input asp-for="MasterEmployee.EmergencyContact"
+                                       class="form-control" />
+
+                            </div>
+
+                            <div class="mb-3">
+
+                                <label>Address</label>
+
+                                <textarea asp-for="MasterEmployee.AddressLine1"
+                                          class="form-control"
+                                          rows="3"></textarea>
+
+                            </div>
+
+                            <div class="mb-3">
+
+                                <label>City</label>
+
+                                <input asp-for="MasterEmployee.City"
+                                       class="form-control" />
+
+                            </div>
+
+                            <div class="mb-3">
+
+                                <label>State</label>
+
+                                <input asp-for="MasterEmployee.State"
+                                       class="form-control" />
+
+                            </div>
+
+                            <div class="mb-3">
+
+                                <label>Country</label>
+
+                                <input asp-for="MasterEmployee.Country"
+                                       class="form-control" />
+
+                            </div>
+
+                            <div class="mb-3">
+
+                                <label>Pincode</label>
+
+                                <input asp-for="MasterEmployee.Pincode"
+                                       class="form-control" />
+
+                            </div>
+
+                            <div class="mb-3">
+
+                                <label>Employment Type</label>
+
+                                <select asp-for="MasterEmployee.EmploymentType"
+                                        class="form-control">
+
+                                    <option value="">--Select Employment Type--</option>
+
+                                    <option>Permanent</option>
+                                    <option>Contract</option>
+                                    <option>Intern</option>
+                                    <option>Part Time</option>
+
+                                </select>
+
+                            </div>
+
+                            <div class="mb-3">
+
+                                <label>Reporting Manager</label>
+
+                                <input asp-for="MasterEmployee.ReportingManager"
+                                       class="form-control" />
+
+                            </div>
+
+                            <div class="mb-3">
+
+                                <label>Work Location</label>
+
+                                <input asp-for="MasterEmployee.WorkLocation"
+                                       class="form-control" />
+
+                            </div>
+
+                            <div class="mb-3">
+
+                                <label>Shift</label>
+
+                                <select asp-for="MasterEmployee.Shift"
+                                        class="form-control">
+
+                                    <option value="">--Select Shift--</option>
+
+                                    <option>Morning</option>
+                                    <option>General</option>
+                                    <option>Evening</option>
+                                    <option>Night</option>
+
+                                </select>
+
+                            </div>
+
+                            <div class="mb-3">
+
+                                <label>Aadhaar Number</label>
+
+                                <input asp-for="MasterEmployee.AadhaarNumber"
+                                       class="form-control" />
+
+                            </div>
+
+                            <div class="mb-3">
+
+                                <label>PAN Number</label>
+
+                                <input asp-for="MasterEmployee.PANNumber"
+                                       class="form-control" />
+
+                            </div>
+
+                            <div class="mb-3">
+
+                                <label>Passport Number</label>
+
+                                <input asp-for="MasterEmployee.PassportNumber"
+                                       class="form-control" />
+
+                            </div>
+
+                            <div class="mb-3">
+
+                                <label>Bank Name</label>
+
+                                <input asp-for="MasterEmployee.BankName"
+                                       class="form-control" />
+
+                            </div>
+
+                            <div class="mb-3">
+
+                                <label>Account Number</label>
+
+                                <input asp-for="MasterEmployee.AccountNumber"
+                                       class="form-control" />
+
+                            </div>
+
+                            <div class="mb-3">
+
+                                <label>IFSC Code</label>
+
+                                <input asp-for="MasterEmployee.IFSCCode"
+                                       class="form-control" />
+
+                            </div>
+
+                            @if (Model.MasterEmployee.EmployeeId == 0)
+                            {
+                                <button class="btn btn-success w-100">
+                                    Save Employee
+                                </button>
+                            }
+                            else
+                            {
+                                <button class="btn btn-warning w-100">
+                                    Update Employee
+                                </button>
+                            }
+
+                        </form>
+
+                </div>
+
+            </div>
+            
+
+        </div>
+        <div class="col-lg-6">
+
+            <div class="card shadow">
+
+                <div class="card-header bg-primary text-white">
+
+                    <h4>Employee Attendance</h4>
+
+                </div>
+
+                <div class="card-body">
+
+                    <form asp-action="SaveAttendance"
                           method="post">
 
                         <div class="mb-3">
 
-                            <label>Employee Code</label>
+                            <label>Employee</label>
 
-                            <input asp-for="EmployeeCode"
-                                   class="form-control" />
+                            <input type="text"
+                                   id="employeeName"
+                                   class="form-control"
+                                   list="employeeList"
+                                   placeholder="Search Employee"
+                                   autocomplete="off"
+                                   required />
 
-                        </div>
+                            <input type="hidden"
+                                   asp-for="EmployeeAttendance.EmployeeId"
+                                   id="EmployeeId" />
 
-                        <div class="mb-3">
+                            <datalist id="employeeList">
 
-                            <label>First Name</label>
+                                @foreach (var emp in Model.EmployeeList)
+                                {
+                                    <option data-id="@emp.EmployeeId"
+                                            value="@emp.FullName"></option>
+                                }
 
-                            <input asp-for="FirstName"
-                                   class="form-control" />
-
-                        </div>
-
-                        <div class="mb-3">
-
-                            <label>Last Name</label>
-
-                            <input asp-for="LastName"
-                                   class="form-control" />
-
-                        </div>
-
-                        <div class="mb-3">
-
-                            <label>Full Name</label>
-
-                            <input asp-for="FullName"
-                                   class="form-control" />
+                            </datalist>
 
                         </div>
 
                         <div class="mb-3">
 
-                            <label>Email</label>
+                            <label class="form-label">Attendance Date</label>
 
-                            <input asp-for="Email"
-                                   class="form-control" />
-
-                        </div>
-
-                        <div class="mb-3">
-
-                            <label>Mobile Number</label>
-
-                            <input asp-for="MobileNumber"
-                                   class="form-control" />
-
-                        </div>
-
-                        <div class="mb-3">
-
-                            <label>Department</label>
-
-                            <input asp-for="Department"
-                                   class="form-control" />
-
-                        </div>
-
-                        <div class="mb-3">
-
-                            <label>Designation</label>
-
-                            <input asp-for="Designation"
-                                   class="form-control" />
-
-                        </div>
-
-                        <div class="mb-3">
-
-                            <label>Gender</label>
-
-                            <select asp-for="Gender"
-                                    class="form-control">
-
-                                <option>Male</option>
-
-                                <option>Female</option>
-
-                                <option>Other</option>
-
-                            </select>
-
-                        </div>
-
-                        <div class="mb-3">
-
-                            <label>Date Of Birth</label>
-
-                            <input asp-for="DateOfBirth"
+                            <input asp-for="EmployeeAttendance.AttendanceDate"
                                    type="date"
-                                   class="form-control" />
-
-                        </div>
-
-                        <div class="mb-3">
-
-                            <label>Joining Date</label>
-
-                            <input asp-for="JoiningDate"
-                                   type="date"
-                                   class="form-control" />
-
-                        </div>
-
-                        <div class="mb-3">
-
-                            <label>Salary</label>
-
-                            <input asp-for="Salary"
-                                   class="form-control" />
+                                   class="form-control"
+                                   required />
 
                         </div>
 
@@ -246,19 +535,30 @@
 
                             <label>Status</label>
 
-                            <select asp-for="EmployeeStatus" class="form-control">
+                            <select asp-for="EmployeeAttendance.Status" class="form-control" required>
 
-                                <option>Active</option>
+                                <option value="">Select Status</option>
 
-                                <option>Inactive</option>
+                                <option value="Present">Present</option>
+
+                                <option value="Absent">Absent</option>
 
                             </select>
 
                         </div>
 
-                        <button class="btn btn-success w-100">
+                        <div class="mb-3">
 
-                            Save Employee
+                            <label>Remarks</label>
+
+                            <textarea asp-for="EmployeeAttendance.Remarks"
+                                      class="form-control"></textarea>
+
+                        </div>
+
+                        <button class="btn btn-success">
+
+                            Save Attendance
 
                         </button>
 
@@ -273,5 +573,29 @@
        
 
     </div>
-
 </div>
+
+<script>
+
+    document.getElementById("employeeName").addEventListener("change", function () {
+
+        var employeeName = this.value;
+
+        var options = document.querySelectorAll("#employeeList option");
+
+        document.getElementById("EmployeeId").value = "";
+
+        options.forEach(function(option) {
+
+            if(option.value === employeeName){
+
+                document.getElementById("EmployeeId").value =
+                    option.getAttribute("data-id");
+
+            }
+
+        });
+
+    });
+
+</script>

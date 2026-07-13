@@ -5,19 +5,13 @@ namespace CRMPortal.Services
 {
     public class EmailService
     {
-        public void SendEmail(
-            string toEmail,
-            string subject,
-            string body)
+        public void SendEmail( string toEmail, string subject, string body)
         {
             try
             {
-                MailMessage mail =
-                    new MailMessage();
+                MailMessage mail = new MailMessage();
 
-                mail.From =
-                    new MailAddress(
-                        "noreply@marstechsol.com");
+                mail.From = new MailAddress("noreply@marstechsol.com");
 
                 mail.To.Add(toEmail);
 
@@ -27,15 +21,9 @@ namespace CRMPortal.Services
 
                 mail.IsBodyHtml = true;
 
-                SmtpClient smtp =
-                    new SmtpClient(
-                        "mail.marstechsol.com",
-                        465);
+                SmtpClient smtp =  new SmtpClient("mail.marstechsol.com", 465);
 
-                smtp.Credentials =
-                    new NetworkCredential(
-                        "noreply@marstechsol.com",
-                        "YOUR_PASSWORD_HERE");
+                smtp.Credentials = new NetworkCredential("noreply@marstechsol.com", "YOUR_PASSWORD_HERE");
 
                 smtp.EnableSsl = true;
 
