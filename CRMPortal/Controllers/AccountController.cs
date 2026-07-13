@@ -49,7 +49,7 @@ namespace CRMPortal.Controllers
             {
                 return RedirectToAction("Dashboard", "Admin");
             }
-            else if (user.RoleId == 5)
+            else if (user.RoleId == 4)
             {
                 return RedirectToAction("Dashboard", "HR");
             }
