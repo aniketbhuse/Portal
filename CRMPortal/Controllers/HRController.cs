@@ -79,13 +79,13 @@ namespace CRMPortal.Controllers
         {
             try
             {
-<<<<<<< HEAD
+
                 int? roleId = HttpContext.Session.GetInt32("RoleId");
 
                 if (roleId != 5 && roleId != 3)
-=======
+
                 if(HttpContext.Session.GetInt32("RoleId") != 4)
->>>>>>> ebcbf18fa9901ce4bba8197b382adb7da3c7740a
+
                 {
                     return RedirectToAction("Login", "Account");
                 }
