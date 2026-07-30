@@ -85,7 +85,11 @@ namespace CRMPortal.Controllers
 
                 if (roleId != 5 && roleId != 3)
 
+<<<<<<< HEAD
                 if(HttpContext.Session.GetInt32("RoleId") != 5)
+=======
+                if(HttpContext.Session.GetInt32("RoleId") != 4)
+>>>>>>> 65685ce3699012548e12b30a81fea46421d665a9
 
                 {
                     return RedirectToAction("Login", "Account");
