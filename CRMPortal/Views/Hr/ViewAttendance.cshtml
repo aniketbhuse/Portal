@@ -1,5 +1,111 @@
 ﻿@model CRMPortal.ViewModels.AttendanceReportViewModel
 
+<style>
+    /* Main Container */
+    .container-fluid {
+        max-width: 1400px;
+        margin: auto;
+    }
+
+    /* Card */
+    .card {
+        border-radius: 8px;
+        margin-bottom: 12px;
+    }
+
+    .card-header {
+        padding: 8px 15px;
+    }
+
+        .card-header h4,
+        .card-header h5 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+    .card-body {
+        padding: 15px;
+    }
+
+    /* Dashboard Summary Cards */
+    .card h6 {
+        font-size: 13px;
+        margin-bottom: 5px;
+    }
+
+    .card h2 {
+        font-size: 24px;
+        margin: 0;
+        font-weight: bold;
+    }
+
+    /* Form Controls */
+    .form-control,
+    .form-select {
+        height: 34px;
+        font-size: 13px;
+        padding: 4px 10px;
+    }
+
+    textarea.form-control {
+        height: 70px;
+    }
+
+    /* Labels */
+    label {
+        font-size: 13px;
+        font-weight: 600;
+        margin-bottom: 3px;
+    }
+
+    /* Reduce spacing between fields */
+    .mb-3 {
+        margin-bottom: 10px !important;
+    }
+
+    /* Buttons */
+    .btn {
+        height: 36px;
+        font-size: 14px;
+        padding: 5px 15px;
+    }
+
+    /* Attendance Card */
+    #employeeName {
+        height: 34px;
+    }
+
+    /* Reduce row spacing */
+    .row {
+        --bs-gutter-y: 0.7rem;
+    }
+
+    .cardview{
+        width: 80%;
+        margin-left: 70px;
+    }
+
+    .attendances{
+        width: 200px;
+        margin-left: 80%;
+        margin-top: -29px;
+    }
+   
+</style>
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @TempData["Error"]
+        <button type="button"
+                class="btn-close"
+                data-bs-dismiss="alert"
+                aria-label="Close">
+        </button>
+    </div>
+}
+
 <div class="card shadow">
 
     <div class="card-header bg-primary text-white">
@@ -10,8 +116,7 @@
 
     <div class="card-body">
 
-        <form asp-action="ViewAttendance"
-              method="post">
+        <form asp-action="ViewAttendance" method="post">
 
             <div class="row">
 
@@ -19,10 +124,11 @@
 
                     <label>Employee</label>
 
-                    <select asp-for="EmployeeId"
-                            class="form-control">
+                    <select asp-for="EmployeeId" class="form-control">
 
                         <option value="">Select Employee</option>
+
+                        <option value="0"> All Employees</option>
 
                         @foreach (var emp in Model.EmployeeList)
                         {
@@ -76,7 +182,7 @@
 
 </div>
 
-<div class="row mt-4">
+<div class="row mt-4 cardview">
 
     <div class="col-md-3">
 
@@ -160,11 +266,11 @@
 
 </div>
 
-<div class="row mt-4">
+<div class="row mt-4 cardview">
 
     <div class="col-md-3">
 
-        <div class="card shadow border-start border-primary border-4">
+        <div class="card shadow border-start border-primary">
 
             <div class="card-body text-center">
 
@@ -184,7 +290,7 @@
 
     <div class="col-md-3">
 
-        <div class="card shadow border-start border-info border-4">
+        <div class="card shadow border-start border-info">
 
             <div class="card-body text-center">
 
@@ -204,7 +310,7 @@
 
     <div class="col-md-3">
 
-        <div class="card shadow border-start border-danger border-4">
+        <div class="card shadow border-start border-danger">
 
             <div class="card-body text-center">
 
@@ -224,7 +330,7 @@
 
     <div class="col-md-3">
 
-        <div class="card shadow border-start border-success border-4">
+        <div class="card shadow border-start border-success">
 
             <div class="card-body text-center">
 
@@ -244,7 +350,7 @@
 
 </div>
 
-<div class="row mt-4">
+<div class="row mt-4 cardview">
 
     <div class="col-md-3">
         <div class="card text-center shadow">
@@ -289,6 +395,34 @@
     <div class="card-header bg-success text-white">
 
         Attendance History
+
+        <!-- Export Button -->
+
+        <div class="text-end attendances">
+
+            <form asp-action="ExportAttendanceExcel"
+                  asp-controller="HR"
+                  method="post">
+
+                <input type="hidden"
+                       asp-for="EmployeeId" />
+
+                <input type="hidden"
+                       asp-for="FromDate" />
+
+                <input type="hidden"
+                       asp-for="ToDate" />
+
+                <button type="submit"
+                        class="btn btn-success">
+
+                    Export Attendance to Excel
+
+                </button>
+
+            </form>
+
+        </div>
 
     </div>
 

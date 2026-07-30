@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using System.Drawing;
+using ClosedXML.Excel;
 
 namespace CRMPortal.Controllers
 {
@@ -24,7 +25,7 @@ namespace CRMPortal.Controllers
         {
             try
             {
-                if (HttpContext.Session.GetInt32("RoleId") != 4)
+                if (HttpContext.Session.GetInt32("RoleId") != 5)
                 {
                     return RedirectToAction("Login", "Account");
                 }
@@ -79,13 +80,13 @@ namespace CRMPortal.Controllers
         {
             try
             {
-<<<<<<< HEAD
+
                 int? roleId = HttpContext.Session.GetInt32("RoleId");
 
                 if (roleId != 5 && roleId != 3)
-=======
-                if(HttpContext.Session.GetInt32("RoleId") != 4)
->>>>>>> ebcbf18fa9901ce4bba8197b382adb7da3c7740a
+
+                if(HttpContext.Session.GetInt32("RoleId") != 5)
+
                 {
                     return RedirectToAction("Login", "Account");
                 }
@@ -271,7 +272,7 @@ namespace CRMPortal.Controllers
         {
             try
             {
-                if (HttpContext.Session.GetInt32("RoleId") != 4)
+                if (HttpContext.Session.GetInt32("RoleId") != 5)
                 {
                     return RedirectToAction("Login", "Account");
                 }
@@ -515,6 +516,8 @@ namespace CRMPortal.Controllers
                 ToDate = DateOnly.FromDateTime(DateTime.Today)
             };
 
+
+
             model.EmployeeList = _context.MasterEmployee
                                          .Where(x => !x.IsDeleted)
                                          .OrderBy(x => x.FullName)
@@ -529,6 +532,13 @@ namespace CRMPortal.Controllers
         [HttpPost]
         public IActionResult ViewAttendance(AttendanceReportViewModel model)
         {
+            if (model.FromDate > model.ToDate)
+            {
+                TempData["Error"] = "From Date cannot be greater than To Date.";
+
+                return RedirectToAction("ViewAttendance");
+            }
+
             model.EmployeeList = _context.MasterEmployee
                                          .Where(x => !x.IsDeleted)
                                          .OrderBy(x => x.FullName)
@@ -545,9 +555,7 @@ namespace CRMPortal.Controllers
 
             // Get Employee Salary
 
-            var employee = _context.MasterEmployee
-                .FirstOrDefault(x =>
-                    x.EmployeeId == model.EmployeeId);
+            var employee = _context.MasterEmployee.FirstOrDefault(x => x.EmployeeId == model.EmployeeId);
 
             if (employee != null)
             {
@@ -584,22 +592,15 @@ namespace CRMPortal.Controllers
 
             // Working Days
 
-            model.WorkingDays =
-                model.TotalDays -
-                saturday -
-                sunday;
+            model.WorkingDays = model.TotalDays - saturday - sunday;
 
 
             // Present Count
-            model.PresentDays =
-                model.AttendanceList
-                .Count(x => x.Status == "Present");
+            model.PresentDays = model.AttendanceList.Count(x => x.Status == "Present");
 
 
             // Absent Count
-            model.AbsentDays =
-                model.AttendanceList
-                .Count(x => x.Status == "Absent");
+            model.AbsentDays = model.AttendanceList.Count(x => x.Status == "Absent");
 
 
             // Attendance Percentage
@@ -631,6 +632,205 @@ namespace CRMPortal.Controllers
                     model.SalaryDeduction;
             }
             return View(model);
+        }
+
+        [HttpPost]
+        public IActionResult ExportAttendanceExcel(AttendanceReportViewModel model)
+        {
+            try
+            {
+                // HR and Super Admin access
+                int? roleId = HttpContext.Session.GetInt32("RoleId");
+
+                if (roleId != 5 && roleId != 3)
+                {
+                    return RedirectToAction("Login", "Account");
+                }
+
+                // Validate dates
+                if (model.FromDate > model.ToDate)
+                {
+                    TempData["Error"] = "From Date cannot be greater than To Date.";
+
+                    return RedirectToAction("ViewAttendance");
+                }
+
+                // Get employees
+                var employeesQuery = _context.MasterEmployee.Where(x => !x.IsDeleted);
+
+                // If specific employee selected
+                // EmployeeId = 0 means All Employees
+                if (model.EmployeeId != 0)
+                {
+                    employeesQuery = employeesQuery.Where(x => x.EmployeeId == model.EmployeeId);
+                }
+
+                var employees = employeesQuery
+                    .OrderBy(x => x.EmployeeCode)
+                    .ToList();
+
+                if (!employees.Any())
+                {
+                    TempData["Error"] = "No employee found.";
+                    return RedirectToAction("ViewAttendance");
+                }
+
+                // Get attendance records
+                var attendanceList = _context.EmployeeAttendance
+                    .Where(x =>
+                        x.AttendanceDate >= model.FromDate &&
+                        x.AttendanceDate <= model.ToDate &&
+                        !x.IsDeleted)
+                    .ToList();
+
+                // Create Excel Workbook
+                using (var workbook = new XLWorkbook())
+                {
+                    var worksheet = workbook.Worksheets.Add("Attendance Report");
+
+                    // ================================
+                    // HEADER
+                    // ================================
+
+                    worksheet.Cell(1, 1).Value = "Employee Code";
+                    worksheet.Cell(1, 2).Value = "Employee Name";
+
+                    // ================================
+                    // DATE COLUMNS
+                    // ================================
+
+                    int column = 3;
+
+                    DateOnly currentDate = model.FromDate;
+
+                    while (currentDate <= model.ToDate)
+                    {
+                        // Example:
+                        // 01-Jul-2026
+                        // 02-Jul-2026
+                        // 03-Jul-2026
+
+                        worksheet.Cell(1, column).Value =
+                            currentDate.ToString("dd-MMM-yyyy");
+
+                        // Move to next date column
+                        column++;
+
+                        currentDate = currentDate.AddDays(1);
+                    }
+
+                    // ================================
+                    // EMPLOYEE DATA
+                    // ================================
+
+                    int row = 2;
+
+                    foreach (var employee in employees)
+                    {
+                        // Employee Code
+                        worksheet.Cell(row, 1).Value =
+                            employee.EmployeeCode;
+
+                        // Employee Name
+                        worksheet.Cell(row, 2).Value =
+                            employee.FullName;
+
+                        column = 3;
+
+                        currentDate = model.FromDate;
+
+                        while (currentDate <= model.ToDate)
+                        {
+                            // Find attendance for this employee
+                            // on the selected date
+
+                            var attendance = attendanceList.FirstOrDefault(x =>
+                                x.EmployeeId == employee.EmployeeId &&
+                                x.AttendanceDate == currentDate);
+
+                            // Attendance Status
+
+                            if (attendance != null)
+                            {
+                                worksheet.Cell(row, column).Value = attendance.Status;
+                            }
+                            else
+                            {
+                                worksheet.Cell(row, column).Value = "Not Marked";
+                            }
+
+                            // Move to next date column
+                            column++;
+
+                            currentDate = currentDate.AddDays(1);
+                        }
+
+                        row++;
+                    }
+
+                    // ================================
+                    // FORMATTING
+                    // ================================
+
+                    var headerRange = worksheet.Range( 1,1,1,column - 1);
+
+                    // Bold Header
+                    headerRange.Style.Font.Bold = true;
+
+                    // Header Background
+                    headerRange.Style.Fill.BackgroundColor = XLColor.LightBlue;
+
+                    // Header Alignment
+                    headerRange.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+
+                    headerRange.Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
+
+                    // ================================
+                    // BORDERS
+                    // ================================
+
+                    var usedRange = worksheet.RangeUsed();
+
+                    if (usedRange != null)
+                    {
+                        usedRange.Style.Border.OutsideBorder =  XLBorderStyleValues.Thin;
+
+                        usedRange.Style.Border.InsideBorder =  XLBorderStyleValues.Thin;
+                    }
+
+                    // ================================
+                    // AUTO-SIZE COLUMNS
+                    // ================================
+
+                    worksheet.Columns().AdjustToContents();
+
+                    // ================================
+                    // FREEZE HEADER AND EMPLOYEE COLUMNS
+                    // ================================
+
+                    worksheet.SheetView.FreezeRows(1);
+
+                    worksheet.SheetView.FreezeColumns(2);
+
+                    // ================================
+                    // RETURN EXCEL FILE
+                    // ================================
+
+                    using (var stream = new MemoryStream())
+                    {
+                        workbook.SaveAs(stream);
+
+                        string fileName = "Attendance_Report_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + ".xlsx";
+
+                        return File( stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = ex.Message;
+                return RedirectToAction("ViewAttendance");
+            }
         }
     }
 }

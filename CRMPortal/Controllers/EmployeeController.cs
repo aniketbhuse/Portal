@@ -55,15 +55,11 @@ namespace CRMPortal.Controllers
                     return RedirectToAction("Login", "Account");
                 }
 
-                int userId =
-                    Convert.ToInt32(
-                        HttpContext.Session.GetInt32("UserId"));
+                int userId = Convert.ToInt32(HttpContext.Session.GetInt32("UserId"));
 
-                ViewBag.LeaveTypes =
-                    _context.LeaveTypes.ToList();
+                ViewBag.LeaveTypes = _context.LeaveTypes.ToList();
 
-                ViewBag.LeaveRequests =
-                    _context.LeaveRequests
+                ViewBag.LeaveRequests = _context.LeaveRequests
                             .Where(x => x.UserId == userId)
                             .OrderByDescending(x => x.CreatedDate)
                             .ToList();
@@ -74,9 +70,7 @@ namespace CRMPortal.Controllers
             {
                 TempData["Error"] = "Something went wrong.";
 
-                return RedirectToAction(
-                    "Dashboard",
-                    "Employee");
+                return RedirectToAction( "Dashboard", "Employee");
             }
         }
 
@@ -94,16 +88,14 @@ namespace CRMPortal.Controllers
 
                 if (model.FromDate < today || model.ToDate < today)
                 {
-                    TempData["Error"] =
-                        "Leave dates cannot be earlier than today.";
+                    TempData["Error"] = "Leave dates cannot be earlier than today.";
 
                     return RedirectToAction("ApplyLeave");
                 }
 
                 if (model.ToDate < model.FromDate)
                 {
-                    TempData["Error"] =
-                        "To Date cannot be earlier than From Date.";
+                    TempData["Error"] = "To Date cannot be earlier than From Date.";
 
                     return RedirectToAction("ApplyLeave");
                 }
@@ -163,8 +155,7 @@ namespace CRMPortal.Controllers
                         body);
                 }*/
 
-                TempData["Success"] =
-                    "Leave request submitted successfully.";
+                TempData["Success"] = "Leave request submitted successfully.";
 
                 return RedirectToAction("ApplyLeave");
             }
@@ -185,8 +176,7 @@ namespace CRMPortal.Controllers
             {
                 if (File == null || File.Length == 0)
                 {
-                    TempData["Error"] =
-                        "Please select a file.";
+                    TempData["Error"] = "Please select a file.";
 
                     return RedirectToAction("Dashboard");
                 }
@@ -196,18 +186,14 @@ namespace CRMPortal.Controllers
                 if (extension != ".xlsx" &&
                     extension != ".xls")
                 {
-                    TempData["Error"] =
-                        "Only Excel files (.xlsx or .xls) are allowed.";
+                    TempData["Error"] = "Only Excel files (.xlsx or .xls) are allowed.";
 
                     return RedirectToAction("Dashboard");
                 }
 
-                int userId =
-                    Convert.ToInt32(
-                        HttpContext.Session.GetInt32("UserId"));
+                int userId = Convert.ToInt32(HttpContext.Session.GetInt32("UserId"));
 
-                string folderPath =
-                    Path.Combine(
+                string folderPath = Path.Combine(
                         _environment.WebRootPath,
                         "Uploads",
                         "CDFiles");
@@ -217,10 +203,7 @@ namespace CRMPortal.Controllers
                     Directory.CreateDirectory(folderPath);
                 }
 
-                string fileName =
-                    Guid.NewGuid().ToString()
-                    + "_"
-                    + File.FileName;
+                string fileName = Guid.NewGuid().ToString() + "_" + File.FileName;
 
                 string fullPath =Path.Combine( folderPath,fileName);
 
@@ -229,8 +212,7 @@ namespace CRMPortal.Controllers
                     File.CopyTo(stream);
                 }
 
-                EmployeeFiles employeeFile =
-                    new EmployeeFiles
+                EmployeeFiles employeeFile = new EmployeeFiles
                     {
                         UserId = userId,
                         FileName = File.FileName,
@@ -243,8 +225,7 @@ namespace CRMPortal.Controllers
 
                 _context.SaveChanges();
 
-                TempData["Success"] =
-                    "File Uploaded Successfully.";
+                TempData["Success"] = "File Uploaded Successfully.";
 
                 return RedirectToAction("Dashboard");
             }
@@ -269,8 +250,7 @@ namespace CRMPortal.Controllers
 
                 int userId = Convert.ToInt32(HttpContext.Session.GetInt32("UserId"));
 
-                var file =
-                    _context.EmployeeFiles
+                var file = _context.EmployeeFiles
                     .FirstOrDefault(x =>
                         x.FileId == id &&
                         x.UserId == userId);

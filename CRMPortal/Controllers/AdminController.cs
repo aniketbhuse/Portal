@@ -139,14 +139,11 @@ namespace CRMPortal.Controllers
 
                     leave.AdminRemarks = remarks;
 
-                    leave.ApprovedBy =
-                        HttpContext.Session.GetInt32("UserId");
+                    leave.ApprovedBy = HttpContext.Session.GetInt32("UserId");
 
-                    leave.ApprovedDate =
-                        DateTime.Now;
+                    leave.ApprovedDate = DateTime.Now;
 
-                    leave.UpdatedDate =
-                        DateTime.Now;
+                    leave.UpdatedDate = DateTime.Now;
 
                     _context.SaveChanges();
                 }
@@ -178,20 +175,16 @@ namespace CRMPortal.Controllers
 
                     leave.AdminRemarks = remarks;
 
-                    leave.ApprovedBy =
-                        HttpContext.Session.GetInt32("UserId");
+                    leave.ApprovedBy = HttpContext.Session.GetInt32("UserId");
 
-                    leave.ApprovedDate =
-                        DateTime.Now;
+                    leave.ApprovedDate = DateTime.Now;
 
-                    leave.UpdatedDate =
-                        DateTime.Now;
+                    leave.UpdatedDate = DateTime.Now;
 
                     _context.SaveChanges();
                 }
 
-                TempData["Success"] =
-                    "Leave Rejected Successfully.";
+                TempData["Success"] = "Leave Rejected Successfully.";
 
                 return RedirectToAction("LeaveRequests");
             }
@@ -360,9 +353,7 @@ namespace CRMPortal.Controllers
         {
             try
             {
-                var file =
-                    _context.EmployeeFiles
-                    .FirstOrDefault(x => x.FileId == id);
+                var file = _context.EmployeeFiles.FirstOrDefault(x => x.FileId == id);
 
                 if (file == null)
                 {
@@ -382,11 +373,9 @@ namespace CRMPortal.Controllers
 
                 if (!System.IO.File.Exists(fullPath))
                 {
-                    TempData["Error"] =
-                        "Physical file not found.";
+                    TempData["Error"] = "Physical file not found.";
 
-                    return RedirectToAction(
-                        "Dashboard");
+                    return RedirectToAction("Dashboard");
                 }
 
                 ExcelPackage.License.SetNonCommercialPersonal("CRMPortal");
@@ -423,8 +412,7 @@ namespace CRMPortal.Controllers
 
                     var headerRow = allData.FirstOrDefault();
 
-                    int totalRecords =
-                        allData.Count - 1;
+                    int totalRecords = allData.Count - 1;
 
                     var pagedData = allData
                         .Skip(((page - 1) * pageSize) + 1)
@@ -448,11 +436,9 @@ namespace CRMPortal.Controllers
             }
             catch (Exception ex)
             {
-                TempData["Error"] =
-                    ex.Message;
+                TempData["Error"] = ex.Message;
 
-                return RedirectToAction(
-                    "Dashboard");
+                return RedirectToAction("Dashboard");
             }
         }
     }
