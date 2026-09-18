@@ -55,8 +55,22 @@ namespace CRMPortal.Controllers
             }
             else if (user.RoleId == 2)
             {
+                var employee = _context.MasterEmployee
+                    .FirstOrDefault(x => x.Email == user.Email && !x.IsDeleted);
+
+                if (employee == null)
+                {
+                    TempData["Error"] = "Employee profile not found.";
+                    return RedirectToAction("Login");
+                }
+
+                HttpContext.Session.SetInt32("EmployeeId", employee.EmployeeId);
+                HttpContext.Session.SetString("EmployeeCode", employee.EmployeeCode);
+                HttpContext.Session.SetString("EmployeeFullName", employee.FullName);
+
                 return RedirectToAction("Dashboard", "Employee");
             }
+
             else
             {
                 TempData["Error"] = "Invalid Role.";
@@ -69,8 +83,8 @@ namespace CRMPortal.Controllers
         public IActionResult Logout()
         {
             HttpContext.Session.Clear();
-
-            return RedirectToAction("Login");
+            TempData["Success"] = "Logged out successfully.";
+            return RedirectToAction("Login", "Account");
         }
 
         [HttpGet]

@@ -7,6 +7,7 @@
 @if (TempData["Success"] != null)
 {
     <div class="alert alert-success alert-dismissible fade show">
+        <i class="fa-solid fa-circle-check me-2"></i>
         @TempData["Success"]
 
         <button class="btn-close"
@@ -18,6 +19,7 @@
 @if (TempData["Error"] != null)
 {
     <div class="alert alert-danger alert-dismissible fade show">
+        <i class="fa-solid fa-circle-exclamation me-2"></i>
         @TempData["Error"]
 
         <button class="btn-close"
@@ -26,32 +28,86 @@
     </div>
 }
 
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
+
+<link rel="stylesheet"
+      href="~/css/ApplyLeave.css"
+      asp-append-version="true" />
+
 <div class="container-fluid mt-3 top" style="margin-left: -110px;">
 
     <!-- Summary Card -->
 
     <div class="row mb-3">
+        <div class="col-md-8">
 
-        <div class="col-md-3">
+            <div class="row">
 
-            <div class="card shadow border-0">
+                <div class="col-md-4">
 
-                <div class="card-body">
+                    <div class="card shadow text-center dashboard-card">
 
-                    <h6>Total Employees</h6>
+                        <div class="card-body">
 
-                    <h2 class="text-primary">
+                            <i class="fa-solid fa-users summary-icon text-primary"></i>
 
-                        @Model.Count
+                            <h6>Total Employees</h6>
 
-                    </h2>
+                            <h2 class="text-primary">
+                                @ViewBag.TotalEmployees
+                            </h2>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="col-md-4">
+
+                    <div class="card shadow text-center dashboard-card">
+
+                        <div class="card-body">
+
+                            <i class="fa-solid fa-user-check summary-icon text-success"></i>
+
+                            <h6>Active Employees</h6>
+
+                            <h2 class="text-success">
+                                @ViewBag.ActiveEmployees
+                            </h2>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="col-md-4">
+
+                    <div class="card shadow text-center dashboard-card">
+
+                        <div class="card-body">
+
+                            <i class="fa-solid fa-user-xmark summary-icon text-danger"></i>
+
+                            <h6>Inactive Employees</h6>
+
+                            <h2 class="text-danger">
+                                @ViewBag.InactiveEmployees
+                            </h2>
+
+                        </div>
+
+                    </div>
 
                 </div>
 
             </div>
-
         </div>
     </div>
+
 
     <!-- Employee Table -->
 
@@ -60,17 +116,20 @@
         <div class="card-header bg-primary text-white">
 
             <h4 class="mb-0">
-
+                <i class="fa-solid fa-users me-2"></i>
                 Employee Master List
-
             </h4>
+
             <a asp-action="ExportEmployeesToExcel"
                class="btn btn-success exporttoexcel">
 
+                <i class="fa-solid fa-file-excel me-1"></i>
                 Export to Excel
 
             </a>
+
         </div>
+
 
         <div class="card-body p-0">
 
@@ -81,82 +140,46 @@
                     <thead class="table-dark">
 
                         <tr>
-
                             <th>Action</th>
-
-                            <th>Employee Code</th>
-
-                            <th>First Name</th>
-
-                            <th>Last Name</th>
-
-                            <th>Full Name</th>
-
-                            <th>Email</th>
-
-                            <th>Gender</th>
-
-                            <th>DOB</th>
-
-                            <th>Blood Group</th>
-
-                            <th>Marital Status</th>
-
-                            <th>Mobile</th>
-
-                            <th>Alternate Mobile</th>
-
-                            <th>Emergency Contact Name</th>
-
-                            <th>Emergency Contact</th>
-
-                            <th>Address</th>
-
-                            <th>City</th>
-
-                            <th>State</th>
-
-                            <th>Country</th>
-
-                            <th>Pincode</th>
-
-                            <th>Department</th>
-
-                            <th>Designation</th>
-
-                            <th>Joining Date</th>
-
-                            <th>Employment Type</th>
-
-                            <th>Reporting Manager</th>
-
-                            <th>Work Location</th>
-
-                            <th>Shift</th>
-
-                            <th>Salary</th>
-
-                            <th>Aadhaar</th>
-
-                            <th>PAN</th>
-
-                            <th>Passport</th>
-
-                            <th>Bank</th>
-
-                            <th>Account No.</th>
-
-                            <th>IFSC</th>
-
                             <th>Status</th>
-
+                            <th>Employee Code</th>
+                            <th>First Name</th>
+                            <th>Last Name</th>
+                            <th>Full Name</th>
+                            <th>Email</th>
+                            <th>Gender</th>
+                            <th>DOB</th>
+                            <th>Blood Group</th>
+                            <th>Marital Status</th>
+                            <th>Mobile</th>
+                            <th>Alternate Mobile</th>
+                            <th>Emergency Contact Name</th>
+                            <th>Emergency Contact</th>
+                            <th>Address</th>
+                            <th>City</th>
+                            <th>State</th>
+                            <th>Country</th>
+                            <th>Pincode</th>
+                            <th>Department</th>
+                            <th>Designation</th>
+                            <th>Joining Date</th>
+                            <th>Employment Type</th>
+                            <th>Reporting Manager</th>
+                            <th>Work Location</th>
+                            <th>Shift</th>
+                            <th>Salary</th>
+                            <th>Aadhaar</th>
+                            <th>PAN</th>
+                            <th>Passport</th>
+                            <th>Bank</th>
+                            <th>Account No.</th>
+                            <th>IFSC</th>
                             <th>Created</th>
-
                             <th>Updated</th>
-
                         </tr>
 
                     </thead>
+
 
                     <tbody>
 
@@ -170,6 +193,7 @@
                                        asp-route-id="@item.EmployeeId"
                                        class="btn btn-warning btn-sm">
 
+                                        <i class="fa-solid fa-pen-to-square"></i>
                                         Edit
 
                                     </a>
@@ -179,11 +203,37 @@
                                        onclick="return confirm('Delete Employee?')"
                                        class="btn btn-danger btn-sm">
 
-                                        Delete
+                                        <i class="fa-solid fa-user-slash"></i>
+                                        InActivate
 
                                     </a>
 
                                 </td>
+
+
+                                <td>
+
+                                    @if (item.IsDeleted)
+                                    {
+                                        <span class="badge bg-danger">
+
+                                            <i class="fa-solid fa-circle-xmark me-1"></i>
+                                            Inactive
+
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-success">
+
+                                            <i class="fa-solid fa-circle-check me-1"></i>
+                                            Active
+
+                                        </span>
+                                    }
+
+                                </td>
+
 
                                 <td>@item.EmployeeCode</td>
 
@@ -193,7 +243,20 @@
 
                                 <td>@item.FullName</td>
 
-                                <td>@item.Email</td>
+
+                                <td>
+
+                                    <a href="mailto:@item.Email"
+                                       class="text-decoration-none text-primary fw-semibold"
+                                       title="Send Email to @item.FullName">
+
+                                        <i class="fa-solid fa-envelope me-1"></i>
+                                        @item.Email
+
+                                    </a>
+
+                                </td>
+
 
                                 <td>@item.Gender</td>
 
@@ -249,27 +312,6 @@
 
                                 <td>@item.IFSCCode</td>
 
-                                <td>
-
-                                    @if (item.EmployeeStatus == "Active")
-                                    {
-                                        <span class="badge bg-success">
-
-                                            Active
-
-                                        </span>
-                                    }
-                                    else
-                                    {
-                                        <span class="badge bg-danger">
-
-                                            @item.EmployeeStatus
-
-                                        </span>
-                                    }
-
-                                </td>
-
                                 <td>@item.CreatedDate.ToString("dd-MM-yyyy")</td>
 
                                 <td>@item.UpdatedDate.ToString("dd-MM-yyyy")</td>
@@ -289,24 +331,43 @@
 
 </div>
 
+
 <style>
 
     .card {
         border-radius: 12px;
     }
 
+    .summary-icon {
+        font-size: 25px;
+        margin-bottom: 8px;
+    }
+
+    /* TABLE SCROLL AREA */
     .table-responsive {
         overflow-x: auto;
         overflow-y: auto;
         max-height: 75vh;
+        position: relative;
     }
 
-    .table thead th {
+    /* FIX TABLE HEADER VISIBILITY */
+    .table thead {
         position: sticky;
         top: 0;
-        z-index: 100;
-        white-space: nowrap;
+        z-index: 20;
     }
+
+        .table thead th {
+            position: sticky;
+            top: 0;
+            z-index: 21;
+            background-color: #212529 !important;
+            color: #ffffff !important;
+            white-space: nowrap;
+            vertical-align: middle;
+            border-color: #454d55 !important;
+        }
 
     .table td,
     .table th {
@@ -323,12 +384,13 @@
         font-size: 14px;
     }
 
-    .top{
+    .top {
         margin-top: 70px;
     }
 
-    .exporttoexcel{
+    .exporttoexcel {
         margin-left: 89%;
         margin-top: -35px;
     }
+
 </style>

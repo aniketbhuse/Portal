@@ -1,45 +1,70 @@
 using CRMPortal.Data;
 using CRMPortal.Services;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.EntityFrameworkCore;
+using System.IO;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services
+// ===========================
+// Add Services
+// ===========================
+
 builder.Services.AddControllersWithViews();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(
-        builder.Configuration.GetConnectionString("DefaultConnection")));
+        builder.Configuration.GetConnectionString("DefaultConnection"),
+        sqlOptions =>
+        {
+            sqlOptions.EnableRetryOnFailure(
+                maxRetryCount: 5,
+                maxRetryDelay: TimeSpan.FromSeconds(10),
+                errorNumbersToAdd: null);
+        }));
+
+builder.Services.AddDataProtection()
+    .PersistKeysToFileSystem(new DirectoryInfo(@"C:\Keys"))
+    .SetApplicationName("CRMPortal");
 
 builder.Services.AddSession(options =>
 {
-    options.IdleTimeout = TimeSpan.FromMinutes(30);
+    options.IdleTimeout = TimeSpan.FromHours(15);
+
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
+
+    options.Cookie.MaxAge = TimeSpan.FromHours(15);
+
+    options.Cookie.Name = ".CRMPortal.Session";
+    options.Cookie.SameSite = SameSiteMode.Lax;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
 });
 
 builder.Services.AddScoped<EmailService>();
 
 var app = builder.Build();
 
-// Configure pipeline
+// ===========================
+// Configure HTTP Request Pipeline
+// ===========================
+
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
 }
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 app.UseStaticFiles();
 
 app.UseRouting();
 
-app.UseAuthorization();
-
+// Session must come before Authorization
 app.UseSession();
 
-app.UseStaticFiles();
+app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",

@@ -397,13 +397,9 @@ namespace CRMPortal.Controllers
                         List<string> rowData =
                             new List<string>();
 
-                        for (int col = 1;
-                             col <= totalColumns;
-                             col++)
+                        for (int col = 1;col <= totalColumns;col++)
                         {
-                            rowData.Add(
-                                sheet.Cells[row, col]
-                                .Text);
+                            rowData.Add(sheet.Cells[row, col].Text);
                         }
 
                         allData.Add(rowData);

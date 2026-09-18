@@ -81,6 +81,8 @@ namespace CRMPortal.Models
 
         public decimal Salary { get; set; }
 
+        public decimal PaidLeaveBalance { get; set; }
+
         public string? AadhaarNumber { get; set; }
 
         public string? PANNumber { get; set; }

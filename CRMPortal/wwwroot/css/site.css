@@ -230,3 +230,243 @@ body {
     .search-btn:hover {
         background: #084298;
     }
+
+
+    /*Logo Animation*/
+
+.logo {
+    width: 200px;
+    animation: slideIn 3s ease-in-out infinite;
+}
+
+@keyframes slideIn {
+    0% {
+        opacity: 0;
+        transform: translateX(-100%);
+    }
+
+    30% {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    70% {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+}
+
+// Dashboard Timer
+
+#workingTimer {
+    font-size: 42px;
+    letter-spacing: 3px;
+}
+
+.login-card {
+    border-radius: 15px;
+}
+
+.btn-lg {
+    width: 180px;
+}
+
+.bg-light {
+    background: #f8f9fa !important;
+}
+
+/* Employee Apply Leave Page Css */
+/* ==========================================
+   LEAVE BALANCE CARDS
+========================================== */
+
+.leave-card {
+    position: relative;
+    overflow: hidden;
+    padding: 22px;
+    border-radius: 20px;
+    color: #fff;
+    min-height: 165px;
+    transition: .35s;
+    box-shadow: 0 12px 22px rgba(0,0,0,.18);
+}
+
+    .leave-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 18px 30px rgba(0,0,0,.25);
+    }
+
+.leave-icon {
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+    background: rgba(255,255,255,.20);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 24px;
+    margin-bottom: 15px;
+}
+
+.leave-card h6 {
+    font-size: 15px;
+    opacity: .95;
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+
+.leave-card h2 {
+    font-size: 34px;
+    font-weight: 700;
+    margin-bottom: 5px;
+}
+
+.leave-card span {
+    font-size: 13px;
+    opacity: .9;
+}
+
+.monthly-card {
+    background: linear-gradient(135deg,#2563EB,#1D4ED8);
+}
+
+.annual-card {
+    background: linear-gradient(135deg,#059669,#047857);
+}
+
+.used-card {
+    background: linear-gradient(135deg,#EA580C,#C2410C);
+}
+
+.remaining-card {
+    background: linear-gradient(135deg,#7C3AED,#5B21B6);
+}
+
+.leave-card::before {
+    content: "";
+    position: absolute;
+    width: 120px;
+    height: 120px;
+    background: rgba(255,255,255,.10);
+    border-radius: 50%;
+    top: -35px;
+    right: -35px;
+}
+
+.leave-card::after {
+    content: "";
+    position: absolute;
+    width: 90px;
+    height: 90px;
+    background: rgba(255,255,255,.08);
+    border-radius: 50%;
+    bottom: -25px;
+    left: -20px;
+}
+
+/* ==========================================
+   APPLY LEAVE FORM
+========================================== */
+
+.card {
+    border-radius: 18px;
+}
+
+.card-header {
+    padding: 18px 22px;
+}
+
+.form-control,
+.form-select {
+    border-radius: 12px;
+    padding: 10px 14px;
+}
+
+    .form-control:focus,
+    .form-select:focus {
+        border-color: #2563EB;
+        box-shadow: 0 0 0 .15rem rgba(37,99,235,.15);
+    }
+
+.btn-success {
+    border-radius: 12px;
+    font-size: 16px;
+}
+
+/* ==========================================
+   TABLE
+========================================== */
+
+.table-hover tbody tr:hover {
+    background: #f4f8ff;
+    transition: .2s;
+}
+
+.table thead th {
+    text-align: center;
+    background: #eef4ff;
+}
+
+.badge {
+    font-size: 12px;
+}
+
+.table td {
+    vertical-align: middle;
+}
+
+.table-responsive {
+    border-radius: 12px;
+}
+
+
+
+/* ================= Dashboard Cards // HR Employye Master table page ================= */
+
+/* Dashboard Cards Hover */
+
+.dashboard-card {
+    border-radius: 12px;
+    transition: all 0.25s ease;
+    cursor: pointer;
+}
+
+    .dashboard-card:hover {
+        transform: translateY(-5px); /* Slight lift */
+        box-shadow: 0 8px 18px rgba(0,0,0,0.18) !important;
+        border: 1px solid #0d6efd; /* Blue border */
+    }
+
+
+
+/* ==========================================
+   Attendance Summary Cards Hover
+========================================== */
+
+.summary-card {
+    border-radius: 12px;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    cursor: pointer;
+}
+
+    .summary-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 12px 20px rgba(0, 0, 0, 0.15) !important;
+    }
+
+    /* Slight zoom on numbers */
+
+    .summary-card h2,
+    .summary-card h3 {
+        transition: transform 0.25s ease;
+    }
+
+    .summary-card:hover h2,
+    .summary-card:hover h3 {
+        transform: scale(1.08);
+    }

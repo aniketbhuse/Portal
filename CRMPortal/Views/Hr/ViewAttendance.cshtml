@@ -71,6 +71,11 @@
         padding: 5px 15px;
     }
 
+        /* Modern Button Icons */
+        .btn i {
+            font-size: 14px;
+        }
+
     /* Attendance Card */
     #employeeName {
         height: 34px;
@@ -81,54 +86,86 @@
         --bs-gutter-y: 0.7rem;
     }
 
-    .cardview{
+    .cardview {
         width: 80%;
         margin-left: 70px;
     }
 
-    .attendances{
-        width: 200px;
-        margin-left: 80%;
-        margin-top: -29px;
+    /* Summary Card Hover */
+    .summary-card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
-   
+
+        .summary-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.15) !important;
+        }
+
+    /* Table Text */
+    .table td,
+    .table th {
+        color: #000 !important;
+    }
 </style>
 
 @if (TempData["Error"] != null)
 {
     <div class="alert alert-danger alert-dismissible fade show" role="alert">
+
         @TempData["Error"]
+
         <button type="button"
                 class="btn-close"
                 data-bs-dismiss="alert"
                 aria-label="Close">
         </button>
+
     </div>
 }
 
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
+
+<link rel="stylesheet"
+      href="~/css/ApplyLeave.css"
+      asp-append-version="true" />
+
+<!-- ATTENDANCE REPORT FILTER -->
 <div class="card shadow">
 
     <div class="card-header bg-primary text-white">
 
-        <h4>Attendance Report</h4>
+        <h4>
+            <i class="fa-solid fa-chart-line me-2"></i>
+            Attendance Report
+        </h4>
 
     </div>
 
     <div class="card-body">
 
+        <!-- VIEW FORM -->
         <form asp-action="ViewAttendance" method="post">
 
             <div class="row">
 
                 <div class="col-md-4">
 
-                    <label>Employee</label>
+                    <label>
+                        <i class="fa-solid fa-user me-1"></i>
+                        Employee
+                    </label>
 
-                    <select asp-for="EmployeeId" class="form-control">
+                    <select asp-for="EmployeeId"
+                            class="form-control">
 
-                        <option value="">Select Employee</option>
+                        <option value="">
+                            Select Employee
+                        </option>
 
-                        <option value="0"> All Employees</option>
+                        <option value="0">
+                            All Employees
+                        </option>
 
                         @foreach (var emp in Model.EmployeeList)
                         {
@@ -146,7 +183,10 @@
 
                 <div class="col-md-3">
 
-                    <label>From Date</label>
+                    <label>
+                        <i class="fa-regular fa-calendar me-1"></i>
+                        From Date
+                    </label>
 
                     <input asp-for="FromDate"
                            type="date"
@@ -156,7 +196,10 @@
 
                 <div class="col-md-3">
 
-                    <label>To Date</label>
+                    <label>
+                        <i class="fa-regular fa-calendar-check me-1"></i>
+                        To Date
+                    </label>
 
                     <input asp-for="ToDate"
                            type="date"
@@ -166,9 +209,46 @@
 
                 <div class="col-md-2 d-flex align-items-end">
 
-                    <button class="btn btn-primary w-100">
+                    <button class="btn btn-primary w-100"
+                            type="submit">
+
+                        <i class="fa-solid fa-chart-simple me-1"></i>
 
                         View
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </form>
+
+        <!-- EXPORT BUTTON -->
+        <form asp-action="ExportAttendanceExcel"
+              asp-controller="HR"
+              method="post"
+              class="mt-2">
+
+            <input type="hidden"
+                   asp-for="EmployeeId" />
+
+            <input type="hidden"
+                   asp-for="FromDate" />
+
+            <input type="hidden"
+                   asp-for="ToDate" />
+
+            <div class="row">
+
+                <div class="col-md-2 offset-md-10">
+
+                    <button type="submit"
+                            class="btn btn-success w-100">
+
+                        <i class="fa-solid fa-file-arrow-down me-1"></i>
+
+                        Export
 
                     </button>
 
@@ -182,11 +262,12 @@
 
 </div>
 
+<!-- SUMMARY CARDS -->
 <div class="row mt-4 cardview">
 
     <div class="col-md-3">
 
-        <div class="card shadow text-center border-primary">
+        <div class="card shadow text-center border-primary summary-card">
 
             <div class="card-body">
 
@@ -206,7 +287,7 @@
 
     <div class="col-md-3">
 
-        <div class="card shadow text-center border-success">
+        <div class="card shadow text-center border-success summary-card">
 
             <div class="card-body">
 
@@ -226,7 +307,7 @@
 
     <div class="col-md-3">
 
-        <div class="card shadow text-center border-danger">
+        <div class="card shadow text-center border-danger summary-card">
 
             <div class="card-body">
 
@@ -246,7 +327,7 @@
 
     <div class="col-md-3">
 
-        <div class="card shadow text-center border-warning">
+        <div class="card shadow text-center border-warning summary-card">
 
             <div class="card-body">
 
@@ -266,11 +347,12 @@
 
 </div>
 
+<!-- SALARY CARDS -->
 <div class="row mt-4 cardview">
 
     <div class="col-md-3">
 
-        <div class="card shadow border-start border-primary">
+        <div class="card shadow border-start border-primary summary-card">
 
             <div class="card-body text-center">
 
@@ -290,7 +372,7 @@
 
     <div class="col-md-3">
 
-        <div class="card shadow border-start border-info">
+        <div class="card shadow border-start border-info summary-card">
 
             <div class="card-body text-center">
 
@@ -310,7 +392,7 @@
 
     <div class="col-md-3">
 
-        <div class="card shadow border-start border-danger">
+        <div class="card shadow border-start border-danger summary-card">
 
             <div class="card-body text-center">
 
@@ -330,7 +412,7 @@
 
     <div class="col-md-3">
 
-        <div class="card shadow border-start border-success">
+        <div class="card shadow border-start border-success summary-card">
 
             <div class="card-body text-center">
 
@@ -350,79 +432,82 @@
 
 </div>
 
+<!-- WORKING DAYS CARDS -->
 <div class="row mt-4 cardview">
 
     <div class="col-md-3">
-        <div class="card text-center shadow">
+
+        <div class="card text-center shadow summary-card">
+
             <div class="card-body">
+
                 <h6>Total Days</h6>
+
                 <h3>@Model.TotalDays</h3>
+
             </div>
+
         </div>
+
     </div>
 
     <div class="col-md-3">
-        <div class="card text-center shadow">
+
+        <div class="card text-center shadow summary-card">
+
             <div class="card-body">
+
                 <h6>Saturday</h6>
+
                 <h3>@Model.SaturdayCount</h3>
+
             </div>
+
         </div>
+
     </div>
 
     <div class="col-md-3">
-        <div class="card text-center shadow">
+
+        <div class="card text-center shadow summary-card">
+
             <div class="card-body">
+
                 <h6>Sunday</h6>
+
                 <h3>@Model.SundayCount</h3>
+
             </div>
+
         </div>
+
     </div>
 
     <div class="col-md-3">
-        <div class="card text-center shadow">
+
+        <div class="card text-center shadow summary-card">
+
             <div class="card-body">
+
                 <h6>Working Days</h6>
+
                 <h3>@Model.WorkingDays</h3>
+
             </div>
+
         </div>
+
     </div>
 
 </div>
 
+<!-- ATTENDANCE HISTORY -->
 <div class="card mt-4 shadow">
 
     <div class="card-header bg-success text-white">
 
+        <i class="fa-solid fa-clock-rotate-left me-2"></i>
         Attendance History
-
-        <!-- Export Button -->
-
-        <div class="text-end attendances">
-
-            <form asp-action="ExportAttendanceExcel"
-                  asp-controller="HR"
-                  method="post">
-
-                <input type="hidden"
-                       asp-for="EmployeeId" />
-
-                <input type="hidden"
-                       asp-for="FromDate" />
-
-                <input type="hidden"
-                       asp-for="ToDate" />
-
-                <button type="submit"
-                        class="btn btn-success">
-
-                    Export Attendance to Excel
-
-                </button>
-
-            </form>
-
-        </div>
 
     </div>
 
@@ -434,11 +519,20 @@
 
                 <tr>
 
-                    <th>Date</th>
+                    <th>
+                        <i class="fa-regular fa-calendar me-1"></i>
+                        Date
+                    </th>
 
-                    <th>Status</th>
+                    <th>
+                        <i class="fa-solid fa-circle-check me-1"></i>
+                        Status
+                    </th>
 
-                    <th>Remarks</th>
+                    <th>
+                        <i class="fa-regular fa-comment-dots me-1"></i>
+                        Remarks
+                    </th>
 
                 </tr>
 
@@ -464,6 +558,7 @@
                                 {
                                     <span class="badge bg-success">
 
+                                        <i class="fa-solid fa-check me-1"></i>
                                         Present
 
                                     </span>
@@ -472,6 +567,7 @@
                                 {
                                     <span class="badge bg-danger">
 
+                                        <i class="fa-solid fa-xmark me-1"></i>
                                         Absent
 
                                     </span>
@@ -495,6 +591,7 @@
                         <td colspan="3"
                             class="text-center">
 
+                            <i class="fa-regular fa-folder-open me-1"></i>
                             No Attendance Found
 
                         </td>

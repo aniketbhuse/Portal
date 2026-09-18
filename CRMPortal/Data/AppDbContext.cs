@@ -17,6 +17,7 @@ namespace CRMPortal.Data
         public DbSet<EmployeeFiles> EmployeeFiles { get; set; }
         public DbSet<MasterEmployee> MasterEmployee { get; set; }
         public DbSet<EmployeeAttendance> EmployeeAttendance { get; set; }
+        public DbSet<EmployeeLoginTracker> EmployeeLoginTracker { get; set; }
 
     }
 }

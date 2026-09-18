@@ -30,11 +30,11 @@
     </div>
 }
 
-<div class="container-fluid mt-3">
+<div class="container-fluid mt-3" style="margin-left: -110px;">
 
     <!-- Summary Card -->
 
-    <div class="row mb-3">
+    <div class="row mb-3" style="display: none;>
         <div class="col-md-8">
 
             <!-- Dashboard Cards -->
@@ -128,7 +128,7 @@
                             <div class="mb-3">
 
                                 <label>Employee Code</label>
-                                <input asp-for="MasterEmployee.EmployeeCode" placeholder="EMP0001" class="form-control" />
+                            <input asp-for="MasterEmployee.EmployeeCode" placeholder="MTS00001" class="form-control" />
 
                             </div>
 
@@ -352,16 +352,12 @@
 
                                 <label>Employment Type</label>
 
-                                <select asp-for="MasterEmployee.EmploymentType"
-                                        class="form-control">
-
-                                    <option value="">--Select Employment Type--</option>
-
-                                    <option>Permanent</option>
-                                    <option>Contract</option>
-                                    <option>Intern</option>
-                                    <option>Part Time</option>
-
+                                <select asp-for="MasterEmployee.EmploymentType" class="form-select">
+                                    <option value="">Select Employment Type</option>
+                                    <option value="Permanent">Permanent</option>
+                                    <option value="Contract">Contract</option>
+                                    <option value="Intern">Intern</option>
+                                    <option value="Part Time">Part Time</option>
                                 </select>
 
                             </div>
@@ -531,21 +527,34 @@
 
                         </div>
 
-                        <div class="mb-3">
+                    <div class="mb-3">
 
-                            <label>Status</label>
+                        <label>Status</label>
 
-                            <select asp-for="EmployeeAttendance.Status" class="form-control" required>
+                        <select asp-for="EmployeeAttendance.Status"
+                                class="form-control" required>
 
-                                <option value="">Select Status</option>
+                            <option value="">Select Status</option>
 
-                                <option value="Present">Present</option>
+                            <option value="Present">Present</option>
 
-                                <option value="Absent">Absent</option>
+                            <option value="PL">Paid Leave (PL)</option>
 
-                            </select>
+                            <option value="HD">Half Day (HD)</option>
 
-                        </div>
+                            <option value="LWP">Leave Without Pay (LWP)</option>
+
+                            <option value="ULWP">Unplanned Leave Without Pay (ULWP)</option>
+
+                            <option value="Sandwich">Sandwich Leave</option>
+
+                            <option value="Abscond">Abscond</option>
+
+                            <option value="Terminated">Terminated</option>
+
+                        </select>
+
+                    </div>
 
                         <div class="mb-3">
 

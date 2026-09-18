@@ -28,10 +28,8 @@
             <div class="container-fluid">
 
                 <!-- BRAND -->
-                <a class="navbar-brand"
-                   asp-controller="Account"
-                   asp-action="Login">
-                    CRMPortal
+                <a class="navbar-brand logo">
+                    Mars Portal
                 </a>
 
                 <button class="navbar-toggler"
@@ -106,6 +104,13 @@
                                     class="nav-link">
                                     Attendance
                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a asp-controller="HR"
+                                   asp-action="LoginTracker"
+                                   class="nav-link">
+                                    Login Tracker
+                                </a>
                             </li>
                             
                         }
@@ -212,10 +217,13 @@
         </nav>
 
     </header>
+
     <style>
         body {
         padding-top: 70px;
         }
+
+       
     </style>
 
     <!-- BODY -->

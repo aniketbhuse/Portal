@@ -1,0 +1,826 @@
+﻿@model CRMPortal.ViewModels.LoginTrackerViewModel
+
+@{
+    ViewData["Title"] = "Employee Login Tracker";
+}
+
+<div class="container-fluid mt-4">
+
+    <!-- SUCCESS MESSAGE -->
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            @TempData["Success"]
+
+            <button class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- ERROR MESSAGE -->
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            @TempData["Error"]
+
+            <button class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+    <meta charset="utf-8" />
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0" />
+
+    <title>@ViewData["Title"] - CRMPortal</title>
+
+    <link rel="stylesheet"
+          href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <link rel="stylesheet"
+          href="~/css/site.css" />
+
+    <!-- PAGE HEADER -->
+
+    <div class="page-header shadow-sm mb-4">
+
+        <div class="d-flex justify-content-between align-items-center flex-wrap">
+
+            <div>
+
+                <h2 class="fw-bold text-white mb-1">
+
+                    <i class="bi bi-person-lines-fill me-2"></i>
+                    Employee Login Tracker
+
+                </h2>
+
+                <p class="text-white mb-0">
+
+                    <i class="bi bi-building-fill me-1"></i>
+                    Mars Tech Solutions - HR Login Monitoring Report
+
+                </p>
+
+            </div>
+
+
+            <div class="text-end text-white">
+
+                <h5 class="mb-0">
+
+                    <i class="bi bi-calendar3 me-1"></i>
+                    @DateTime.Now.ToString("dd MMM yyyy")
+
+                </h5>
+
+                <small>
+
+                    <i class="bi bi-calendar-day me-1"></i>
+                    @DateTime.Now.ToString("dddd")
+
+                </small>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- SUMMARY CARDS -->
+
+    <div class="row g-3 mb-4">
+
+        <!-- PRESENT -->
+
+        <div class="col-xl-2 col-md-4">
+
+            <div class="summary-card green">
+
+                <i class="bi bi-person-check-fill"></i>
+
+                <h3>@Model.TotalPresentDays</h3>
+
+                <p>
+                    <i class="bi bi-calendar-check me-1"></i>
+                    Present Days
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- WORKING HOURS -->
+
+        <div class="col-xl-2 col-md-4">
+
+            <div class="summary-card blue">
+
+                <i class="bi bi-hourglass-split"></i>
+
+                <h3>@Model.TotalWorkingHours Hrs</h3>
+
+                <p>
+                    <i class="bi bi-clock me-1"></i>
+                    Working Hours
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- LATE LOGIN -->
+
+        <div class="col-xl-2 col-md-4">
+
+            <div class="summary-card orange">
+
+                <i class="bi bi-alarm-fill"></i>
+
+                <h3>@Model.LateLoginCount</h3>
+
+                <p>
+                    <i class="bi bi-clock-history me-1"></i>
+                    Late Login
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- NOT SIGNED OUT -->
+
+        <div class="col-xl-2 col-md-4">
+
+            <div class="summary-card red">
+
+                <i class="bi bi-person-x-fill"></i>
+
+                <h3>@Model.NotSignedOutCount</h3>
+
+                <p>
+                    <i class="bi bi-box-arrow-right me-1"></i>
+                    Not Signed Out
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- AVERAGE HOURS -->
+
+        <div class="col-xl-2 col-md-4">
+
+            <div class="summary-card purple">
+
+                <i class="bi bi-speedometer2"></i>
+
+                <h3>@Model.AverageWorkingHours Hrs</h3>
+
+                <p>
+                    <i class="bi bi-graph-up me-1"></i>
+                    Average Hours
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- FILTER CARD -->
+
+    <div class="card shadow-lg border-0 mb-4">
+
+        <div class="card-header bg-primary text-white">
+
+            <h5 class="mb-0">
+
+                <i class="bi bi-funnel-fill me-2"></i>
+                Login Tracker Filter
+
+            </h5>
+
+        </div>
+
+
+        <div class="card-body">
+
+            <form asp-action="LoginTracker" method="post">
+
+                <div class="row">
+
+
+                    <!-- Employee -->
+
+                    <div class="col-md-4 mb-3">
+
+                        <label class="form-label fw-bold">
+
+                            <i class="bi bi-person-badge-fill me-1"></i>
+                            Employee
+
+                        </label>
+
+
+                        <select asp-for="EmployeeId"
+                                class="form-select">
+
+                            <option value="0">
+
+                                <i class="bi bi-people-fill"></i>
+                                All Employees
+
+                            </option>
+
+                            @foreach (var emp in Model.EmployeeList)
+                            {
+                                <option value="@emp.EmployeeId">
+
+                                    @emp.EmployeeCode - @emp.FullName
+
+                                </option>
+                            }
+
+                        </select>
+
+                    </div>
+
+
+
+                    <!-- From Date -->
+
+                    <div class="col-md-3 mb-3">
+
+                        <label class="form-label fw-bold">
+
+                            <i class="bi bi-calendar2-date-fill me-1"></i>
+                            From Date
+
+                        </label>
+
+
+                        <input asp-for="FromDate"
+                               type="date"
+                               class="form-control" />
+
+                    </div>
+
+
+
+                    <!-- To Date -->
+
+                    <div class="col-md-3 mb-3">
+
+                        <label class="form-label fw-bold">
+
+                            <i class="bi bi-calendar2-check-fill me-1"></i>
+                            To Date
+
+                        </label>
+
+
+                        <input asp-for="ToDate"
+                               type="date"
+                               class="form-control" />
+
+                    </div>
+
+
+
+                    <!-- BUTTONS -->
+
+                    <div class="col-md-2 d-grid align-items-end">
+
+
+                        <!-- VIEW -->
+
+                        <button type="submit"
+                                class="btn btn-success mb-2">
+
+                            <i class="bi bi-eye-fill me-1"></i>
+                            View
+
+                        </button>
+
+
+                        <!-- EXPORT -->
+
+                        <button type="submit"
+                                formaction="@Url.Action("ExportLoginTrackerExcel", "HR")"
+                                class="btn btn-primary">
+
+                            <i class="bi bi-file-earmark-excel-fill me-1"></i>
+                            Export
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- REPORT TABLE -->
+
+    <div class="card shadow-lg border-0">
+
+        <div class="card-header bg-dark text-white">
+
+            <div class="d-flex justify-content-between">
+
+
+                <h5 class="mb-0">
+
+                    <i class="bi bi-person-lines-fill me-2"></i>
+                    Employee Login Report
+
+                </h5>
+
+
+                <span class="badge bg-success fs-6">
+
+                    <i class="bi bi-list-check me-1"></i>
+                    @Model.LoginList.Count Records
+
+                </span>
+
+            </div>
+
+        </div>
+
+
+
+        <div class="card-body">
+
+            <div class="table-responsive">
+
+                <table class="table table-hover table-bordered align-middle text-center">
+
+
+                    <thead>
+
+                        <tr>
+
+
+                            <th>
+
+                                <i class="bi bi-hash"></i>
+
+                            </th>
+
+
+                            <th>
+
+                                <i class="bi bi-person-vcard-fill me-1"></i>
+                                Employee Code
+
+                            </th>
+
+
+                            <th>
+
+                                <i class="bi bi-person-fill me-1"></i>
+                                Employee Name
+
+                            </th>
+
+
+                            <th>
+
+                                <i class="bi bi-calendar-event-fill me-1"></i>
+                                Date
+
+                            </th>
+
+
+                            <th>
+
+                                <i class="bi bi-box-arrow-in-right me-1"></i>
+                                Sign In
+
+                            </th>
+
+
+                            <th>
+
+                                <i class="bi bi-box-arrow-right me-1"></i>
+                                Sign Out
+
+                            </th>
+
+
+                            <th>
+
+                                <i class="bi bi-clock-history me-1"></i>
+                                Total Hours
+
+                            </th>
+
+
+                            <th>
+
+                                <i class="bi bi-alarm-fill me-1"></i>
+                                Late Login
+
+                            </th>
+
+
+                            <th>
+
+                                <i class="bi bi-activity me-1"></i>
+                                Status
+
+                            </th>
+
+
+                        </tr>
+
+                    </thead>
+
+
+
+                    <tbody>
+
+
+                        @if (Model.LoginList.Any())
+                        {
+
+                            int sr = 1;
+
+
+                            foreach (var item in Model.LoginList)
+                            {
+
+                                bool isLate = false;
+
+
+                                if (item.SignInTime != null)
+                                {
+
+                                    isLate =
+                                        item.SignInTime.Value.TimeOfDay >
+                                        new TimeSpan(9, 15, 0);
+
+                                }
+
+
+                                <tr>
+
+
+                                    <!-- SERIAL NUMBER -->
+
+                                    <td>
+
+                                        <span class="fw-bold">
+
+                                            @sr
+
+                                        </span>
+
+                                    </td>
+
+
+
+                                    <!-- EMPLOYEE CODE -->
+
+                                    <td>
+
+                                        <span class="badge bg-secondary">
+
+                                            <i class="bi bi-person-vcard-fill me-1"></i>
+
+                                            @item.EmployeeCode
+
+                                        </span>
+
+                                    </td>
+
+
+
+                                    <!-- EMPLOYEE NAME -->
+
+                                    <td class="text-start fw-semibold">
+
+                                        <i class="bi bi-person-circle me-1 text-primary"></i>
+
+                                        @item.FullName
+
+                                    </td>
+
+
+
+                                    <!-- DATE -->
+
+                                    <td>
+
+                                        <i class="bi bi-calendar3 me-1 text-muted"></i>
+
+                                        @item.LoginDate.ToString("dd-MMM-yyyy")
+
+                                    </td>
+
+
+
+                                    <!-- SIGN IN -->
+
+                                    <td class="text-success fw-bold">
+
+                                        <i class="bi bi-box-arrow-in-right me-1"></i>
+
+                                        @(item.SignInTime?.ToString("hh:mm tt") ?? "--")
+
+                                    </td>
+
+
+
+                                    <!-- SIGN OUT -->
+
+                                    <td class="text-danger fw-bold">
+
+                                        <i class="bi bi-box-arrow-right me-1"></i>
+
+                                        @(item.SignOutTime?.ToString("hh:mm tt") ?? "--")
+
+                                    </td>
+
+
+
+                                    <!-- TOTAL HOURS -->
+
+                                    <td>
+
+                                        @if (item.TotalWorkingHours != null)
+                                        {
+
+                                            <span class="badge bg-info text-dark">
+
+                                                <i class="bi bi-clock-fill me-1"></i>
+
+                                                @item.TotalWorkingHours Hrs
+
+                                            </span>
+
+                                        }
+                                        else
+                                        {
+
+                                            <span class="badge bg-warning text-dark">
+
+                                                <i class="bi bi-hourglass-split me-1"></i>
+
+                                                Working
+
+                                            </span>
+
+                                        }
+
+                                    </td>
+
+
+
+                                    <!-- LATE LOGIN -->
+
+                                    <td>
+
+                                        @if (isLate)
+                                        {
+
+                                            <span class="badge bg-warning text-dark">
+
+                                                <i class="bi bi-exclamation-triangle-fill me-1"></i>
+
+                                                Late
+
+                                            </span>
+
+                                        }
+                                        else
+                                        {
+
+                                            <span class="badge bg-success">
+
+                                                <i class="bi bi-check-circle-fill me-1"></i>
+
+                                                On Time
+
+                                            </span>
+
+                                        }
+
+                                    </td>
+
+
+
+                                    <!-- STATUS -->
+
+                                    <td>
+
+                                        @if (item.SessionStatus == "SignedOut")
+                                        {
+
+                                            <span class="badge bg-success">
+
+                                                <i class="bi bi-check2-circle me-1"></i>
+
+                                                Completed
+
+                                            </span>
+
+                                        }
+                                        else
+                                        {
+
+                                            <span class="badge bg-danger">
+
+                                                <i class="bi bi-person-fill-exclamation me-1"></i>
+
+                                                Signed In
+
+                                            </span>
+
+                                        }
+
+                                    </td>
+
+
+                                </tr>
+
+
+                                sr++;
+
+                            }
+
+                        }
+                        else
+                        {
+
+                            <!-- EMPTY STATE -->
+
+                            <tr>
+
+                                <td colspan="9"
+                                    class="text-center text-muted p-4">
+
+
+                                    <i class="bi bi-inbox display-6"></i>
+
+
+                                    <br />
+
+
+                                    <span class="mt-2 d-inline-block">
+
+                                        <i class="bi bi-search me-1"></i>
+
+                                        No Login Records Found.
+
+                                    </span>
+
+
+                                </td>
+
+                            </tr>
+
+                        }
+
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<style>
+
+    body {
+        background: #f5f7fb;
+    }
+
+
+    /* HEADER */
+
+    .page-header {
+        background: linear-gradient(90deg,#0d6efd,#0b5ed7);
+        border-radius: 15px;
+        padding: 20px;
+    }
+
+
+    /* SUMMARY CARD */
+
+    .summary-card {
+        border-radius: 15px;
+        padding: 18px;
+        color: white;
+        text-align: center;
+        box-shadow: 0 5px 15px rgba(0,0,0,.12);
+        transition: .3s;
+    }
+
+
+        .summary-card:hover {
+            transform: translateY(-4px);
+        }
+
+
+        .summary-card i {
+            font-size: 34px;
+            margin-bottom: 10px;
+        }
+
+
+        .summary-card h3 {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+
+        .summary-card p {
+            margin: 0;
+            font-size: 14px;
+        }
+
+
+    .green {
+        background: #16a34a;
+    }
+
+
+    .blue {
+        background: #2563eb;
+    }
+
+
+    .orange {
+        background: #ea580c;
+    }
+
+
+    .red {
+        background: #dc2626;
+    }
+
+
+    .purple {
+        background: #7c3aed;
+    }
+
+
+    /* TABLE */
+
+    .table thead {
+        background: #1f2937;
+        color: white;
+    }
+
+
+    .table-hover tbody tr:hover {
+        background: #edf5ff;
+        transition: .2s;
+    }
+
+
+    .card {
+        border-radius: 15px;
+    }
+
+
+    .form-control,
+    .form-select {
+        border-radius: 10px;
+    }
+
+
+    .btn {
+        border-radius: 10px;
+        font-weight: 600;
+    }
+
+</style>

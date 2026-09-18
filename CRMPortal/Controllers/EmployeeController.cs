@@ -1,8 +1,9 @@
 ﻿using CRMPortal.Data;
 using CRMPortal.Models;
+using CRMPortal.Services;
 using CRMPortal.ViewModels;
 using Microsoft.AspNetCore.Mvc;
-using CRMPortal.Services;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace CRMPortal.Controllers
 {
@@ -21,58 +22,239 @@ namespace CRMPortal.Controllers
         {
             try
             {
-                if (HttpContext.Session.GetInt32("UserId") == null)
+                if (HttpContext.Session.GetInt32("RoleId") != 2)
                 {
                     return RedirectToAction("Login", "Account");
                 }
 
-                int userId = Convert.ToInt32(HttpContext.Session.GetInt32("UserId"));
+                // ✅ Use EmployeeId, NOT UserId
+                int employeeId = HttpContext.Session.GetInt32("EmployeeId").Value;
 
-                ViewBag.Files =  _context.EmployeeFiles
-                    .Where(x => x.UserId == userId)
-                    .OrderByDescending(x => x.UploadedDate)
-                    .ToList(); 
+                var employee = _context.MasterEmployee
+                    .FirstOrDefault(x => x.EmployeeId == employeeId && !x.IsDeleted);
 
-                return View();
+                DateOnly today = DateOnly.FromDateTime(DateTime.Today);
+
+                var login = _context.EmployeeLoginTracker
+                    .FirstOrDefault(x =>
+                        x.EmployeeId == employeeId &&
+                        x.LoginDate == today &&
+                        !x.IsDeleted);
+
+                if (login != null)
+                {
+                    ViewBag.SignInTime = login.SignInTime;
+                    ViewBag.SignOutTime = login.SignOutTime;
+                    ViewBag.SessionStatus = login.SessionStatus;
+
+                    // Important
+                    ViewBag.SignInDateTime = login.SignInTime.Value.ToString("yyyy-MM-ddTHH:mm:ss");
+                }
+                else
+                {
+                    ViewBag.SignInTime = null;
+                    ViewBag.SignOutTime = null;
+                    ViewBag.SessionStatus = "Not Signed In";
+                    ViewBag.SignInDateTime = "";
+                }
+
+                return View(employee);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                TempData["Error"] = "Something went wrong.";
-
+                TempData["Error"] = ex.Message;
                 return RedirectToAction("Login", "Account");
             }
         }
 
+        // Session SignIn/ SignOut code 
+
+        [HttpPost]
+        public IActionResult EmployeeSignIn()
+        {
+            try
+            {
+                // Get EmployeeId from Session
+                int employeeId = HttpContext.Session.GetInt32("EmployeeId").Value;
+
+                DateOnly today = DateOnly.FromDateTime(DateTime.Today);
+
+                bool alreadySignedIn = _context.EmployeeLoginTracker.Any(x =>
+                    x.EmployeeId == employeeId &&
+                    x.LoginDate == today &&
+                    !x.IsDeleted);
+
+                if (alreadySignedIn)
+                {
+                    TempData["Error"] = "You have already signed in today.";
+                    return RedirectToAction("Dashboard");
+                }
+
+                var employee = _context.MasterEmployee
+                    .FirstOrDefault(x => x.EmployeeId == employeeId && !x.IsDeleted);
+
+                if (employee == null)
+                {
+                    TempData["Error"] = "Employee not found.";
+                    return RedirectToAction("Login", "Account");
+                }
+
+                EmployeeLoginTracker tracker = new EmployeeLoginTracker();
+
+                tracker.EmployeeId = employee.EmployeeId;
+                tracker.EmployeeCode = employee.EmployeeCode;
+                tracker.FullName = employee.FullName;
+                tracker.LoginDate = today;
+                tracker.SignInTime = DateTime.Now;
+                tracker.SessionStatus = "SignedIn";
+                tracker.CreatedDate = DateTime.Now;
+                tracker.UpdatedDate = DateTime.Now;
+                tracker.ModifiedDate = DateTime.Now;
+                tracker.IsDeleted = false;
+
+                _context.EmployeeLoginTracker.Add(tracker);
+                _context.SaveChanges();
+
+                TempData["Success"] = "Sign In recorded successfully.";
+
+                return RedirectToAction("Dashboard");
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = ex.Message;
+                return RedirectToAction("Dashboard");
+            }
+        }
+
+        [HttpPost]
+        public IActionResult EmployeeSignOut()
+        {
+            try
+            {
+                // Get EmployeeId from Session
+                int employeeId = HttpContext.Session.GetInt32("EmployeeId").Value;
+
+                DateOnly today = DateOnly.FromDateTime(DateTime.Today);
+
+                var tracker = _context.EmployeeLoginTracker
+                    .FirstOrDefault(x =>
+                        x.EmployeeId == employeeId &&
+                        x.LoginDate == today &&
+                        !x.IsDeleted);
+
+                if (tracker == null)
+                {
+                    TempData["Error"] = "Please Sign In first.";
+                    return RedirectToAction("Dashboard");
+                }
+
+                if (tracker.SignOutTime != null)
+                {
+                    TempData["Error"] = "You have already signed out today.";
+                    return RedirectToAction("Dashboard");
+                }
+
+                // Update Sign Out Time
+                tracker.SignOutTime = DateTime.Now;
+
+                // Update Status
+                tracker.SessionStatus = "Signed Out";
+
+                // Calculate Working Hours
+                tracker.TotalWorkingHours = Convert.ToDecimal(
+                    Math.Round(
+                        (tracker.SignOutTime.Value - tracker.SignInTime.Value).TotalHours,
+                        2));
+
+                tracker.UpdatedDate = DateTime.Now;
+                tracker.ModifiedDate = DateTime.Now;
+
+                _context.SaveChanges();
+
+                TempData["Success"] = "Sign Out recorded successfully.";
+
+                return RedirectToAction("Dashboard");
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = ex.Message;
+                return RedirectToAction("Dashboard");
+            }
+        }
+
+
         // ================= Get Apply Leave =================
+
 
         [HttpGet]
         public IActionResult ApplyLeave()
         {
             try
             {
-                if (HttpContext.Session.GetInt32("UserId") == null)
+                if (HttpContext.Session.GetInt32("RoleId") != 2)
                 {
                     return RedirectToAction("Login", "Account");
                 }
 
-                int userId = Convert.ToInt32(HttpContext.Session.GetInt32("UserId"));
+                int userId = HttpContext.Session.GetInt32("UserId").Value;
 
-                ViewBag.LeaveTypes = _context.LeaveTypes.ToList();
+                ApplyLeaveViewModel model = new ApplyLeaveViewModel();
 
-                ViewBag.LeaveRequests = _context.LeaveRequests
-                            .Where(x => x.UserId == userId)
-                            .OrderByDescending(x => x.CreatedDate)
-                            .ToList();
+                // Leave Type Dropdown
+                model.LeaveTypes = _context.LeaveTypes
+                    .Select(x => new SelectListItem
+                    {
+                        Value = x.LeaveTypeId.ToString(),
+                        Text = x.LeaveTypeName
+                    })
+                    .ToList();
 
-                return View();
+                // Leave History
+                model.MyLeaves = _context.LeaveRequests
+                    .Where(x => x.UserId == userId)
+                    .OrderByDescending(x => x.CreatedDate)
+                    .ToList();
+
+                // ==========================================
+                // LEAVE BALANCE CALCULATION
+                // Company Policy: 1.5 Paid Leave every month
+                // ==========================================
+
+                int currentYear = DateTime.Now.Year;
+                int currentMonth = DateTime.Now.Month;
+
+                model.MonthlyLeaveEarned = 1.5M;
+
+                // Total PL earned till current month
+                model.AnnualLeaveBalance = currentMonth * 1.5M;
+
+                // Approved Paid Leave (Casual + Sick Leave only)
+                model.LeaveUsedThisYear = _context.LeaveRequests
+                    .Where(x =>
+                        x.UserId == userId &&
+                        x.Status == "Approved" &&
+                        x.FromDate.Year == currentYear &&
+                        (x.LeaveTypeId == 1 || x.LeaveTypeId == 2))
+                    .Sum(x => (decimal?)x.TotalDays) ?? 0;
+
+                // Remaining PL Balance
+                model.RemainingLeaveBalance =
+                    model.AnnualLeaveBalance - model.LeaveUsedThisYear;
+
+                if (model.RemainingLeaveBalance < 0)
+                {
+                    model.RemainingLeaveBalance = 0;
+                }
+
+                return View(model);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                TempData["Error"] = "Something went wrong.";
-
-                return RedirectToAction( "Dashboard", "Employee");
+                TempData["Error"] = ex.Message;
+                return RedirectToAction("Dashboard");
             }
         }
+
 
         [HttpPost]
         public IActionResult ApplyLeave(ApplyLeaveViewModel model)

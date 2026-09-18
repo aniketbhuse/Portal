@@ -1,66 +1,160 @@
-﻿@{
+﻿@model CRMPortal.ViewModels.ApplyLeaveViewModel
+
+@{
     ViewData["Title"] = "Apply Leave";
 }
 
-@if (TempData["Success"] != null)
-{
-    <div class="alert alert-success alert-dismissible fade show">
-        @TempData["Success"]
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
 
-        <button type="button"
-                class="btn-close"
-                data-bs-dismiss="alert">
-        </button>
-    </div>
-}
-
-@if (TempData["Error"] != null)
-{
-    <div class="alert alert-danger alert-dismissible fade show">
-        @TempData["Error"]
-
-        <button type="button"
-                class="btn-close"
-                data-bs-dismiss="alert">
-        </button>
-    </div>
-}
+<link rel="stylesheet"
+      href="~/css/ApplyLeave.css"
+      asp-append-version="true" />
 
 <div class="container-fluid mt-4">
 
-    <div class="row">
+    <!-- SUCCESS MESSAGE -->
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show">
+            @TempData["Success"]
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert">
+            </button>
+        </div>
+    }
 
-        <!-- LEFT SIDE -->
-        <div class="col-md-4">
+    <!-- ERROR MESSAGE -->
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show">
+            @TempData["Error"]
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert">
+            </button>
+        </div>
+    }
 
-            <div class="card shadow">
+    <!-- ===================================== -->
+    <!-- LEAVE BALANCE CARDS -->
+    <!-- ===================================== -->
 
-                <div class="card-header bg-primary text-white">
-                    <h4>Apply Leave</h4>
+    <div class="row g-4 mb-4">
+
+        <!-- Monthly Leave -->
+        <div class="col-xl-3 col-md-6">
+            <div class="leave-card monthly-card">
+
+                <div class="leave-icon">
+                    <i class="fa-solid fa-calendar-plus"></i>
                 </div>
 
-                <div class="card-body">
+                <h6>Monthly Leave</h6>
 
-                    <form asp-action="ApplyLeave"
-                          method="post">
+                <h2>@Model.MonthlyLeaveEarned</h2>
 
+                <span>Earned Every Month</span>
+
+            </div>
+        </div>
+
+        <!-- Annual Leave -->
+        <div class="col-xl-3 col-md-6">
+            <div class="leave-card annual-card">
+
+                <div class="leave-icon">
+                    <i class="fa-solid fa-calendar-check"></i>
+                </div>
+
+                <h6>Annual Leave</h6>
+
+                <h2>@Model.AnnualLeaveBalance</h2>
+
+                <span>Total Earned This Year</span>
+
+            </div>
+        </div>
+
+        <!-- Used Leave -->
+        <div class="col-xl-3 col-md-6">
+            <div class="leave-card used-card">
+
+                <div class="leave-icon">
+                    <i class="fa-solid fa-plane-departure"></i>
+                </div>
+
+                <h6>Leave Used</h6>
+
+                <h2>@Model.LeaveUsedThisYear</h2>
+
+                <span>Approved Leave Taken</span>
+
+            </div>
+        </div>
+
+        <!-- Remaining Leave -->
+        <div class="col-xl-3 col-md-6">
+            <div class="leave-card remaining-card">
+
+                <div class="leave-icon">
+                    <i class="fa-solid fa-wallet"></i>
+                </div>
+
+                <h6>Remaining Leave</h6>
+
+                <h2>@Model.RemainingLeaveBalance</h2>
+
+                <span>Available Leave Balance</span>
+
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ===================================== -->
+    <!-- APPLY LEAVE + LEAVE REQUEST TABLE -->
+    <!-- ===================================== -->
+
+    <div class="row">
+
+        <!-- LEFT SIDE : APPLY LEAVE -->
+        <div class="col-lg-4">
+
+            <div class="card shadow border-0 rounded-4">
+
+                <div class="card-header bg-primary text-white rounded-top-4">
+
+                    <h4 class="mb-0">
+                        <i class="fa-solid fa-calendar-days me-2"></i>
+                        Apply Leave
+                    </h4>
+
+                </div>
+
+                <div class="card-body p-4">
+
+                    <form asp-action="ApplyLeave" method="post">
+
+                        <!-- Leave Type -->
                         <div class="mb-3">
 
-                            <label class="form-label">
+                            <label class="form-label fw-semibold">
                                 Leave Type
                             </label>
 
-                            <select class="form-control"
-                                    name="LeaveTypeId">
+                            <select asp-for="LeaveTypeId"
+                                    class="form-select">
 
                                 <option value="">
                                     Select Leave Type
                                 </option>
 
-                                @foreach (var item in ViewBag.LeaveTypes)
+                                @foreach (var item in Model.LeaveTypes)
                                 {
-                                    <option value="@item.LeaveTypeId">
-                                        @item.LeaveTypeName
+                                    <option value="@item.Value">
+                                        @item.Text
                                     </option>
                                 }
 
@@ -68,46 +162,54 @@
 
                         </div>
 
+                        <!-- From Date -->
                         <div class="mb-3">
 
-                            <label class="form-label">
+                            <label class="form-label fw-semibold">
                                 From Date
                             </label>
 
-                            <input type="date"
-                                   name="FromDate"
-                                   class="form-control" 
+                            <input asp-for="FromDate"
+                                   type="date"
+                                   class="form-control"
                                    min="@DateTime.Now.ToString("yyyy-MM-dd")" />
 
                         </div>
 
+                        <!-- To Date -->
                         <div class="mb-3">
 
-                            <label class="form-label">
+                            <label class="form-label fw-semibold">
                                 To Date
                             </label>
 
-                            <input type="date"
-                                   name="ToDate"
-                                   class="form-control" 
+                            <input asp-for="ToDate"
+                                   type="date"
+                                   class="form-control"
                                    min="@DateTime.Now.ToString("yyyy-MM-dd")" />
 
                         </div>
 
-                        <div class="mb-3">
+                        <!-- Reason -->
+                        <div class="mb-4">
 
-                            <label class="form-label">
+                            <label class="form-label fw-semibold">
                                 Reason
                             </label>
 
-                            <textarea class="form-control"
-                                      name="Reason"
-                                      rows="4"></textarea>
+                            <textarea asp-for="Reason"
+                                      class="form-control"
+                                      rows="4"
+                                      placeholder="Enter Leave Reason...">
+                            </textarea>
 
                         </div>
 
+                        <!-- Button -->
                         <button type="submit"
-                                class="btn btn-success w-100">
+                                class="btn btn-success w-100 py-2 fw-bold">
+
+                            <i class="fa-solid fa-paper-plane me-2"></i>
 
                             Submit Leave Request
 
@@ -121,26 +223,33 @@
 
         </div>
 
-        <!-- RIGHT SIDE -->
-        <div class="col-md-8">
+        <!-- RIGHT SIDE : MY LEAVE REQUESTS -->
+        <div class="col-lg-8">
 
-            <div class="card shadow">
+            <div class="card shadow border-0 rounded-4">
 
-                <div class="card-header bg-dark text-white">
-                    <h4>My Leave Requests</h4>
+                <div class="card-header bg-dark text-white rounded-top-4">
+
+                    <h4 class="mb-0">
+                        <i class="fa-solid fa-list-check me-2"></i>
+                        My Leave Requests
+                    </h4>
+
                 </div>
 
                 <div class="card-body">
 
                     <div class="table-responsive">
 
-                        <table class="table table-bordered table-hover">
+                        <table class="table table-bordered table-hover align-middle">
 
-                            <thead class="table-light">
+                            <thead class="table-light text-center">
 
                                 <tr>
 
                                     <th>Leave ID</th>
+
+                                    <th>Leave Type</th>
 
                                     <th>From Date</th>
 
@@ -160,45 +269,70 @@
 
                             <tbody>
 
-                                @if (ViewBag.LeaveRequests != null)
+                                @if (Model.MyLeaves != null && Model.MyLeaves.Any())
                                 {
-                                    @foreach (var item in ViewBag.LeaveRequests)
+                                    @foreach (var item in Model.MyLeaves)
                                     {
                                         <tr>
 
-                                            <td>
+                                            <td class="text-center fw-semibold">
                                                 @item.LeaveRequestId
                                             </td>
 
                                             <td>
-                                                @item.FromDate
+                                                @switch (item.LeaveTypeId)
+                                                {
+                                                    case 1:
+                                                        <span class="badge bg-primary">Casual Leave</span>
+                                                        break;
+
+                                                    case 2:
+                                                        <span class="badge bg-info text-dark">Sick Leave</span>
+                                                        break;
+
+                                                    case 3:
+                                                        <span class="badge bg-success">Work From Home</span>
+                                                        break;
+
+                                                    case 4:
+                                                        <span class="badge bg-warning text-dark">Half Day</span>
+                                                        break;
+
+                                                    case 5:
+                                                        <span class="badge bg-danger">Emergency Leave</span>
+                                                        break;
+                                                }
                                             </td>
 
                                             <td>
-                                                @item.ToDate
+                                                @item.FromDate.ToString("dd-MMM-yyyy")
                                             </td>
 
                                             <td>
+                                                @item.ToDate.ToString("dd-MMM-yyyy")
+                                            </td>
+
+                                            <td class="text-center">
                                                 @item.TotalDays
                                             </td>
 
-                                            <td>
+                                            <td class="text-center">
 
                                                 @if (item.Status == "Pending")
                                                 {
-                                                    <span class="badge bg-warning text-dark">
+                                                    <span class="badge bg-warning text-dark px-3 py-2">
                                                         Pending
                                                     </span>
                                                 }
                                                 else if (item.Status == "Approved")
                                                 {
-                                                    <span class="badge bg-success">
+                                                    <span class="badge bg-success px-3 py-2">
                                                         Approved
                                                     </span>
                                                 }
                                                 else
                                                 {
-                                                    <span class="badge bg-danger">
+                                                    <span class="badge bg-danger px-3 py-2">
                                                         Rejected
                                                     </span>
                                                 }
@@ -214,7 +348,7 @@
                                                 else
                                                 {
                                                     <span class="text-muted">
-                                                        Waiting for approval
+                                                        Waiting for Approval
                                                     </span>
                                                 }
 
@@ -231,10 +365,14 @@
                                 {
                                     <tr>
 
-                                        <td colspan="6"
-                                            class="text-center">
+                                        <td colspan="8"
+                                            class="text-center text-muted py-4">
 
-                                            No Leave Requests Found
+                                            <i class="fa-solid fa-calendar-xmark fa-2x mb-2"></i>
+
+                                            <br />
+
+                                            No Leave Requests Found.
 
                                         </td>
 
@@ -256,13 +394,3 @@
     </div>
 
 </div>
-
-<style>
-
-    .table-hover tbody tr:hover {
-        background-color: #f5f9ff;
-        cursor: pointer;
-        transition: 0.3s;
-    }
-
-</style>
