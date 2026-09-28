@@ -43,12 +43,12 @@ namespace CRMPortal.Controllers
                     AttendanceDate = DateOnly.FromDateTime(DateTime.Today)
                 };
 
-               
-
-                model.EmployeeList = _context.MasterEmployee .Where(x => !x.IsDeleted).ToList();
 
 
-                
+                model.EmployeeList = _context.MasterEmployee.Where(x => !x.IsDeleted).ToList();
+
+
+
                 // Total Employees
                 //ViewBag.TotalEmployees =_context.MasterEmployee.Count();
 
@@ -76,12 +76,12 @@ namespace CRMPortal.Controllers
                 if (roleId != 5 && roleId != 3)
 
 
-                if(HttpContext.Session.GetInt32("RoleId") != 5)
+                    if (HttpContext.Session.GetInt32("RoleId") != 5)
 
-                if(HttpContext.Session.GetInt32("RoleId") != 4)
-                {
-                    return RedirectToAction("Login", "Account");
-                }
+                        if (HttpContext.Session.GetInt32("RoleId") != 4)
+                        {
+                            return RedirectToAction("Login", "Account");
+                        }
 
                 // Total Employees
                 ViewBag.TotalEmployees = _context.MasterEmployee.Count();
@@ -212,22 +212,14 @@ namespace CRMPortal.Controllers
 
                 // Update Employee Details
                 dbEmployee.EmployeeCode = employee.EmployeeCode;
-                dbEmployee.FirstName = employee.FirstName;
-                dbEmployee.LastName = employee.LastName;
                 dbEmployee.FullName = employee.FullName;
                 dbEmployee.Email = employee.Email;
                 dbEmployee.MobileNumber = employee.MobileNumber;
-                dbEmployee.AlternateMobile = employee.AlternateMobile;
                 dbEmployee.Gender = employee.Gender;
                 dbEmployee.DateOfBirth = employee.DateOfBirth;
                 dbEmployee.BloodGroup = employee.BloodGroup;
                 dbEmployee.MaritalStatus = employee.MaritalStatus;
-                dbEmployee.EmergencyContactName = employee.EmergencyContactName;
-                dbEmployee.EmergencyContact = employee.EmergencyContact;
                 dbEmployee.AddressLine1 = employee.AddressLine1;
-                dbEmployee.City = employee.City;
-                dbEmployee.State = employee.State;
-                dbEmployee.Country = employee.Country;
                 dbEmployee.Pincode = employee.Pincode;
                 dbEmployee.Department = employee.Department;
                 dbEmployee.Designation = employee.Designation;
@@ -238,12 +230,10 @@ namespace CRMPortal.Controllers
                     dbEmployee.EmploymentType = employee.EmploymentType;
                 }
                 dbEmployee.ReportingManager = employee.ReportingManager;
-                dbEmployee.WorkLocation = employee.WorkLocation;
                 dbEmployee.Shift = employee.Shift;
                 dbEmployee.Salary = employee.Salary;
                 dbEmployee.AadhaarNumber = employee.AadhaarNumber;
                 dbEmployee.PANNumber = employee.PANNumber;
-                dbEmployee.PassportNumber = employee.PassportNumber;
                 dbEmployee.BankName = employee.BankName;
                 dbEmployee.AccountNumber = employee.AccountNumber;
                 dbEmployee.IFSCCode = employee.IFSCCode;
@@ -289,7 +279,7 @@ namespace CRMPortal.Controllers
                 }
 
                 // Check if employee is already inactive
-                if(employee.IsDeleted || employee.EmployeeStatus == "InActive")
+                if (employee.IsDeleted || employee.EmployeeStatus == "InActive")
                 {
                     TempData["Error"] = "Employee is already inactive.";
                     return RedirectToAction("Employees");
@@ -693,8 +683,6 @@ namespace CRMPortal.Controllers
                 foreach (var emp in employees)
                 {
                     ws.Cells[row, 1].Value = emp.EmployeeCode;
-                    ws.Cells[row, 2].Value = emp.FirstName;
-                    ws.Cells[row, 3].Value = emp.LastName;
                     ws.Cells[row, 4].Value = emp.FullName;
                     ws.Cells[row, 5].Value = emp.Email;
                     ws.Cells[row, 6].Value = emp.Gender;
@@ -702,25 +690,17 @@ namespace CRMPortal.Controllers
                     ws.Cells[row, 8].Value = emp.BloodGroup;
                     ws.Cells[row, 9].Value = emp.MaritalStatus;
                     ws.Cells[row, 10].Value = emp.MobileNumber;
-                    ws.Cells[row, 11].Value = emp.AlternateMobile;
-                    ws.Cells[row, 12].Value = emp.EmergencyContactName;
-                    ws.Cells[row, 13].Value = emp.EmergencyContact;
                     ws.Cells[row, 14].Value = emp.AddressLine1;
-                    ws.Cells[row, 15].Value = emp.City;
-                    ws.Cells[row, 16].Value = emp.State;
-                    ws.Cells[row, 17].Value = emp.Country;
                     ws.Cells[row, 18].Value = emp.Pincode;
                     ws.Cells[row, 19].Value = emp.Department;
                     ws.Cells[row, 20].Value = emp.Designation;
                     ws.Cells[row, 21].Value = emp.JoiningDate.ToString("dd-MM-yyyy");
                     ws.Cells[row, 22].Value = emp.EmploymentType;
                     ws.Cells[row, 23].Value = emp.ReportingManager;
-                    ws.Cells[row, 24].Value = emp.WorkLocation;
                     ws.Cells[row, 25].Value = emp.Shift;
                     ws.Cells[row, 26].Value = emp.Salary;
                     ws.Cells[row, 27].Value = emp.AadhaarNumber;
                     ws.Cells[row, 28].Value = emp.PANNumber;
-                    ws.Cells[row, 29].Value = emp.PassportNumber;
                     ws.Cells[row, 30].Value = emp.BankName;
                     ws.Cells[row, 31].Value = emp.AccountNumber;
                     ws.Cells[row, 32].Value = emp.IFSCCode;
@@ -748,7 +728,7 @@ namespace CRMPortal.Controllers
         {
             AttendanceReportViewModel model = new AttendanceReportViewModel
             {
-                
+
                 FromDate = DateOnly.FromDateTime(DateTime.Today),
                 ToDate = DateOnly.FromDateTime(DateTime.Today)
             };
@@ -759,7 +739,7 @@ namespace CRMPortal.Controllers
                                          .Where(x => !x.IsDeleted)
                                          .OrderBy(x => x.FullName)
                                          .ToList();
-            
+
 
             model.AttendanceList = new List<EmployeeAttendance>();
 
@@ -791,14 +771,30 @@ namespace CRMPortal.Controllers
                 // ==========================================
                 // LOAD ATTENDANCE
                 // ==========================================
-                model.AttendanceList = _context.EmployeeAttendance
-                    .Where(x =>
-                        x.EmployeeId == model.EmployeeId &&
-                        x.AttendanceDate >= model.FromDate &&
-                        x.AttendanceDate <= model.ToDate &&
-                        !x.IsDeleted)
-                    .OrderBy(x => x.AttendanceDate)
-                    .ToList();
+
+                if (model.EmployeeId == 0)
+                {
+                    // ALL EMPLOYEES
+                    model.AttendanceList = _context.EmployeeAttendance
+                        .Where(x =>
+                            x.AttendanceDate >= model.FromDate &&
+                            x.AttendanceDate <= model.ToDate &&
+                            !x.IsDeleted)
+                        .OrderBy(x => x.AttendanceDate)
+                        .ToList();
+                }
+                else
+                {
+                    // SPECIFIC EMPLOYEE
+                    model.AttendanceList = _context.EmployeeAttendance
+                        .Where(x =>
+                            x.EmployeeId == model.EmployeeId &&
+                            x.AttendanceDate >= model.FromDate &&
+                            x.AttendanceDate <= model.ToDate &&
+                            !x.IsDeleted)
+                        .OrderBy(x => x.AttendanceDate)
+                        .ToList();
+                }
 
                 // ==========================================
                 // LOAD EMPLOYEE DETAILS
@@ -1884,5 +1880,248 @@ namespace CRMPortal.Controllers
         }
 
 
+        // ==========================================
+        // EDIT ATTENDANCE
+        // ==========================================
+        [HttpGet]
+        public async Task<IActionResult> EditAttendance(int attendanceId)
+        {
+            try
+            {
+                // Only HR can edit attendance
+                if (HttpContext.Session.GetInt32("RoleId") != 5)
+                {
+                    return RedirectToAction("Login", "Account");
+                }
+
+                // ==========================================
+                // FIND EXISTING ATTENDANCE
+                // ==========================================
+
+                var attendance = await _context.EmployeeAttendance
+                    .FirstOrDefaultAsync(x =>
+                        x.AttendanceId == attendanceId &&
+                        !x.IsDeleted);
+
+                if (attendance == null)
+                {
+                    TempData["Error"] = "Attendance record not found.";
+
+                    return RedirectToAction("ViewAttendance");
+                }
+
+                // ==========================================
+                // FIND EMPLOYEE
+                // ==========================================
+
+                var employee = await _context.MasterEmployee
+                    .FirstOrDefaultAsync(x =>
+                        x.EmployeeId == attendance.EmployeeId &&
+                        !x.IsDeleted);
+
+                if (employee == null)
+                {
+                    TempData["Error"] = "Employee not found.";
+
+                    return RedirectToAction("ViewAttendance");
+                }
+
+                // ==========================================
+                // CREATE DASHBOARD MODEL
+                // ==========================================
+
+                HRDashboardViewModel model =
+                    new HRDashboardViewModel();
+
+                // Existing employee
+                model.MasterEmployee = employee;
+
+                // Existing attendance
+                model.EmployeeAttendance = attendance;
+
+                // ==========================================
+                // LOAD EMPLOYEE LIST
+                // ==========================================
+
+                model.EmployeeList = await _context.MasterEmployee
+                    .Where(x => !x.IsDeleted)
+                    .OrderBy(x => x.FullName)
+                    .ToListAsync();
+
+                // ==========================================
+                // EDIT MODE
+                // ==========================================
+
+                model.IsAttendanceEdit = true;
+
+                // IMPORTANT:
+                // Keep using your existing Dashboard view.
+                // This prevents creating a new Attendance view
+                // and keeps your existing page structure.
+                return View("Dashboard", model);
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = ex.Message;
+
+                return RedirectToAction("ViewAttendance");
+            }
+        }
+
+
+        // ==========================================
+        // UPDATE ATTENDANCE
+        // ==========================================
+        [HttpPost]
+        public async Task<IActionResult> UpdateAttendance(
+            HRDashboardViewModel model)
+        {
+            try
+            {
+                // Only HR can update attendance
+                if (HttpContext.Session.GetInt32("RoleId") != 5)
+                {
+                    return RedirectToAction("Login", "Account");
+                }
+
+                // ==========================================
+                // NULL CHECK
+                // ==========================================
+
+                if (model.EmployeeAttendance == null)
+                {
+                    TempData["Error"] =
+                        "Attendance information is missing.";
+
+                    return RedirectToAction("ViewAttendance");
+                }
+
+                var attendanceModel =
+                    model.EmployeeAttendance;
+
+                // ==========================================
+                // FIND EXISTING ATTENDANCE
+                // ==========================================
+
+                var attendance =
+                    await _context.EmployeeAttendance
+                        .FirstOrDefaultAsync(x =>
+                            x.AttendanceId ==
+                                attendanceModel.AttendanceId &&
+                            !x.IsDeleted);
+
+                if (attendance == null)
+                {
+                    TempData["Error"] =
+                        "Attendance record not found.";
+
+                    return RedirectToAction("ViewAttendance");
+                }
+
+                // ==========================================
+                // CHECK EMPLOYEE
+                // ==========================================
+
+                var employee =
+                    await _context.MasterEmployee
+                        .FirstOrDefaultAsync(x =>
+                            x.EmployeeId ==
+                                attendanceModel.EmployeeId &&
+                            !x.IsDeleted);
+
+                if (employee == null)
+                {
+                    TempData["Error"] =
+                        "Employee not found.";
+
+                    return RedirectToAction("ViewAttendance");
+                }
+
+                // ==========================================
+                // DUPLICATE ATTENDANCE CHECK
+                // ==========================================
+
+                bool duplicate =
+                    await _context.EmployeeAttendance
+                        .AnyAsync(x =>
+                            x.AttendanceId !=
+                                attendanceModel.AttendanceId &&
+
+                            x.EmployeeId ==
+                                attendanceModel.EmployeeId &&
+
+                            x.AttendanceDate ==
+                                attendanceModel.AttendanceDate &&
+
+                            !x.IsDeleted);
+
+                if (duplicate)
+                {
+                    TempData["Error"] =
+                        "Attendance already exists for this employee on the selected date.";
+
+                    return RedirectToAction(
+                        "EditAttendance",
+                        new
+                        {
+                            attendanceId =
+                                attendanceModel.AttendanceId
+                        });
+                }
+
+                // ==========================================
+                // UPDATE EXISTING RECORD
+                // ==========================================
+
+                attendance.EmployeeId =
+                    attendanceModel.EmployeeId;
+
+                attendance.AttendanceDate =
+                    attendanceModel.AttendanceDate;
+
+                attendance.Status =
+                    attendanceModel.Status;
+
+                attendance.Remarks =
+                    attendanceModel.Remarks;
+
+                // Do NOT change CreatedDate
+                attendance.UpdatedDate =
+                    DateTime.Now;
+
+                attendance.ModifiedDate =
+                    DateTime.Now;
+
+                // ==========================================
+                // SAVE CHANGES ASYNC
+                // ==========================================
+
+                await _context.SaveChangesAsync();
+
+                TempData["Success"] =
+                    "Attendance updated successfully.";
+
+                // Return to attendance report
+                return RedirectToAction("ViewAttendance");
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = ex.Message;
+
+                // Prevent null reference in catch
+                if (model?.EmployeeAttendance != null)
+                {
+                    return RedirectToAction(
+                        "EditAttendance",
+                        new
+                        {
+                            attendanceId =
+                                model.EmployeeAttendance.AttendanceId
+                        });
+                }
+
+                return RedirectToAction("ViewAttendance");
+            }
+        }
     }
 }

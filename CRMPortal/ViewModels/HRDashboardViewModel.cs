@@ -16,5 +16,7 @@ namespace CRMPortal.ViewModels
         public int ActiveEmployees { get; set; }
 
         public int InactiveEmployees { get; set; }
+
+        public bool IsAttendanceEdit { get; set; } = false;
     }
 }

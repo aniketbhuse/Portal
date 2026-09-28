@@ -4,9 +4,11 @@
     ViewData["Title"] = "HR Dashboard";
 }
 
+
+
 @if (TempData["Success"] != null)
 {
-    <div class="alert alert-success alert-dismissible fade show">
+    <div id="successAlert" class="alert alert-success alert-dismissible fade show" role="alert">
 
         @TempData["Success"]
 
@@ -19,7 +21,7 @@
 
 @if (TempData["Error"] != null)
 {
-    <div class="alert alert-danger alert-dismissible fade show">
+    <div id="errorAlert" class="alert alert-danger alert-dismissible fade show" role="alert">
 
         @TempData["Error"]
 
@@ -132,21 +134,8 @@
 
                             </div>
 
-                            <div class="mb-3">
+                           
 
-                                <label>First Name</label>
-
-                                <input asp-for="MasterEmployee.FirstName" placeholder="Frist Name" class="form-control" />
-
-                            </div>
-
-                            <div class="mb-3">
-
-                                <label>Last Name</label>
-
-                                <input asp-for="MasterEmployee.LastName" placeholder="Last Name" class="form-control" />
-
-                            </div>
 
                             <div class="mb-3">
 
@@ -276,31 +265,11 @@
 
                             </div>
 
-                            <div class="mb-3">
+                            
 
-                                <label>Alternate Mobile Number</label>
+                           
 
-                                <input asp-for="MasterEmployee.AlternateMobile" class="form-control" maxlength="10" />
-
-                            </div>
-
-                            <div class="mb-3">
-
-                                <label>Emergency Contact Name</label>
-
-                                <input asp-for="MasterEmployee.EmergencyContactName"
-                                       class="form-control" />
-
-                            </div>
-
-                            <div class="mb-3">
-
-                                <label>Emergency Contact Number</label>
-
-                                <input asp-for="MasterEmployee.EmergencyContact"
-                                       class="form-control" />
-
-                            </div>
+                          
 
                             <div class="mb-3">
 
@@ -312,32 +281,10 @@
 
                             </div>
 
-                            <div class="mb-3">
+                            
 
-                                <label>City</label>
+                            
 
-                                <input asp-for="MasterEmployee.City"
-                                       class="form-control" />
-
-                            </div>
-
-                            <div class="mb-3">
-
-                                <label>State</label>
-
-                                <input asp-for="MasterEmployee.State"
-                                       class="form-control" />
-
-                            </div>
-
-                            <div class="mb-3">
-
-                                <label>Country</label>
-
-                                <input asp-for="MasterEmployee.Country"
-                                       class="form-control" />
-
-                            </div>
 
                             <div class="mb-3">
 
@@ -371,14 +318,7 @@
 
                             </div>
 
-                            <div class="mb-3">
-
-                                <label>Work Location</label>
-
-                                <input asp-for="MasterEmployee.WorkLocation"
-                                       class="form-control" />
-
-                            </div>
+                          
 
                             <div class="mb-3">
 
@@ -416,14 +356,7 @@
 
                             </div>
 
-                            <div class="mb-3">
-
-                                <label>Passport Number</label>
-
-                                <input asp-for="MasterEmployee.PassportNumber"
-                                       class="form-control" />
-
-                            </div>
+                           
 
                             <div class="mb-3">
 
@@ -473,111 +406,201 @@
             
 
         </div>
-        <div class="col-lg-6">
+    <div class="col-lg-6">
 
-            <div class="card shadow">
+        <div class="card shadow">
 
-                <div class="card-header bg-primary text-white">
+            <div class="card-header bg-primary text-white">
 
-                    <h4>Employee Attendance</h4>
+                <h4>
+                    @if (Model.IsAttendanceEdit)
+                    {
+                        <i class="fa-solid fa-pen-to-square me-2"></i>
+                        <span>Edit Employee Attendance</span>
+                    }
+                    else
+                    {
+                        <i class="fa-solid fa-calendar-check me-2"></i>
+                        <span>Employee Attendance</span>
+                    }
+                </h4>
 
-                </div>
+            </div>
 
-                <div class="card-body">
+            <div class="card-body">
 
-                    <form asp-action="SaveAttendance"
-                          method="post">
+                <form asp-action="@(Model.IsAttendanceEdit ? "UpdateAttendance" : "SaveAttendance")"
+                      method="post">
 
-                        <div class="mb-3">
+                    <!-- Attendance ID -->
+                    <input type="hidden"
+                           asp-for="EmployeeAttendance.AttendanceId" />
 
-                            <label>Employee</label>
 
-                            <input type="text"
-                                   id="employeeName"
-                                   class="form-control"
-                                   list="employeeList"
-                                   placeholder="Search Employee"
-                                   autocomplete="off"
-                                   required />
+                    <!-- EMPLOYEE -->
+                   <div class="mb-3 position-relative">
 
-                            <input type="hidden"
-                                   asp-for="EmployeeAttendance.EmployeeId"
-                                   id="EmployeeId" />
+    <label>Employee</label>
 
-                            <datalist id="employeeList">
+    <!-- Search Box -->
+    <input type="text"
+           id="employeeName"
+           class="form-control"
+           placeholder="Search Employee Code or Name"
+           autocomplete="off"
+           value="@(Model.EmployeeAttendance?.EmployeeId > 0
+                        ? Model.EmployeeList
+                            .Where(x => x.EmployeeId ==
+                                        Model.EmployeeAttendance.EmployeeId)
+                            .Select(x => x.EmployeeCode + " - " + x.FullName)
+                            .FirstOrDefault()
+                        : "")"
+           required />
 
-                                @foreach (var emp in Model.EmployeeList)
-                                {
-                                    <option data-id="@emp.EmployeeId"
-                                            value="@emp.FullName"></option>
-                                }
+    <!-- Employee ID -->
+    <input type="hidden"
+           asp-for="EmployeeAttendance.EmployeeId"
+           id="EmployeeId" />
 
-                            </datalist>
 
-                        </div>
+    <!-- Searchable Employee Dropdown -->
+    <div id="employeeDropdown"
+         class="list-group position-absolute w-100 shadow"
+         style="display:none; z-index:1000; max-height:250px; overflow-y:auto;">
 
-                        <div class="mb-3">
+        @foreach (var emp in Model.EmployeeList)
+        {
+            <button type="button"
+                    class="list-group-item list-group-item-action employee-option"
+                    data-id="@emp.EmployeeId"
+                    data-search="@($"{emp.EmployeeCode} {emp.FullName}")">
 
-                            <label class="form-label">Attendance Date</label>
+                <strong>@emp.EmployeeCode</strong>
+                -
+                @emp.FullName
 
-                            <input asp-for="EmployeeAttendance.AttendanceDate"
-                                   type="date"
-                                   class="form-control"
-                                   required />
+            </button>
+        }
 
-                        </div>
+    </div>
 
+</div>
+
+
+                    <!-- ATTENDANCE DATE -->
+                    <div class="mb-3">
+
+                        <label class="form-label">
+                            Attendance Date
+                        </label>
+
+                        <input asp-for="EmployeeAttendance.AttendanceDate"
+                               type="date"
+                               class="form-control"
+                               required />
+
+                    </div>
+
+
+                    <!-- STATUS -->
                     <div class="mb-3">
 
                         <label>Status</label>
 
                         <select asp-for="EmployeeAttendance.Status"
-                                class="form-control" required>
+                                class="form-control"
+                                required>
 
                             <option value="">Select Status</option>
 
-                            <option value="Present">Present</option>
+                            <option value="Present">
+                                Present
+                            </option>
 
-                            <option value="PL">Paid Leave (PL)</option>
+                            <option value="PL">
+                                Paid Leave (PL)
+                            </option>
 
-                            <option value="HD">Half Day (HD)</option>
+                            <option value="HD">
+                                Half Day (HD)
+                            </option>
 
-                            <option value="LWP">Leave Without Pay (LWP)</option>
+                            <option value="LWP">
+                                Leave Without Pay (LWP)
+                            </option>
 
-                            <option value="ULWP">Unplanned Leave Without Pay (ULWP)</option>
+                            <option value="ULWP">
+                                Unplanned Leave Without Pay (ULWP)
+                            </option>
 
-                            <option value="Sandwich">Sandwich Leave</option>
+                            <option value="Sandwich">
+                                Sandwich Leave
+                            </option>
 
-                            <option value="Abscond">Abscond</option>
+                            <option value="Abscond">
+                                Abscond
+                            </option>
 
-                            <option value="Terminated">Terminated</option>
+                            <option value="Terminated">
+                                Terminated
+                            </option>
 
                         </select>
 
                     </div>
 
-                        <div class="mb-3">
 
-                            <label>Remarks</label>
+                    <!-- REMARKS -->
+                    <div class="mb-3">
 
-                            <textarea asp-for="EmployeeAttendance.Remarks"
-                                      class="form-control"></textarea>
+                        <label>Remarks</label>
 
-                        </div>
+                        <textarea asp-for="EmployeeAttendance.Remarks"
+                                  class="form-control"></textarea>
 
-                        <button class="btn btn-success">
+                    </div>
+
+
+                    <!-- BUTTON -->
+                    @if (Model.IsAttendanceEdit)
+                    {
+                        <button type="submit"
+                                class="btn btn-warning">
+
+                            <i class="fa-solid fa-pen-to-square me-1"></i>
+
+                            Update Attendance
+
+                        </button>
+
+                        <a asp-action="ViewAttendance"
+                           class="btn btn-secondary ms-2">
+
+                            <i class="fa-solid fa-xmark me-1"></i>
+
+                            Cancel
+
+                        </a>
+                    }
+                    else
+                    {
+                        <button type="submit"
+                                class="btn btn-success">
+
+                            <i class="fa-solid fa-floppy-disk me-1"></i>
 
                             Save Attendance
 
                         </button>
+                    }
 
-                    </form>
-
-                </div>
+                </form>
 
             </div>
 
         </div>
+
+    </div>
 
        
 
@@ -588,23 +611,25 @@
 
     document.getElementById("employeeName").addEventListener("change", function () {
 
-        var employeeName = this.value;
+    var selectedEmployee = this.value;
 
-        var options = document.querySelectorAll("#employeeList option");
+    var options = document.querySelectorAll("#employeeList option");
 
-        document.getElementById("EmployeeId").value = "";
+    var employeeId = document.getElementById("EmployeeId");
 
-        options.forEach(function(option) {
+    employeeId.value = "";
 
-            if(option.value === employeeName){
+    options.forEach(function (option) {
 
-                document.getElementById("EmployeeId").value =
-                    option.getAttribute("data-id");
+        if (option.value === selectedEmployee) {
 
-            }
+            employeeId.value =
+                option.getAttribute("data-id");
 
-        });
+        }
 
     });
+
+});
 
 </script>

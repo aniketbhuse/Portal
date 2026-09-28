@@ -22,19 +22,33 @@ namespace CRMPortal.Controllers
         {
             try
             {
+                // Check Employee Role
                 if (HttpContext.Session.GetInt32("RoleId") != 2)
                 {
                     return RedirectToAction("Login", "Account");
                 }
 
-                // ✅ Use EmployeeId, NOT UserId
-                int employeeId = HttpContext.Session.GetInt32("EmployeeId").Value;
+                // Get EmployeeId from Session
+                int employeeId = HttpContext.Session
+                    .GetInt32("EmployeeId").Value;
 
+                // Get Employee
                 var employee = _context.MasterEmployee
-                    .FirstOrDefault(x => x.EmployeeId == employeeId && !x.IsDeleted);
+                    .FirstOrDefault(x =>
+                        x.EmployeeId == employeeId &&
+                        !x.IsDeleted);
 
-                DateOnly today = DateOnly.FromDateTime(DateTime.Today);
+                if (employee == null)
+                {
+                    TempData["Error"] = "Employee not found.";
+                    return RedirectToAction("Login", "Account");
+                }
 
+                // Today's date
+                DateOnly today =
+                    DateOnly.FromDateTime(DateTime.Today);
+
+                // Get today's login tracker
                 var login = _context.EmployeeLoginTracker
                     .FirstOrDefault(x =>
                         x.EmployeeId == employeeId &&
@@ -43,18 +57,41 @@ namespace CRMPortal.Controllers
 
                 if (login != null)
                 {
-                    ViewBag.SignInTime = login.SignInTime;
-                    ViewBag.SignOutTime = login.SignOutTime;
-                    ViewBag.SessionStatus = login.SessionStatus;
+                    // Sign In Time
+                    ViewBag.SignInTime =
+                        login.SignInTime?.ToString("hh:mm tt");
 
-                    // Important
-                    ViewBag.SignInDateTime = login.SignInTime.Value.ToString("yyyy-MM-ddTHH:mm:ss");
+                    // Sign Out Time
+                    ViewBag.SignOutTime =
+                        login.SignOutTime?.ToString("hh:mm tt");
+
+                    // Session Status
+                    ViewBag.SessionStatus =
+                        login.SessionStatus;
+
+                    // Sign In DateTime for JavaScript Timer
+                    if (login.SignInTime.HasValue)
+                    {
+                        ViewBag.SignInDateTime =
+                            login.SignInTime.Value
+                                .ToString("yyyy-MM-ddTHH:mm:ss");
+                    }
+                    else
+                    {
+                        ViewBag.SignInDateTime = "";
+                    }
                 }
                 else
                 {
+                    // No attendance record for today
+
                     ViewBag.SignInTime = null;
+
                     ViewBag.SignOutTime = null;
-                    ViewBag.SessionStatus = "Not Signed In";
+
+                    ViewBag.SessionStatus =
+                        "Not Signed In";
+
                     ViewBag.SignInDateTime = "";
                 }
 
@@ -63,6 +100,7 @@ namespace CRMPortal.Controllers
             catch (Exception ex)
             {
                 TempData["Error"] = ex.Message;
+
                 return RedirectToAction("Login", "Account");
             }
         }
@@ -106,7 +144,7 @@ namespace CRMPortal.Controllers
                 tracker.FullName = employee.FullName;
                 tracker.LoginDate = today;
                 tracker.SignInTime = DateTime.Now;
-                tracker.SessionStatus = "SignedIn";
+                tracker.SessionStatus = "Signed In";
                 tracker.CreatedDate = DateTime.Now;
                 tracker.UpdatedDate = DateTime.Now;
                 tracker.ModifiedDate = DateTime.Now;

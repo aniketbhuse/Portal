@@ -41,6 +41,15 @@ builder.Services.AddSession(options =>
     options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
 });
 
+
+// ===========================
+// ADD THESE TWO LINES
+// ===========================
+builder.Services.AddHttpContextAccessor();
+
+builder.Services.AddScoped<ErrorLogService>();
+
+// Existing Service
 builder.Services.AddScoped<EmailService>();
 
 var app = builder.Build();
@@ -55,7 +64,8 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-//app.UseHttpsRedirection();
+// Uncomment only after HTTPS certificate is configured on IIS
+// app.UseHttpsRedirection();
 
 app.UseStaticFiles();
 

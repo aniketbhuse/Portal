@@ -470,3 +470,202 @@ body {
     .summary-card:hover h3 {
         transform: scale(1.08);
     }
+
+
+
+    /* ==========================================
+   Employee Dashboard Attendance Top Section
+========================================== */
+
+.attendance-top-section{
+    margin-bottom:30px;
+}
+
+/* Shared Card */
+
+.attendance-info-card,
+.timer-card{
+    background:#fff;
+    border:1px solid #e5e7eb;
+    border-radius:20px;
+    padding:22px;
+    box-shadow:0 8px 20px rgba(0,0,0,.05);
+    transition:.3s ease;
+}
+
+.attendance-info-card:hover,
+.timer-card:hover{
+    transform:translateY(-3px);
+    box-shadow:0 14px 30px rgba(0,0,0,.08);
+}
+
+/* Sign In / Sign Out Card */
+
+.attendance-info-card{
+    display:flex;
+    align-items:center;
+    gap:18px;
+    min-height:170px;
+}
+
+.attendance-icon{
+    width:65px;
+    height:65px;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:28px;
+}
+
+.success-icon{
+    background:#d1fae5;
+    color:#059669;
+}
+
+.danger-icon{
+    background:#fee2e2;
+    color:#dc2626;
+}
+
+.attendance-content small{
+    color:#6b7280;
+    font-size:14px;
+    display:block;
+    margin-bottom:6px;
+}
+
+.attendance-content h4{
+    font-size:24px;
+}
+
+/* Timer Card */
+
+.timer-card{
+    text-align:center;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    min-height:170px;
+}
+
+.timer-badge{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:8px 18px;
+    background:#d1fae5;
+    color:#047857;
+    border-radius:50px;
+    font-weight:600;
+    font-size:14px;
+    margin-bottom:15px;
+}
+
+.timer-badge i{
+    font-size:8px;
+}
+
+#workingTimer{
+    font-size:54px;
+    font-weight:700;
+    color:#059669;
+    margin:0;
+    line-height:1;
+}
+
+.timer-card small{
+    color:#6b7280;
+    margin-top:10px;
+    font-size:13px;
+    letter-spacing:.5px;
+}
+
+/* ==========================================
+   Responsive
+========================================== */
+
+/* Large Laptop */
+@media (max-width:1200px){
+
+    #workingTimer{
+        font-size:46px;
+    }
+
+    .attendance-content h4{
+        font-size:21px;
+    }
+}
+
+/* Tablet */
+@media (max-width:992px){
+
+    .attendance-info-card,
+    .timer-card{
+        min-height:150px;
+        padding:18px;
+    }
+
+    #workingTimer{
+        font-size:42px;
+    }
+
+    .attendance-content h4{
+        font-size:20px;
+    }
+}
+
+/* Mobile */
+@media (max-width:768px){
+
+    .attendance-info-card,
+    .timer-card{
+        min-height:auto;
+    }
+
+    .attendance-info-card{
+        justify-content:center;
+        text-align:center;
+        flex-direction:column;
+    }
+
+    #workingTimer{
+        font-size:36px;
+    }
+
+    .timer-card{
+        padding:22px 15px;
+    }
+
+    .attendance-content h4{
+        font-size:18px;
+    }
+
+    .attendance-icon{
+        width:60px;
+        height:60px;
+        font-size:24px;
+    }
+}
+
+/* Small Mobile */
+@media (max-width:576px){
+
+    #workingTimer{
+        font-size:32px;
+    }
+
+    .timer-badge{
+        font-size:12px;
+        padding:6px 14px;
+    }
+
+    .attendance-content small{
+        font-size:12px;
+    }
+
+    .attendance-content h4{
+        font-size:17px;
+    }
+}

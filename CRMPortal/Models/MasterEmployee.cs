@@ -10,11 +10,6 @@ namespace CRMPortal.Models
         [Required]
         public string EmployeeCode { get; set; }
 
-        [Required]
-        public string FirstName { get; set; }
-
-        [Required]
-        public string LastName { get; set; }
 
         [Required]
         public string FullName { get; set; }
@@ -37,25 +32,8 @@ namespace CRMPortal.Models
         [Required]
         public string MobileNumber { get; set; }
 
-        public string? AlternateMobile { get; set; }
-
-        [Required]
-        public string EmergencyContactName { get; set; }
-
-        [Required]
-        public string EmergencyContact { get; set; }
-
         [Required]
         public string AddressLine1 { get; set; }
-
-        [Required]
-        public string City { get; set; }
-
-        [Required]
-        public string State { get; set; }
-
-        [Required]
-        public string Country { get; set; }
 
         [Required]
         public string Pincode { get; set; }
@@ -74,9 +52,6 @@ namespace CRMPortal.Models
         public string? ReportingManager { get; set; }
 
         [Required]
-        public string WorkLocation { get; set; }
-
-        [Required]
         public string Shift { get; set; }
 
         public decimal Salary { get; set; }
@@ -86,8 +61,6 @@ namespace CRMPortal.Models
         public string? AadhaarNumber { get; set; }
 
         public string? PANNumber { get; set; }
-
-        public string? PassportNumber { get; set; }
 
         public string? BankName { get; set; }
 
