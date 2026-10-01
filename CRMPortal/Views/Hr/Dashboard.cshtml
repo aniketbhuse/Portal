@@ -4,632 +4,1500 @@
     ViewData["Title"] = "HR Dashboard";
 }
 
+<style>
+
+    /* =========================================================
+           PAGE LAYOUT
+           ========================================================= */
+
+    .hr-dashboard-container {
+        width: 100%;
+        padding-left: 20px;
+        padding-right: 20px;
+        margin-top: 20px;
+    }
+
+    .dashboard-row {
+        align-items: flex-start;
+    }
 
 
+    /* =========================================================
+           CARDS
+           ========================================================= */
+
+    .dashboard-card {
+        border: none;
+        border-radius: 12px;
+        overflow: visible;
+    }
+
+        .dashboard-card .card-header {
+            background-color: #0d6efd !important;
+            color: white;
+            min-height: 56px;
+            display: flex;
+            align-items: center;
+            padding: 14px 20px;
+            border-radius: 12px 12px 0 0;
+        }
+
+            .dashboard-card .card-header h5,
+            .dashboard-card .card-header h4 {
+                margin: 0;
+                font-size: 20px;
+                font-weight: 600;
+            }
+
+        .dashboard-card .card-body {
+            padding: 20px;
+        }
+
+
+    /* =========================================================
+           FORM
+           ========================================================= */
+
+    .form-label {
+        font-weight: 500;
+        margin-bottom: 7px;
+        color: #212529;
+    }
+
+    .form-control,
+    .form-select {
+        min-height: 42px;
+        border: 1px solid #ced4da;
+        border-radius: 10px;
+        padding: 9px 13px;
+        font-size: 14px;
+    }
+
+    textarea.form-control {
+        min-height: auto;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+        border-color: #86b7fe;
+        box-shadow: 0 0 0 0.15rem rgba(13, 110, 253, 0.15);
+    }
+
+    .mb-3 {
+        margin-bottom: 16px !important;
+    }
+
+
+    /* =========================================================
+           EMPLOYEE SEARCH DROPDOWN
+           ========================================================= */
+
+    .employee-search-wrapper {
+        position: relative;
+    }
+
+    #employeeDropdown {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        z-index: 1050;
+        max-height: 250px;
+        overflow-y: auto;
+        background: white;
+        border: 1px solid #ced4da;
+        border-radius: 0 0 10px 10px;
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.12);
+    }
+
+    .employee-option {
+        display: block;
+        width: 100%;
+        text-align: left;
+        padding: 10px 13px;
+        border: 0;
+        border-bottom: 1px solid #eeeeee;
+        background: white;
+        color: #212529;
+        font-size: 14px;
+        white-space: nowrap;
+    }
+
+        .employee-option:last-child {
+            border-bottom: none;
+        }
+
+        .employee-option:hover {
+            background-color: #f1f5f9;
+            color: #0d6efd;
+        }
+
+    .employee-code {
+        font-weight: 600;
+        color: #0d6efd;
+    }
+
+    .employee-name {
+        color: #212529;
+    }
+
+    .employee-separator {
+        margin-left: 4px;
+        margin-right: 4px;
+        color: #6c757d;
+    }
+
+
+    /* =========================================================
+           BUTTONS
+           ========================================================= */
+
+    .dashboard-card .btn {
+        border-radius: 8px;
+        min-height: 40px;
+    }
+
+    .save-employee-btn {
+        width: 100%;
+        margin-top: 5px;
+    }
+
+
+    /* =========================================================
+           ALERT
+           ========================================================= */
+
+    #successAlert,
+    #errorAlert {
+        margin-left: 20px;
+        margin-right: 20px;
+    }
+
+
+    /* =========================================================
+           RESPONSIVE
+           ========================================================= */
+
+    
+        @@media (max-width: 991px) {
+
+            .hr-dashboard-container {
+                padding-left: 15px;
+                padding-right: 15px;
+            }
+
+            .dashboard-card {
+                margin-bottom: 20px;
+            }
+        }
+</style>
+
+
+
+
+<!-- ========================================================= -->
+<!-- SUCCESS MESSAGE -->
+<!-- ========================================================= -->
 @if (TempData["Success"] != null)
 {
-    <div id="successAlert" class="alert alert-success alert-dismissible fade show" role="alert">
+    <div id="successAlert"
+         class="alert alert-success alert-dismissible fade show"
+         role="alert">
+
+        <i class="fa-solid fa-circle-check me-2"></i>
 
         @TempData["Success"]
 
-        <button class="btn-close"
+        <button type="button"
+                class="btn-close"
                 data-bs-dismiss="alert">
         </button>
 
     </div>
 }
 
+
+<!-- ========================================================= -->
+<!-- ERROR MESSAGE -->
+<!-- ========================================================= -->
 @if (TempData["Error"] != null)
 {
-    <div id="errorAlert" class="alert alert-danger alert-dismissible fade show" role="alert">
+    <div id="errorAlert"
+         class="alert alert-danger alert-dismissible fade show"
+         role="alert">
+
+        <i class="fa-solid fa-circle-exclamation me-2"></i>
 
         @TempData["Error"]
 
-        <button class="btn-close"
+        <button type="button"
+                class="btn-close"
                 data-bs-dismiss="alert">
         </button>
 
     </div>
 }
 
-<div class="container-fluid mt-3" style="margin-left: -110px;">
 
-    <!-- Summary Card -->
+<!-- ========================================================= -->
+<!-- MAIN CONTAINER -->
+<!-- ========================================================= -->
 
-    <div class="row mb-3" style="display: none;>
-        <div class="col-md-8">
+<div class="container-fluid hr-dashboard-container">
 
-            <!-- Dashboard Cards -->
+    <!-- ===================================================== -->
+    <!-- SUMMARY CARD -->
+    <!-- ===================================================== -->
 
-            <div class="row">
+    <div class="row mb-3"
+         style="display:none;">
 
-                <div class="col-md-4">
+        <div class="col-md-3">
 
-                    <div class="card shadow text-center">
+            <div class="card shadow">
 
-                        <div class="card-body">
+                <div class="card-body">
 
-                            <h6>Total Employees</h6>
+                    <h6>Total Employees</h6>
 
-                            <h2 class="text-primary">
-
-                                @ViewBag.TotalEmployees
-
-                            </h2>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-                <div class="col-md-4">
-
-                    <div class="card shadow text-center">
-
-                        <div class="card-body">
-
-                            <h6>Active Employees</h6>
-
-                            <h2 class="text-success">
-
-                                @ViewBag.ActiveEmployees
-
-                            </h2>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-                <div class="col-md-4">
-
-                    <div class="card shadow text-center">
-
-                        <div class="card-body">
-
-                            <h6>Inactive Employees</h6>
-
-                            <h2 class="text-danger">
-
-                                @ViewBag.InactiveEmployees
-
-                            </h2>
-
-                        </div>
-
-                    </div>
+                    <h3>
+                        @Model.EmployeeList.Count
+                    </h3>
 
                 </div>
 
             </div>
 
         </div>
+
     </div>
 
-    <div class="row">
+
+    <!-- ===================================================== -->
+    <!-- MAIN ROW -->
+    <!-- ===================================================== -->
+
+    <div class="row g-4 dashboard-row">
+
+
+        <!-- ===================================================== -->
+        <!-- LEFT SIDE - EMPLOYEE FORM -->
+        <!-- ===================================================== -->
 
         <div class="col-lg-6">
 
-            <!-- Employee Form -->
-            <div class="card shadow mb-4">
+            <div class="card shadow dashboard-card">
 
-                <div class="card-header bg-primary text-white">
 
-                    <h5>Add Employee</h5>
+                <!-- ================================================= -->
+                <!-- CARD HEADER -->
+                <!-- ================================================= -->
+
+                <div class="card-header">
+
+                    <h5>
+
+                        @if (Model.MasterEmployee.EmployeeId == 0)
+                        {
+                            <i class="fa-solid fa-user-plus me-2"></i>
+                            <span>Add Employee</span>
+                        }
+                        else
+                        {
+                            <i class="fa-solid fa-user-pen me-2"></i>
+                            <span>Update Employee</span>
+                        }
+
+                    </h5>
 
                 </div>
 
+
+                <!-- ================================================= -->
+                <!-- CARD BODY -->
+                <!-- ================================================= -->
+
                 <div class="card-body">
+
+                    <!-- ============================================= -->
+                    <!-- EMPLOYEE FORM -->
+                    <!-- ============================================= -->
+
                     <form asp-action="@(Model.MasterEmployee.EmployeeId == 0 ? "AddEmployee" : "UpdateEmployee")"
                           method="post">
 
-                            <input type="hidden" asp-for="MasterEmployee.EmployeeId" />
 
-                            <div class="mb-3">
+                        <!-- Employee ID -->
 
-                                <label>Employee Code</label>
-                            <input asp-for="MasterEmployee.EmployeeCode" placeholder="MTS00001" class="form-control" />
+                        <input type="hidden"
+                               asp-for="MasterEmployee.EmployeeId" />
 
-                            </div>
 
-                           
+                        <!-- ========================================= -->
+                        <!-- EMPLOYEE CODE -->
+                        <!-- ========================================= -->
 
+                        <div class="mb-3">
 
-                            <div class="mb-3">
+                            <label class="form-label">
+                                Employee Code
+                            </label>
 
-                                <label>Full Name</label>
+                            <input asp-for="MasterEmployee.EmployeeCode"
+                                   placeholder="MTS00001"
+                                   class="form-control" />
 
-                                <input asp-for="MasterEmployee.FullName" placeholder="Full Name" class="form-control" />
+                            <span asp-validation-for="MasterEmployee.EmployeeCode"
+                                  class="text-danger">
+                            </span>
 
-                            </div>
+                        </div>
 
-                            <div class="mb-3">
 
-                                <label>Email</label>
+                        <!-- ========================================= -->
+                        <!-- FULL NAME -->
+                        <!-- ========================================= -->
 
-                                <input asp-for="MasterEmployee.Email" placeholder="Email" class="form-control" />
+                        <div class="mb-3">
 
-                            </div>
+                            <label class="form-label">
+                                Full Name
+                            </label>
 
-                            <div class="mb-3">
+                            <input asp-for="MasterEmployee.FullName"
+                                   placeholder="Full Name"
+                                   class="form-control" />
 
-                                <label>Mobile Number</label>
+                            <span asp-validation-for="MasterEmployee.FullName"
+                                  class="text-danger">
+                            </span>
 
-                                <input asp-for="MasterEmployee.MobileNumber" class="form-control" maxlength="10" />
+                        </div>
 
-                            </div>
 
-                            <div class="mb-3">
+                        <!-- ========================================= -->
+                        <!-- EMAIL -->
+                        <!-- ========================================= -->
 
-                                <label>Department</label>
+                        <div class="mb-3">
 
-                                <input asp-for="MasterEmployee.Department" class="form-control" />
+                            <label class="form-label">
+                                Email
+                            </label>
 
-                            </div>
+                            <input asp-for="MasterEmployee.Email"
+                                   type="email"
+                                   placeholder="Email"
+                                   class="form-control" />
 
-                            <div class="mb-3">
+                            <span asp-validation-for="MasterEmployee.Email"
+                                  class="text-danger">
+                            </span>
 
-                                <label>Designation</label>
+                        </div>
 
-                                <input asp-for="MasterEmployee.Designation" class="form-control" />
 
-                            </div>
+                        <!-- ========================================= -->
+                        <!-- MOBILE NUMBER -->
+                        <!-- ========================================= -->
 
-                            <div class="mb-3">
+                        <div class="mb-3">
 
-                                <label>Gender</label>
+                            <label class="form-label">
+                                Mobile Number
+                            </label>
 
-                                <select asp-for="MasterEmployee.Gender" class="form-control">
+                            <input asp-for="MasterEmployee.MobileNumber"
+                                   class="form-control"
+                                   maxlength="10"
+                                   inputmode="numeric"
+                                   placeholder="10 digit mobile number" />
 
-                                    <option>Male</option>
+                            <span asp-validation-for="MasterEmployee.MobileNumber"
+                                  class="text-danger">
+                            </span>
 
-                                    <option>Female</option>
+                        </div>
 
-                                    <option>Other</option>
 
-                                </select>
+                        <!-- ========================================= -->
+                        <!-- EMERGENCY CONTACT NAME -->
+                        <!-- ========================================= -->
 
-                            </div>
+                        <div class="mb-3">
 
-                            <div class="mb-3">
+                            <label class="form-label">
+                                Emergency Contact Name
+                            </label>
 
-                                <label>Date Of Birth</label>
+                            <input asp-for="MasterEmployee.EmergencyContactName"
+                                   class="form-control"
+                                   maxlength="150"
+                                   placeholder="Emergency contact name" />
 
-                                <input asp-for="MasterEmployee.DateOfBirth" type="date" class="form-control" />
+                            <span asp-validation-for="MasterEmployee.EmergencyContactName"
+                                  class="text-danger">
+                            </span>
 
-                            </div>
+                        </div>
 
-                            <div class="mb-3">
-                                <label>Joining Date</label>
-                                <input asp-for="MasterEmployee.JoiningDate" type="date" class="form-control" />
 
-                            </div>
+                        <!-- ========================================= -->
+                        <!-- EMERGENCY CONTACT -->
+                        <!-- ========================================= -->
 
-                            <div class="mb-3">
-                                <label>Salary</label>
-                                <input asp-for="MasterEmployee.Salary" class="form-control" />
+                        <div class="mb-3">
 
-                            </div>
+                            <label class="form-label">
+                                Emergency Contact
+                            </label>
 
-                            <div class="mb-3">
+                            <input asp-for="MasterEmployee.EmergencyContact"
+                                   class="form-control"
+                                   maxlength="10"
+                                   inputmode="numeric"
+                                   placeholder="10 digit emergency contact number" />
 
-                                <label>Status</label>
+                            <span asp-validation-for="MasterEmployee.EmergencyContact"
+                                  class="text-danger">
+                            </span>
 
-                                <select asp-for="MasterEmployee.EmployeeStatus" class="form-control">
+                        </div>
 
-                                    <option>Active</option>
 
-                                    <option>Inactive</option>
+                        <!-- ========================================= -->
+                        <!-- DEPARTMENT -->
+                        <!-- ========================================= -->
 
-                                </select>
+                        <div class="mb-3">
 
-                            </div>
+                            <label class="form-label">
+                                Department
+                            </label>
 
-                            <div class="mb-3">
+                            <input asp-for="MasterEmployee.Department"
+                                   class="form-control"
+                                   placeholder="Department" />
 
-                                <label>Blood Group</label>
+                            <span asp-validation-for="MasterEmployee.Department"
+                                  class="text-danger">
+                            </span>
 
-                                <select asp-for="MasterEmployee.BloodGroup" class="form-control">
+                        </div>
 
-                                    <option value="">--Select Blood Group--</option>
 
-                                    <option>A+</option>
-                                    <option>A-</option>
-                                    <option>B+</option>
-                                    <option>B-</option>
-                                    <option>AB+</option>
-                                    <option>AB-</option>
-                                    <option>O+</option>
-                                    <option>O-</option>
+                        <!-- ========================================= -->
+                        <!-- DESIGNATION -->
+                        <!-- ========================================= -->
 
-                                </select>
+                        <div class="mb-3">
 
-                            </div>
+                            <label class="form-label">
+                                Designation
+                            </label>
 
-                            <div class="mb-3">
+                            <input asp-for="MasterEmployee.Designation"
+                                   class="form-control"
+                                   placeholder="Designation" />
 
-                                <label>Marital Status</label>
+                            <span asp-validation-for="MasterEmployee.Designation"
+                                  class="text-danger">
+                            </span>
 
-                                <select asp-for="MasterEmployee.MaritalStatus" class="form-control">
+                        </div>
 
-                                    <option value="">--Select Marital Status--</option>
 
-                                    <option>Single</option>
-                                    <option>Married</option>
-                                    <option>Divorced</option>
-                                    <option>Widowed</option>
+                        <!-- ========================================= -->
+                        <!-- GENDER -->
+                        <!-- ========================================= -->
 
-                                </select>
+                        <div class="mb-3">
 
-                            </div>
+                            <label class="form-label">
+                                Gender
+                            </label>
 
-                            
+                            <select asp-for="MasterEmployee.Gender"
+                                    class="form-select">
 
-                           
+                                <option value="">
+                                    -- Select Gender --
+                                </option>
 
-                          
+                                <option value="Male">
+                                    Male
+                                </option>
 
-                            <div class="mb-3">
+                                <option value="Female">
+                                    Female
+                                </option>
 
-                                <label>Address</label>
+                                <option value="Other">
+                                    Other
+                                </option>
 
-                                <textarea asp-for="MasterEmployee.AddressLine1"
-                                          class="form-control"
-                                          rows="3"></textarea>
+                            </select>
 
-                            </div>
+                            <span asp-validation-for="MasterEmployee.Gender"
+                                  class="text-danger">
+                            </span>
 
-                            
+                        </div>
 
-                            
 
+                        <!-- ========================================= -->
+                        <!-- DATE OF BIRTH -->
+                        <!-- ========================================= -->
 
-                            <div class="mb-3">
+                        <div class="mb-3">
 
-                                <label>Pincode</label>
+                            <label class="form-label">
+                                Date Of Birth
+                            </label>
 
-                                <input asp-for="MasterEmployee.Pincode"
-                                       class="form-control" />
+                            <input asp-for="MasterEmployee.DateOfBirth"
+                                   type="date"
+                                   class="form-control" />
 
-                            </div>
+                            <span asp-validation-for="MasterEmployee.DateOfBirth"
+                                  class="text-danger">
+                            </span>
 
-                            <div class="mb-3">
+                        </div>
 
-                                <label>Employment Type</label>
 
-                                <select asp-for="MasterEmployee.EmploymentType" class="form-select">
-                                    <option value="">Select Employment Type</option>
-                                    <option value="Permanent">Permanent</option>
-                                    <option value="Contract">Contract</option>
-                                    <option value="Intern">Intern</option>
-                                    <option value="Part Time">Part Time</option>
-                                </select>
+                        <!-- ========================================= -->
+                        <!-- JOINING DATE -->
+                        <!-- ========================================= -->
 
-                            </div>
+                        <div class="mb-3">
 
-                            <div class="mb-3">
+                            <label class="form-label">
+                                Joining Date
+                            </label>
 
-                                <label>Reporting Manager</label>
+                            <input asp-for="MasterEmployee.JoiningDate"
+                                   type="date"
+                                   class="form-control" />
 
-                                <input asp-for="MasterEmployee.ReportingManager"
-                                       class="form-control" />
+                            <span asp-validation-for="MasterEmployee.JoiningDate"
+                                  class="text-danger">
+                            </span>
 
-                            </div>
+                        </div>
 
-                          
 
-                            <div class="mb-3">
+                        <!-- ========================================= -->
+                        <!-- SALARY -->
+                        <!-- ========================================= -->
 
-                                <label>Shift</label>
+                        <div class="mb-3">
 
-                                <select asp-for="MasterEmployee.Shift"
-                                        class="form-control">
+                            <label class="form-label">
+                                Salary
+                            </label>
 
-                                    <option value="">--Select Shift--</option>
+                            <input asp-for="MasterEmployee.Salary"
+                                   class="form-control"
+                                   type="number"
+                                   step="0.01"
+                                   placeholder="Salary" />
 
-                                    <option>Morning</option>
-                                    <option>General</option>
-                                    <option>Evening</option>
-                                    <option>Night</option>
+                            <span asp-validation-for="MasterEmployee.Salary"
+                                  class="text-danger">
+                            </span>
 
-                                </select>
+                        </div>
 
-                            </div>
 
-                            <div class="mb-3">
+                        <!-- ========================================= -->
+                        <!-- STATUS -->
+                        <!-- ========================================= -->
 
-                                <label>Aadhaar Number</label>
+                        <div class="mb-3">
 
-                                <input asp-for="MasterEmployee.AadhaarNumber"
-                                       class="form-control" />
+                            <label asp-for="MasterEmployee.EmployeeStatus"
+                                   class="form-label">
+                                Status
+                            </label>
 
-                            </div>
+                            <select asp-for="MasterEmployee.EmployeeStatus"
+                                    class="form-select">
 
-                            <div class="mb-3">
+                                <option value="Active">
+                                    Active
+                                </option>
 
-                                <label>PAN Number</label>
+                                <option value="Inactive">
+                                    Inactive
+                                </option>
 
-                                <input asp-for="MasterEmployee.PANNumber"
-                                       class="form-control" />
+                            </select>
 
-                            </div>
+                            <span asp-validation-for="MasterEmployee.EmployeeStatus"
+                                  class="text-danger">
+                            </span>
 
-                           
+                        </div>
 
-                            <div class="mb-3">
 
-                                <label>Bank Name</label>
+                        <!-- ========================================= -->
+                        <!-- BLOOD GROUP -->
+                        <!-- ========================================= -->
 
-                                <input asp-for="MasterEmployee.BankName"
-                                       class="form-control" />
+                        <div class="mb-3">
 
-                            </div>
+                            <label class="form-label">
+                                Blood Group
+                            </label>
 
-                            <div class="mb-3">
+                            <select asp-for="MasterEmployee.BloodGroup"
+                                    class="form-select">
 
-                                <label>Account Number</label>
+                                <option value="">
+                                    -- Select Blood Group --
+                                </option>
 
-                                <input asp-for="MasterEmployee.AccountNumber"
-                                       class="form-control" />
+                                <option value="A+">A+</option>
+                                <option value="A-">A-</option>
 
-                            </div>
+                                <option value="B+">B+</option>
+                                <option value="B-">B-</option>
 
-                            <div class="mb-3">
+                                <option value="AB+">AB+</option>
+                                <option value="AB-">AB-</option>
 
-                                <label>IFSC Code</label>
+                                <option value="O+">O+</option>
+                                <option value="O-">O-</option>
 
-                                <input asp-for="MasterEmployee.IFSCCode"
-                                       class="form-control" />
+                            </select>
 
-                            </div>
+                            <span asp-validation-for="MasterEmployee.BloodGroup"
+                                  class="text-danger">
+                            </span>
 
-                            @if (Model.MasterEmployee.EmployeeId == 0)
-                            {
-                                <button class="btn btn-success w-100">
-                                    Save Employee
-                                </button>
-                            }
-                            else
-                            {
-                                <button class="btn btn-warning w-100">
-                                    Update Employee
-                                </button>
-                            }
+                        </div>
 
-                        </form>
+
+                        <!-- ========================================= -->
+                        <!-- MARITAL STATUS -->
+                        <!-- ========================================= -->
+
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                Marital Status
+                            </label>
+
+                            <select asp-for="MasterEmployee.MaritalStatus"
+                                    class="form-select">
+
+                                <option value="">
+                                    -- Select Marital Status --
+                                </option>
+
+                                <option value="Single">
+                                    Single
+                                </option>
+
+                                <option value="Married">
+                                    Married
+                                </option>
+
+                                <option value="Divorced">
+                                    Divorced
+                                </option>
+
+                                <option value="Widowed">
+                                    Widowed
+                                </option>
+
+                            </select>
+
+                            <span asp-validation-for="MasterEmployee.MaritalStatus"
+                                  class="text-danger">
+                            </span>
+
+                        </div>
+
+
+                        <!-- ========================================= -->
+                        <!-- ADDRESS -->
+                        <!-- ========================================= -->
+
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                Address
+                            </label>
+
+                            <textarea asp-for="MasterEmployee.AddressLine1"
+                                      class="form-control"
+                                      rows="3"
+                                      placeholder="Address"></textarea>
+
+                            <span asp-validation-for="MasterEmployee.AddressLine1"
+                                  class="text-danger">
+                            </span>
+
+                        </div>
+
+
+                        <!-- ========================================= -->
+                        <!-- PINCODE -->
+                        <!-- ========================================= -->
+
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                Pincode
+                            </label>
+
+                            <input asp-for="MasterEmployee.Pincode"
+                                   class="form-control"
+                                   maxlength="6"
+                                   inputmode="numeric"
+                                   placeholder="Pincode" />
+
+                            <span asp-validation-for="MasterEmployee.Pincode"
+                                  class="text-danger">
+                            </span>
+
+                        </div>
+
+
+                        <!-- ========================================= -->
+                        <!-- EMPLOYMENT TYPE -->
+                        <!-- ========================================= -->
+
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                Employment Type
+                            </label>
+
+                            <select asp-for="MasterEmployee.EmploymentType"
+                                    class="form-select">
+
+                                <option value="">
+                                    Select Employment Type
+                                </option>
+
+                                <option value="Permanent">
+                                    Permanent
+                                </option>
+
+                                <option value="Contract">
+                                    Contract
+                                </option>
+
+                                <option value="Intern">
+                                    Intern
+                                </option>
+
+                                <option value="Part Time">
+                                    Part Time
+                                </option>
+
+                            </select>
+
+                            <span asp-validation-for="MasterEmployee.EmploymentType"
+                                  class="text-danger">
+                            </span>
+
+                        </div>
+
+
+                        <!-- ========================================= -->
+                        <!-- REPORTING MANAGER -->
+                        <!-- ========================================= -->
+
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                Reporting Manager
+                            </label>
+
+                            <input asp-for="MasterEmployee.ReportingManager"
+                                   class="form-control"
+                                   placeholder="Reporting Manager" />
+
+                            <span asp-validation-for="MasterEmployee.ReportingManager"
+                                  class="text-danger">
+                            </span>
+
+                        </div>
+
+
+                        <!-- ========================================= -->
+                        <!-- SHIFT -->
+                        <!-- ========================================= -->
+
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                Shift
+                            </label>
+
+                            <select asp-for="MasterEmployee.Shift"
+                                    class="form-select">
+
+                                <option value="">
+                                    -- Select Shift --
+                                </option>
+
+                                <option value="Morning">
+                                    Morning
+                                </option>
+
+                                <option value="Afternoon">
+                                    Afternoon
+                                </option>
+
+                                <option value="Night">
+                                    Night
+                                </option>
+
+                            </select>
+
+                            <span asp-validation-for="MasterEmployee.Shift"
+                                  class="text-danger">
+                            </span>
+
+                        </div>
+
+
+                        <!-- ========================================= -->
+                        <!-- AADHAAR -->
+                        <!-- ========================================= -->
+
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                Aadhaar Number
+                            </label>
+
+                            <input asp-for="MasterEmployee.AadhaarNumber"
+                                   class="form-control"
+                                   maxlength="12"
+                                   inputmode="numeric"
+                                   placeholder="12 digit Aadhaar number" />
+
+                            <span asp-validation-for="MasterEmployee.AadhaarNumber"
+                                  class="text-danger">
+                            </span>
+
+                        </div>
+
+
+                        <!-- ========================================= -->
+                        <!-- PAN -->
+                        <!-- ========================================= -->
+
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                PAN Number
+                            </label>
+
+                            <input asp-for="MasterEmployee.PANNumber"
+                                   class="form-control"
+                                   maxlength="10"
+                                   placeholder="PAN Number" />
+
+                            <span asp-validation-for="MasterEmployee.PANNumber"
+                                  class="text-danger">
+                            </span>
+
+                        </div>
+
+
+                        <!-- ========================================= -->
+                        <!-- BANK NAME -->
+                        <!-- ========================================= -->
+
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                Bank Name
+                            </label>
+
+                            <input asp-for="MasterEmployee.BankName"
+                                   class="form-control"
+                                   placeholder="Bank Name" />
+
+                            <span asp-validation-for="MasterEmployee.BankName"
+                                  class="text-danger">
+                            </span>
+
+                        </div>
+
+
+                        <!-- ========================================= -->
+                        <!-- ACCOUNT NUMBER -->
+                        <!-- ========================================= -->
+
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                Account Number
+                            </label>
+
+                            <input asp-for="MasterEmployee.AccountNumber"
+                                   class="form-control"
+                                   inputmode="numeric"
+                                   placeholder="Account Number" />
+
+                            <span asp-validation-for="MasterEmployee.AccountNumber"
+                                  class="text-danger">
+                            </span>
+
+                        </div>
+
+
+                        <!-- ========================================= -->
+                        <!-- IFSC -->
+                        <!-- ========================================= -->
+
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                IFSC Code
+                            </label>
+
+                            <input asp-for="MasterEmployee.IFSCCode"
+                                   class="form-control"
+                                   maxlength="11"
+                                   placeholder="IFSC Code" />
+
+                            <span asp-validation-for="MasterEmployee.IFSCCode"
+                                  class="text-danger">
+                            </span>
+
+                        </div>
+
+
+                        <!-- ========================================= -->
+                        <!-- SAVE / UPDATE -->
+                        <!-- ========================================= -->
+                        @if (Model.MasterEmployee.EmployeeId == 0)
+                        {
+                            <button type="submit"
+                                    class="btn btn-success save-employee-btn">
+
+                                <i class="fa-solid fa-user-plus me-1"></i>
+
+                                Save Employee
+
+                            </button>
+                        }
+                        else
+                        {
+                            <button type="submit"
+                                    class="btn btn-warning save-employee-btn">
+
+                                <i class="fa-solid fa-user-pen me-1"></i>
+
+                                Update Employee
+
+                            </button>
+                        }
+
+                    </form>
 
                 </div>
 
             </div>
-            
 
         </div>
-    <div class="col-lg-6">
 
-        <div class="card shadow">
 
-            <div class="card-header bg-primary text-white">
 
-                <h4>
-                    @if (Model.IsAttendanceEdit)
-                    {
-                        <i class="fa-solid fa-pen-to-square me-2"></i>
-                        <span>Edit Employee Attendance</span>
-                    }
-                    else
-                    {
-                        <i class="fa-solid fa-calendar-check me-2"></i>
-                        <span>Employee Attendance</span>
-                    }
-                </h4>
+        <!-- ===================================================== -->
+        <!-- RIGHT SIDE - ATTENDANCE -->
+        <!-- ===================================================== -->
+
+        <div class="col-lg-6">
+
+            <div class="card shadow dashboard-card">
+
+
+                <!-- ================================================= -->
+                <!-- ATTENDANCE HEADER -->
+                <!-- ================================================= -->
+
+                <div class="card-header">
+
+                    <h5>
+
+                        @if (Model.IsAttendanceEdit)
+                        {
+                            <i class="fa-solid fa-pen-to-square me-2"></i>
+
+                            <span>
+                                Edit Employee Attendance
+                            </span>
+                        }
+                        else
+                        {
+                            <i class="fa-solid fa-calendar-check me-2"></i>
+
+                            <span>
+                                Employee Attendance
+                            </span>
+                        }
+
+                    </h5>
+
+                </div>
+
+
+                <!-- ================================================= -->
+                <!-- ATTENDANCE BODY -->
+                <!-- ================================================= -->
+
+                <div class="card-body">
+
+
+                    <!-- ============================================= -->
+                    <!-- ATTENDANCE FORM -->
+                    <!-- ============================================= -->
+
+                    <form asp-action="@(Model.IsAttendanceEdit ? "UpdateAttendance" : "SaveAttendance")"
+                          method="post">
+
+
+                        <!-- Attendance ID -->
+
+                        <input type="hidden"
+                               asp-for="EmployeeAttendance.AttendanceId" />
+
+
+                        <!-- ========================================= -->
+                        <!-- EMPLOYEE SEARCH -->
+                        <!-- ========================================= -->
+
+                        <div class="mb-3 employee-search-wrapper">
+
+                            <label class="form-label">
+                                Employee
+                            </label>
+
+
+                            <input type="text"
+                                   id="employeeName"
+                                   class="form-control"
+                                   placeholder="Search Employee Code or Name"
+                                   autocomplete="off"
+                                   value="@(Model.EmployeeAttendance?.EmployeeId > 0
+                                                                        ? Model.EmployeeList
+                                                                            .Where(x => x.EmployeeId == Model.EmployeeAttendance.EmployeeId)
+                                                                            .Select(x => x.EmployeeCode + " - " + x.FullName)
+                                                                            .FirstOrDefault()
+                                                                        : "")"
+                                   required />
+
+
+                            <!-- Hidden Employee ID -->
+
+                            <input type="hidden"
+                                   asp-for="EmployeeAttendance.EmployeeId"
+                                   id="EmployeeId" />
+
+
+                            <!-- ========================================= -->
+                            <!-- EMPLOYEE DROPDOWN -->
+                            <!-- ========================================= -->
+
+                            <div id="employeeDropdown">
+
+                                @foreach (var emp in Model.EmployeeList)
+                                {
+                                    <button type="button"
+                                            class="employee-option"
+                                            data-id="@emp.EmployeeId"
+                                            data-code="@emp.EmployeeCode"
+                                            data-name="@emp.FullName"
+                                            data-search="@($"{emp.EmployeeCode} {emp.FullName}")">
+
+                                        <span class="employee-code">
+                                            @emp.EmployeeCode
+                                        </span>
+
+                                        <span class="employee-separator">
+                                            -
+                                        </span>
+
+                                        <span class="employee-name">
+                                            @emp.FullName
+                                        </span>
+
+                                    </button>
+                                }
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- ========================================= -->
+                        <!-- ATTENDANCE DATE -->
+                        <!-- ========================================= -->
+
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                Attendance Date
+                            </label>
+
+                            <input asp-for="EmployeeAttendance.AttendanceDate"
+                                   type="date"
+                                   class="form-control"
+                                   required />
+
+                            <span asp-validation-for="EmployeeAttendance.AttendanceDate"
+                                  class="text-danger">
+                            </span>
+
+                        </div>
+
+
+                        <!-- ========================================= -->
+                        <!-- ATTENDANCE STATUS -->
+                        <!-- ========================================= -->
+
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                Status
+                            </label>
+
+                            <select asp-for="EmployeeAttendance.Status"
+                                    class="form-select"
+                                    required>
+
+                                <option value="">
+                                    Select Status
+                                </option>
+
+                                <option value="Present">
+                                    Present
+                                </option>
+
+                                <option value="PL">
+                                    Paid Leave (PL)
+                                </option>
+
+                                <option value="HD">
+                                    Half Day (HD)
+                                </option>
+
+                                <option value="H">
+                                    Holiday (H)
+                                </option>
+
+                                <option value="NCNS">
+                                    No Call No Show (NCNS)
+                                </option>
+
+                                <option value="LWP">
+                                    Leave Without Pay (LWP)
+                                </option>
+
+                                <option value="ULWP">
+                                    Unplanned Leave Without Pay (ULWP)
+                                </option>
+
+                                <option value="SL">
+                                    Sandwich Leave
+                                </option>
+
+                                <option value="Abscond">
+                                    Abscond
+                                </option>
+
+                                <option value="Terminated">
+                                    Terminated
+                                </option>
+
+                            </select>
+
+                            <span asp-validation-for="EmployeeAttendance.Status"
+                                  class="text-danger">
+                            </span>
+
+                        </div>
+
+
+                        <!-- ========================================= -->
+                        <!-- REMARKS -->
+                        <!-- ========================================= -->
+
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                Remarks
+                            </label>
+
+                            <textarea asp-for="EmployeeAttendance.Remarks"
+                                      class="form-control"
+                                      rows="3"
+                                      placeholder="Attendance remarks"></textarea>
+
+                            <span asp-validation-for="EmployeeAttendance.Remarks"
+                                  class="text-danger">
+                            </span>
+
+                        </div>
+
+
+                        <!-- ========================================= -->
+                        <!-- BUTTONS -->
+                        <!-- ========================================= -->
+                        @if (Model.IsAttendanceEdit)
+                        {
+                            <button type="submit"
+                                    class="btn btn-warning">
+
+                                <i class="fa-solid fa-pen-to-square me-1"></i>
+
+                                Update Attendance
+
+                            </button>
+
+                            <a asp-action="ViewAttendance"
+                               class="btn btn-secondary ms-2">
+
+                                <i class="fa-solid fa-xmark me-1"></i>
+
+                                Cancel
+
+                            </a>
+                        }
+                        else
+                        {
+                            <button type="submit"
+                                    class="btn btn-success">
+
+                                <i class="fa-solid fa-floppy-disk me-1"></i>
+
+                                Save Attendance
+
+                            </button>
+                        }
+
+                    </form>
+
+                </div>
 
             </div>
 
-            <div class="card-body">
-
-                <form asp-action="@(Model.IsAttendanceEdit ? "UpdateAttendance" : "SaveAttendance")"
-                      method="post">
-
-                    <!-- Attendance ID -->
-                    <input type="hidden"
-                           asp-for="EmployeeAttendance.AttendanceId" />
-
-
-                    <!-- EMPLOYEE -->
-                   <div class="mb-3 position-relative">
-
-    <label>Employee</label>
-
-    <!-- Search Box -->
-    <input type="text"
-           id="employeeName"
-           class="form-control"
-           placeholder="Search Employee Code or Name"
-           autocomplete="off"
-           value="@(Model.EmployeeAttendance?.EmployeeId > 0
-                        ? Model.EmployeeList
-                            .Where(x => x.EmployeeId ==
-                                        Model.EmployeeAttendance.EmployeeId)
-                            .Select(x => x.EmployeeCode + " - " + x.FullName)
-                            .FirstOrDefault()
-                        : "")"
-           required />
-
-    <!-- Employee ID -->
-    <input type="hidden"
-           asp-for="EmployeeAttendance.EmployeeId"
-           id="EmployeeId" />
-
-
-    <!-- Searchable Employee Dropdown -->
-    <div id="employeeDropdown"
-         class="list-group position-absolute w-100 shadow"
-         style="display:none; z-index:1000; max-height:250px; overflow-y:auto;">
-
-        @foreach (var emp in Model.EmployeeList)
-        {
-            <button type="button"
-                    class="list-group-item list-group-item-action employee-option"
-                    data-id="@emp.EmployeeId"
-                    data-search="@($"{emp.EmployeeCode} {emp.FullName}")">
-
-                <strong>@emp.EmployeeCode</strong>
-                -
-                @emp.FullName
-
-            </button>
-        }
+        </div>
 
     </div>
 
 </div>
 
 
-                    <!-- ATTENDANCE DATE -->
-                    <div class="mb-3">
 
-                        <label class="form-label">
-                            Attendance Date
-                        </label>
-
-                        <input asp-for="EmployeeAttendance.AttendanceDate"
-                               type="date"
-                               class="form-control"
-                               required />
-
-                    </div>
-
-
-                    <!-- STATUS -->
-                    <div class="mb-3">
-
-                        <label>Status</label>
-
-                        <select asp-for="EmployeeAttendance.Status"
-                                class="form-control"
-                                required>
-
-                            <option value="">Select Status</option>
-
-                            <option value="Present">
-                                Present
-                            </option>
-
-                            <option value="PL">
-                                Paid Leave (PL)
-                            </option>
-
-                            <option value="HD">
-                                Half Day (HD)
-                            </option>
-
-                            <option value="LWP">
-                                Leave Without Pay (LWP)
-                            </option>
-
-                            <option value="ULWP">
-                                Unplanned Leave Without Pay (ULWP)
-                            </option>
-
-                            <option value="Sandwich">
-                                Sandwich Leave
-                            </option>
-
-                            <option value="Abscond">
-                                Abscond
-                            </option>
-
-                            <option value="Terminated">
-                                Terminated
-                            </option>
-
-                        </select>
-
-                    </div>
-
-
-                    <!-- REMARKS -->
-                    <div class="mb-3">
-
-                        <label>Remarks</label>
-
-                        <textarea asp-for="EmployeeAttendance.Remarks"
-                                  class="form-control"></textarea>
-
-                    </div>
-
-
-                    <!-- BUTTON -->
-                    @if (Model.IsAttendanceEdit)
-                    {
-                        <button type="submit"
-                                class="btn btn-warning">
-
-                            <i class="fa-solid fa-pen-to-square me-1"></i>
-
-                            Update Attendance
-
-                        </button>
-
-                        <a asp-action="ViewAttendance"
-                           class="btn btn-secondary ms-2">
-
-                            <i class="fa-solid fa-xmark me-1"></i>
-
-                            Cancel
-
-                        </a>
-                    }
-                    else
-                    {
-                        <button type="submit"
-                                class="btn btn-success">
-
-                            <i class="fa-solid fa-floppy-disk me-1"></i>
-
-                            Save Attendance
-
-                        </button>
-                    }
-
-                </form>
-
-            </div>
-
-        </div>
-
-    </div>
-
-       
-
-    </div>
-</div>
+<!-- ========================================================= -->
+<!-- EMPLOYEE SEARCH DROPDOWN SCRIPT -->
+<!-- ========================================================= -->
 
 <script>
 
-    document.getElementById("employeeName").addEventListener("change", function () {
+    document.addEventListener("DOMContentLoaded", function() {
 
-    var selectedEmployee = this.value;
+        const employeeInput =
+            document.getElementById("employeeName");
 
-    var options = document.querySelectorAll("#employeeList option");
+        const employeeId =
+            document.getElementById("EmployeeId");
 
-    var employeeId = document.getElementById("EmployeeId");
+        const employeeDropdown =
+            document.getElementById("employeeDropdown");
 
-    employeeId.value = "";
+        const employeeOptions =
+            document.querySelectorAll(".employee-option");
 
-    options.forEach(function (option) {
 
-        if (option.value === selectedEmployee) {
+        if (!employeeInput ||
+            !employeeId ||
+            !employeeDropdown) {
 
-            employeeId.value =
-                option.getAttribute("data-id");
+            return;
 
         }
 
+
+        // =====================================================
+        // FILTER EMPLOYEES
+        // =====================================================
+
+        function filterEmployees() {
+
+            const searchText =
+                employeeInput.value
+                    .toLowerCase()
+                    .trim();
+
+
+            let visibleCount = 0;
+
+
+            employeeOptions.forEach(function(option) {
+
+                const searchValue =
+                    option
+                        .getAttribute("data-search")
+                        .toLowerCase();
+
+
+                if (searchText === "" ||
+                    searchValue.includes(searchText)) {
+
+                    option.style.display = "block";
+
+                    visibleCount++;
+
+                }
+                else {
+
+                    option.style.display = "none";
+
+                }
+
+            });
+
+
+            if (visibleCount > 0) {
+
+                employeeDropdown.style.display = "block";
+
+            }
+            else {
+
+                employeeDropdown.style.display = "none";
+
+            }
+
+        }
+
+
+        // =====================================================
+        // INPUT FOCUS
+        // =====================================================
+
+        employeeInput.addEventListener("focus", function() {
+
+            filterEmployees();
+
+        });
+
+
+        // =====================================================
+        // INPUT SEARCH
+        // =====================================================
+
+        employeeInput.addEventListener("input", function() {
+
+            // Clear selected employee
+            employeeId.value = "";
+
+            filterEmployees();
+
+        });
+
+
+        // =====================================================
+        // SELECT EMPLOYEE
+        // =====================================================
+
+        employeeOptions.forEach(function(option) {
+
+            option.addEventListener("click", function() {
+
+                const selectedId =
+                    this.getAttribute("data-id");
+
+                const selectedCode =
+                    this.getAttribute("data-code");
+
+                const selectedName =
+                    this.getAttribute("data-name");
+
+
+                // IMPORTANT:
+                // Build the value ourselves.
+                // This prevents spaces/newlines from
+                // the HTML formatting.
+
+                employeeInput.value =
+                    selectedCode + " - " + selectedName;
+
+
+                employeeId.value =
+                    selectedId;
+
+
+                employeeDropdown.style.display =
+                    "none";
+
+            });
+
+        });
+
+
+        // =====================================================
+        // CLICK OUTSIDE
+        // =====================================================
+
+        document.addEventListener("click", function(event) {
+
+            if (!employeeInput.contains(event.target) &&
+                !employeeDropdown.contains(event.target)) {
+
+                employeeDropdown.style.display =
+                    "none";
+
+            }
+
+        });
+
+
+        // =====================================================
+        // ESCAPE KEY
+        // =====================================================
+
+        employeeInput.addEventListener("keydown", function(event) {
+
+            if (event.key === "Escape") {
+
+                employeeDropdown.style.display =
+                    "none";
+
+            }
+
+        });
+
     });
 
-});
-
 </script>
+
+
+
+<!-- ========================================================= -->
+<!-- VALIDATION SCRIPTS -->
+<!-- ========================================================= -->
+@section Scripts {
+
+    @{
+
+        await Html.RenderPartialAsync(
+            "_ValidationScriptsPartial"
+        );
+
+    }
+
+}

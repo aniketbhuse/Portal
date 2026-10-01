@@ -1,4 +1,5 @@
-﻿using CRMPortal.Models;
+﻿
+using CRMPortal.Models;
 
 namespace CRMPortal.ViewModels
 {
@@ -13,6 +14,7 @@ namespace CRMPortal.ViewModels
 
         public DateOnly ToDate { get; set; }
 
+
         // ==========================================
         // EMPLOYEE DATA
         // ==========================================
@@ -20,43 +22,54 @@ namespace CRMPortal.ViewModels
 
         public List<EmployeeAttendance> AttendanceList { get; set; } = new();
 
+
         // ==========================================
         // ATTENDANCE SUMMARY
         // ==========================================
-        public int TotalDays { get; set; }          // 30 / 31 / 28 / 29
+        public int TotalDays { get; set; }
 
-        public int WorkingDays { get; set; }        // Total Days - Holidays
+        public int WorkingDays { get; set; }
 
         public int SaturdayCount { get; set; }
 
         public int SundayCount { get; set; }
 
+        // Saturday + Sunday
         public int HolidayCount { get; set; }
+
+        // Official Holiday marked as H
+        public int OfficialHolidayCount { get; set; }
 
         public int PresentDays { get; set; }
 
         public int AbsentDays { get; set; }
 
+
         // ==========================================
-        // LEAVE SUMMARY
+        // LEAVE / ATTENDANCE SUMMARY
         // ==========================================
-        public int PaidLeaveCount { get; set; }         // PL
+        public int PaidLeaveCount { get; set; }
 
-        public int WorkFromHomeCount { get; set; }      // WFH
+        public int WorkFromHomeCount { get; set; }
 
-        public int HalfDayCount { get; set; }           // HD
+        public int HalfDayCount { get; set; }
 
-        public int EmergencyLeaveCount { get; set; }    // EL
+        public int EmergencyLeaveCount { get; set; }
 
-        public int LWPCount { get; set; }               // Leave Without Pay
+        public int LWPCount { get; set; }
 
-        public int ULWPCount { get; set; }              // Unplanned Leave Without Pay
+        public int ULWPCount { get; set; }
 
-        public int SandwichCount { get; set; }          // Sandwich Leave
+        // Sandwich Leave
+        public int SandwichCount { get; set; }
 
-        public int AbscondCount { get; set; }           // Abscond
+        // No Call No Show
+        public int NCNSCount { get; set; }
 
-        public int TerminatedCount { get; set; }        // Terminated
+        public int AbscondCount { get; set; }
+
+        public int TerminatedCount { get; set; }
+
 
         // ==========================================
         // ATTENDANCE CALCULATION
@@ -64,6 +77,7 @@ namespace CRMPortal.ViewModels
         public decimal AttendanceDays { get; set; }
 
         public double AttendancePercentage { get; set; }
+
 
         // ==========================================
         // SALARY CALCULATION
@@ -76,6 +90,7 @@ namespace CRMPortal.ViewModels
 
         public decimal NetSalary { get; set; }
 
+
         // ==========================================
         // DEDUCTION BREAKDOWN
         // ==========================================
@@ -85,15 +100,25 @@ namespace CRMPortal.ViewModels
 
         public decimal ULWPDeduction { get; set; }
 
+        // 3 days deduction
         public decimal SandwichDeduction { get; set; }
 
+        // 3 days deduction
+        public decimal NCNSDeduction { get; set; }
+
+        // Reserved for reporting if required
         public decimal AbscondDeduction { get; set; }
 
+        // Reserved for reporting if required
         public decimal TerminatedDeduction { get; set; }
+
 
         // ==========================================
         // PAID LEAVE BALANCE
         // ==========================================
         public decimal PaidLeaveBalance { get; set; }
+
+        public List<EmployeeAttendanceSummaryViewModel> EmployeeSummaryList { get; set; } = new();
     }
 }
+

@@ -2,12 +2,61 @@
     ViewData["Title"] = "Employee Dashboard";
 }
 
-<div class="container-fluid mt-4">
+@{
+    string signInDateTime = ViewBag.SignInDateTime ?? "";
+    string signOutDateTime = ViewBag.SignOutDateTime ?? "";
+    string sessionStatus = ViewBag.SessionStatus ?? "Not Signed In";
+}
 
-    <!-- SUCCESS MESSAGE -->
+<!-- =========================================================
+     FLOATING BUBBLE BACKGROUND
+     ========================================================= -->
+
+<div class="floating-bubbles">
+
+    <span class="floating-bubble bubble-1"></span>
+    <span class="floating-bubble bubble-2"></span>
+    <span class="floating-bubble bubble-3"></span>
+    <span class="floating-bubble bubble-4"></span>
+    <span class="floating-bubble bubble-5"></span>
+    <span class="floating-bubble bubble-6"></span>
+    <span class="floating-bubble bubble-7"></span>
+    <span class="floating-bubble bubble-8"></span>
+    <span class="floating-bubble bubble-9"></span>
+    <span class="floating-bubble bubble-10"></span>
+    <span class="floating-bubble bubble-11"></span>
+    <span class="floating-bubble bubble-12"></span>
+
+</div>
+
+
+<!-- =========================================================
+     HIDDEN ATTENDANCE VALUES
+     ========================================================= -->
+
+<input type="hidden"
+       id="signInDateTime"
+       value="@signInDateTime" />
+
+<input type="hidden"
+       id="signOutDateTime"
+       value="@signOutDateTime" />
+
+<input type="hidden"
+       id="sessionStatus"
+       value="@sessionStatus" />
+
+
+<div class="container-fluid mt-4 employee-dashboard-content">
+
+    <!-- =========================================================
+         SUCCESS MESSAGE
+         ========================================================= -->
     @if (TempData["Success"] != null)
     {
-        <div id="successAlert" class="alert alert-success alert-dismissible fade show" role="alert">
+        <div id="successAlert"
+             class="alert alert-success alert-dismissible fade show"
+             role="alert">
 
             @TempData["Success"]
 
@@ -19,10 +68,15 @@
         </div>
     }
 
-    <!-- ERROR MESSAGE -->
+
+    <!-- =========================================================
+         ERROR MESSAGE
+         ========================================================= -->
     @if (TempData["Error"] != null)
     {
-        <div id="errorAlert" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <div id="errorAlert"
+             class="alert alert-danger alert-dismissible fade show"
+             role="alert">
 
             @TempData["Error"]
 
@@ -34,30 +88,56 @@
         </div>
     }
 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    
-    <!-- TODAY'S LOGIN TRACKER -->
+
+    <!-- =========================================================
+         BOOTSTRAP ICONS
+         ========================================================= -->
+
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <link rel="stylesheet"href="~/css/site.css" asp-append-version="true" />
+
+
+    <!-- =========================================================
+         TODAY'S LOGIN TRACKER
+         ========================================================= -->
+
     <div class="card border-0 shadow-lg rounded-4 mt-4 overflow-hidden">
 
-        <!-- HEADER -->
+
+        <!-- =====================================================
+             HEADER
+             ===================================================== -->
+
         <div class="card-header border-0 p-4"
              style="background: linear-gradient(135deg, #198754, #20c997);">
 
             <div class="d-flex justify-content-between align-items-center">
 
                 <div>
+
                     <h4 class="text-white fw-bold mb-1">
+
                         <i class="bi bi-clock-history me-2"></i>
+
                         Today's Login Tracker
+
                     </h4>
 
                     <small class="text-white opacity-75">
+
                         Track your working hours and attendance
+
                     </small>
+
                 </div>
 
+
                 <div class="bg-white bg-opacity-25 rounded-circle p-3">
+
                     <i class="bi bi-person-check-fill text-white fs-3"></i>
+
                 </div>
 
             </div>
@@ -65,29 +145,44 @@
         </div>
 
 
-        <!-- BODY -->
+        <!-- =====================================================
+             BODY
+             ===================================================== -->
+
         <div class="card-body p-4">
 
-            <!-- =========================
-             SIGN IN | TIMER | SIGN OUT
-              ========================= -->
+
+            <!-- =================================================
+                 SIGN IN | TIMER | SIGN OUT
+                 ================================================= -->
+
             <div class="row g-3 align-items-stretch mb-4 attendance-top-section">
 
-                <!-- SIGN IN -->
+
+                <!-- =================================================
+                     SIGN IN
+                     ================================================= -->
+
                 <div class="col-lg-4 col-md-6 col-12">
 
                     <div class="attendance-info-card sign-in-card h-100">
 
                         <div class="attendance-icon success-icon">
+
                             <i class="bi bi-box-arrow-in-right"></i>
+
                         </div>
+
 
                         <div class="attendance-content">
 
                             <small>Sign In Time</small>
 
-                            <h4 class="text-success fw-bold mb-0">
+                            <h4 id="signInDisplay"
+                                class="text-success fw-bold mb-0">
+
                                 @(ViewBag.SignInTime ?? "--:--")
+
                             </h4>
 
                         </div>
@@ -96,43 +191,62 @@
 
                 </div>
 
-                <!-- WORKING TIMER -->
+
+                <!-- =================================================
+                     WORKING TIMER
+                     ================================================= -->
+
                 <div class="col-lg-4 col-md-12 col-12">
 
                     <div class="timer-card h-100">
 
                         <span class="timer-badge">
+
                             <i class="bi bi-circle-fill"></i>
+
                             Current Working Time
+
                         </span>
 
-                        <h1 id="workingTimer">00:00:00</h1>
 
-                        <input type="hidden"
-                               id="signInDateTime"
-                               value="@ViewBag.SignInDateTime" />
+                        <h1 id="workingTimer">
+                            00:00:00
+                        </h1>
 
-                        <small>Hours : Minutes : Seconds</small>
+
+                        <small>
+                            Hours : Minutes : Seconds
+                        </small>
 
                     </div>
 
                 </div>
 
-                <!-- SIGN OUT -->
+
+                <!-- =================================================
+                     SIGN OUT
+                     ================================================= -->
+
                 <div class="col-lg-4 col-md-6 col-12">
 
                     <div class="attendance-info-card sign-out-card h-100">
 
                         <div class="attendance-icon danger-icon">
+
                             <i class="bi bi-box-arrow-right"></i>
+
                         </div>
+
 
                         <div class="attendance-content">
 
                             <small>Sign Out Time</small>
 
-                            <h4 class="text-danger fw-bold mb-0">
+                            <h4 id="signOutDisplay"
+                                class="text-danger fw-bold mb-0">
+
                                 @(ViewBag.SignOutTime ?? "--:--")
+
                             </h4>
 
                         </div>
@@ -144,34 +258,69 @@
             </div>
 
 
-            
-            <!-- ACTION BUTTONS -->
+            <!-- =================================================
+                 TOTAL WORKING HOURS
+                 ================================================= -->
+
+            <div class="text-center mb-4">
+
+                <small class="text-muted d-block">
+                    Total Working Hours
+                </small>
+
+                <h5 id="totalWorkingHours"
+                    class="fw-bold text-primary mb-0">
+
+                    @(ViewBag.TotalWorkingHours ?? "--")
+
+                </h5>
+
+            </div>
+
+
+            <!-- =================================================
+                 ACTION BUTTONS
+                 ================================================= -->
+
             <div class="mt-4">
 
                 <div class="text-center mb-3">
+
                     <h6 class="fw-bold text-dark mb-1">
+
                         Attendance Actions
+
                     </h6>
 
                     <small class="text-muted">
+
                         Manage your current attendance session
+
                     </small>
+
                 </div>
 
 
                 <div class="d-flex justify-content-center align-items-center gap-3">
 
-                    <!-- SIGN IN -->
+
+                    <!-- =================================================
+                         SIGN IN BUTTON
+                         ================================================= -->
+
                     <form asp-action="EmployeeSignIn"
                           method="post">
 
-                        <button type="submit" class="btn btn-success rounded-3 px-4 py-2 shadow-sm"
-                           @(ViewBag.SessionStatus == "Signed In" ? "disabled" : "")>
+                        <button type="submit"
+                                class="btn btn-success rounded-3 px-4 py-2 shadow-sm"
+                            @(ViewBag.SessionStatus == "Signed In" ? "disabled" : "")>
 
                             <i class="bi bi-box-arrow-in-right me-2"></i>
 
                             <span class="fw-semibold">
+
                                 Sign In
+
                             </span>
 
                         </button>
@@ -179,17 +328,23 @@
                     </form>
 
 
-                    <!-- SIGN OUT -->
+                    <!-- =================================================
+                         SIGN OUT BUTTON
+                         ================================================= -->
+
                     <form asp-action="EmployeeSignOut"
                           method="post">
 
-                        <button type="submit" class="btn btn-outline-danger rounded-3 px-4 py-2"
+                        <button type="submit"
+                                class="btn btn-outline-danger rounded-3 px-4 py-2"
                             @(ViewBag.SessionStatus != "Signed In" ? "disabled" : "")>
 
                             <i class="bi bi-box-arrow-right me-2"></i>
 
                             <span class="fw-semibold">
+
                                 Sign Out
+
                             </span>
 
                         </button>
@@ -199,31 +354,39 @@
                 </div>
 
             </div>
-            
 
 
+            <!-- =================================================
+                 STATUS
+                 ================================================= -->
 
-            <!-- STATUS -->
             <div class="border-top pt-4">
 
                 <div class="d-flex justify-content-between
                     align-items-center flex-wrap">
 
+
                     <div>
 
                         <small class="text-muted d-block">
+
                             Attendance Status
+
                         </small>
 
                         <span class="fw-bold">
+
                             Current Session
+
                         </span>
 
                     </div>
 
+
                     <div>
 
-                        <span class="badge bg-primary rounded-pill px-4 py-2">
+                        <span id="sessionStatusDisplay"
+                              class="badge bg-primary rounded-pill px-4 py-2">
 
                             <i class="bi bi-activity me-1"></i>
 
@@ -240,24 +403,34 @@
         </div>
 
     </div>
-   
 
 
-   
-    <!-- UPLOAD FILE SECTION -->
-    <div class="card shadow mb-4 dashboard" style="margin-top: 30px;">
+
+
+    <!-- =========================================================
+         UPLOAD FILE SECTION
+         ========================================================= -->
+
+    <div class="card shadow mb-4 dashboard"
+         style="margin-top: 30px;">
 
         <div class="card-header bg-primary text-white">
 
             <h5 class="mb-0">
+
                 Upload CD Excel File
+
             </h5>
 
         </div>
 
+
         <div class="card-body">
 
-            <form asp-controller="Employee" asp-action="UploadCD" method="post" enctype="multipart/form-data">
+            <form asp-controller="Employee"
+                  asp-action="UploadCD"
+                  method="post"
+                  enctype="multipart/form-data">
 
                 <div class="row">
 
@@ -270,9 +443,11 @@
 
                     </div>
 
+
                     <div class="col-md-2">
 
-                        <button type="submit" class="btn btn-success w-100">
+                        <button type="submit"
+                                class="btn btn-success w-100">
 
                             Upload
 
@@ -288,16 +463,25 @@
 
     </div>
 
-    <!-- FILE LIST -->
+
+
+
+    <!-- =========================================================
+         FILE LIST
+         ========================================================= -->
+
     <div class="card shadow dashboard">
 
         <div class="card-header bg-dark text-white">
 
             <h5 class="mb-0">
+
                 My Uploaded Files
+
             </h5>
 
         </div>
+
 
         <div class="card-body">
 
@@ -321,26 +505,32 @@
 
                     </thead>
 
+
                     <tbody>
 
                         @if (ViewBag.Files != null &&
                              ViewBag.Files.Count > 0)
                         {
+
                             @foreach (var item in ViewBag.Files)
                             {
+
                                 <tr>
 
                                     <td>
                                         @item.FileName
                                     </td>
 
+
                                     <td>
                                         @(item.FileSize / 1024)
                                     </td>
 
+
                                     <td>
                                         @item.UploadedDate.ToString("dd-MMM-yyyy hh:mm tt")
                                     </td>
+
 
                                     <td>
 
@@ -355,14 +545,18 @@
                                         </a>
 
                                     </td>
+
                                 </tr>
+
                             }
+
                         }
                         else
                         {
+
                             <tr>
 
-                                <td colspan="3"
+                                <td colspan="4"
                                     class="text-center text-muted">
 
                                     No files uploaded yet.
@@ -370,6 +564,7 @@
                                 </td>
 
                             </tr>
+
                         }
 
                     </tbody>
@@ -384,36 +579,85 @@
 
 </div>
 
-<link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+
+
+<!-- =========================================================
+     SITE CSS
+     ========================================================= -->
+
+<link rel="stylesheet"
+      href="~/css/site.css"
+      asp-append-version="true" />
+
+
+<!-- =========================================================
+     SITE JAVASCRIPT
+     ========================================================= -->
+
 <script src="~/js/site.js"></script>
 
+
+
+<!-- =========================================================
+     EMPLOYEE TIMER
+     ========================================================= -->
+
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
+
+    document.addEventListener("DOMContentLoaded", function() {
+
+        // ==========================================
+        // GET HIDDEN VALUES
+        // ==========================================
+
+        const signInElement =
+            document.getElementById("signInDateTime");
+
+        const signOutElement =
+            document.getElementById("signOutDateTime");
+
+        const sessionStatusElement =
+            document.getElementById("sessionStatus");
+
+
+        const signInTime =
+            signInElement
+                ? signInElement.value
+                : "";
+
+
+        const signOutTime =
+            signOutElement
+                ? signOutElement.value
+                : "";
+
+
+        const sessionStatus =
+            sessionStatusElement
+                ? sessionStatusElement.value
+                : "Not Signed In";
+
+
+        // ==========================================
+        // START EMPLOYEE TIMER
+        // ==========================================
+
         startEmployeeTimer(
-            document.getElementById("signInDateTime").value,
-            "@ViewBag.SessionStatus"
+            signInTime,
+            sessionStatus,
+            signOutTime
         );
 
     });
+
 </script>
 
 
 
-<style>
+<!-- =========================================================
+     PAGE STYLE
+     ========================================================= -->
 
-    .table-hover tbody tr:hover {
-        background-color: #f5f9ff;
-        cursor: pointer;
-        transition: 0.3s;
-    }
 
-    .card {
-        border-radius: 10px;
-    }
 
-    .dashboard
-    {
-        display: none;
-    }
-
-</style>
+  

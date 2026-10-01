@@ -669,3 +669,638 @@ body {
         font-size:17px;
     }
 }
+
+
+
+/* =========================================================
+           EXISTING STYLES
+           ========================================================= */
+
+.table-hover tbody tr:hover {
+    background-color: #f5f9ff;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+
+.card {
+    border-radius: 10px;
+}
+
+
+.dashboard {
+    display: none;
+}
+
+
+/* =========================================================
+           FLOATING BUBBLE BACKGROUND
+           ========================================================= */
+
+.floating-bubbles {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 0;
+}
+
+
+/* =========================================================
+           COMMON BUBBLE
+           ========================================================= */
+
+.floating-bubble {
+    position: absolute;
+    bottom: -150px;
+    display: block;
+    border-radius: 50%;
+    background: rgba(37, 99, 235, 0.07);
+    border: 1px solid rgba(37, 99, 235, 0.12);
+    box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.5), 0 0 10px rgba(37, 99, 235, 0.05);
+    animation-name: floatingBubbleAnimation;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+}
+
+
+/* =========================================================
+           BUBBLE ANIMATION
+           ========================================================= */
+
+@keyframes floatingBubbleAnimation {
+
+    0% {
+        transform: translate3d(0, 0, 0) scale(0.8);
+        opacity: 0;
+    }
+
+
+    10% {
+        opacity: 0.8;
+    }
+
+
+    25% {
+        transform: translate3d(30px, -25vh, 0) scale(0.9);
+    }
+
+
+    50% {
+        transform: translate3d(-25px, -50vh, 0) scale(1);
+    }
+
+
+    75% {
+        transform: translate3d(35px, -75vh, 0) scale(1.05);
+    }
+
+
+    100% {
+        transform: translate3d(-20px, -120vh, 0) scale(1.15);
+        opacity: 0;
+    }
+}
+
+
+/* =========================================================
+           BUBBLE 1
+           ========================================================= */
+
+.bubble-1 {
+    width: 55px;
+    height: 55px;
+    left: 4%;
+    animation-duration: 18s;
+    animation-delay: 0s;
+}
+
+
+/* =========================================================
+           BUBBLE 2
+           ========================================================= */
+
+.bubble-2 {
+    width: 85px;
+    height: 85px;
+    left: 13%;
+    animation-duration: 24s;
+    animation-delay: 4s;
+}
+
+
+/* =========================================================
+           BUBBLE 3
+           ========================================================= */
+
+.bubble-3 {
+    width: 45px;
+    height: 45px;
+    left: 23%;
+    animation-duration: 17s;
+    animation-delay: 2s;
+}
+
+
+/* =========================================================
+           BUBBLE 4
+           ========================================================= */
+
+.bubble-4 {
+    width: 105px;
+    height: 105px;
+    left: 32%;
+    animation-duration: 27s;
+    animation-delay: 7s;
+}
+
+
+/* =========================================================
+           BUBBLE 5
+           ========================================================= */
+
+.bubble-5 {
+    width: 60px;
+    height: 60px;
+    left: 42%;
+    animation-duration: 20s;
+    animation-delay: 1s;
+}
+
+
+/* =========================================================
+           BUBBLE 6
+           ========================================================= */
+
+.bubble-6 {
+    width: 95px;
+    height: 95px;
+    left: 51%;
+    animation-duration: 25s;
+    animation-delay: 5s;
+}
+
+
+/* =========================================================
+           BUBBLE 7
+           ========================================================= */
+
+.bubble-7 {
+    width: 48px;
+    height: 48px;
+    left: 61%;
+    animation-duration: 16s;
+    animation-delay: 3s;
+}
+
+
+/* =========================================================
+           BUBBLE 8
+           ========================================================= */
+
+.bubble-8 {
+    width: 110px;
+    height: 110px;
+    left: 70%;
+    animation-duration: 28s;
+    animation-delay: 8s;
+}
+
+
+/* =========================================================
+           BUBBLE 9
+           ========================================================= */
+
+.bubble-9 {
+    width: 65px;
+    height: 65px;
+    left: 79%;
+    animation-duration: 21s;
+    animation-delay: 6s;
+}
+
+
+/* =========================================================
+           BUBBLE 10
+           ========================================================= */
+
+.bubble-10 {
+    width: 80px;
+    height: 80px;
+    left: 88%;
+    animation-duration: 23s;
+    animation-delay: 10s;
+}
+
+
+/* =========================================================
+           BUBBLE 11
+           ========================================================= */
+
+.bubble-11 {
+    width: 40px;
+    height: 40px;
+    left: 28%;
+    animation-duration: 15s;
+    animation-delay: 9s;
+}
+
+
+/* =========================================================
+           BUBBLE 12
+           ========================================================= */
+
+.bubble-12 {
+    width: 72px;
+    height: 72px;
+    left: 65%;
+    animation-duration: 19s;
+    animation-delay: 11s;
+}
+
+
+/* =========================================================
+           KEEP DASHBOARD ABOVE BUBBLES
+           ========================================================= */
+
+.employee-dashboard-content {
+    position: relative;
+    z-index: 2;
+}
+
+
+/* =========================================================
+           KEEP HIDDEN VALUES ABOVE/BELOW WITHOUT UI CHANGE
+           ========================================================= */
+
+input[type="hidden"] {
+    position: absolute;
+    z-index: -1;
+}
+
+
+/* =========================================================
+           MOBILE
+           ========================================================= */
+
+@media (max-width: 768px) {
+
+    .floating-bubble {
+        opacity: 0.7;
+    }
+}
+
+
+/* =========================================================
+           REDUCE ANIMATION FOR USERS WHO PREFER LESS MOTION
+           ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .floating-bubble {
+        animation: none;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* =========================================================
+           MAIN PROFILE PAGE
+           ========================================================= */
+
+.profile-page {
+    display: flex;
+    width: 100%;
+    min-height: 600px;
+    background: #ffffff;
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+}
+
+
+/* =========================================================
+           LEFT SIDEBAR
+           ========================================================= */
+
+.profile-sidebar {
+    width: 30%;
+    min-width: 280px;
+    padding: 45px 30px;
+    text-align: center;
+    background: linear-gradient( 180deg, #2563eb 0%, #4f46e5 100% );
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+
+/* =========================================================
+           PROFILE AVATAR
+           ========================================================= */
+
+.profile-avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.18);
+    border: 4px solid rgba(255, 255, 255, 0.65);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 22px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+
+    .profile-avatar i {
+        font-size: 65px;
+        color: white;
+    }
+
+
+/* =========================================================
+           NAME
+           ========================================================= */
+
+.profile-name {
+    font-weight: 700;
+    margin-bottom: 6px;
+    color: white;
+    word-break: break-word;
+}
+
+
+/* =========================================================
+           EMAIL
+           ========================================================= */
+
+.profile-email {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.80);
+    margin-bottom: 15px;
+    word-break: break-word;
+}
+
+
+/* =========================================================
+           ROLE
+           ========================================================= */
+
+.profile-role {
+    display: inline-block;
+    padding: 6px 18px;
+    border-radius: 20px;
+    background: white;
+    color: #2563eb;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+
+/* =========================================================
+           EMPLOYEE CODE
+           ========================================================= */
+
+.profile-employee-code {
+    margin-top: 25px;
+    padding: 10px 15px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.12);
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.90);
+}
+
+
+/* =========================================================
+           DIVIDER
+           ========================================================= */
+
+.profile-divider {
+    width: 80%;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.20);
+    margin: 35px 0;
+}
+
+
+/* =========================================================
+           WELCOME SECTION
+           ========================================================= */
+
+.profile-welcome {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    text-align: left;
+    width: 100%;
+    padding: 15px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.10);
+}
+
+
+    .profile-welcome > i {
+        font-size: 28px;
+        color: #fbbf24;
+    }
+
+
+.welcome-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: white;
+}
+
+
+.welcome-subtitle {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.70);
+    margin-top: 3px;
+}
+
+
+/* =========================================================
+           RIGHT CONTENT
+           ========================================================= */
+
+.profile-content {
+    width: 70%;
+    padding: 40px 45px;
+    background: #ffffff;
+}
+
+
+/* =========================================================
+           SECTION
+           ========================================================= */
+
+.profile-section {
+    margin-bottom: 40px;
+}
+
+
+/* =========================================================
+           SECTION TITLE
+           ========================================================= */
+
+.section-title {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding-bottom: 18px;
+    margin-bottom: 5px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+
+.section-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    background: #eff6ff;
+    color: #2563eb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+    .section-icon i {
+        font-size: 20px;
+    }
+
+
+.section-title h4 {
+    margin: 0;
+    font-size: 19px;
+    font-weight: 700;
+    color: #1f2937;
+}
+
+
+.section-title span {
+    display: block;
+    font-size: 12px;
+    color: #6b7280;
+    margin-top: 3px;
+}
+
+
+/* =========================================================
+           INFORMATION LIST
+           ========================================================= */
+
+.information-list {
+    width: 100%;
+}
+
+
+/* =========================================================
+           INFORMATION ROW
+           ========================================================= */
+
+.information-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 58px;
+    padding: 10px 5px;
+    border-bottom: 1px solid #f0f1f3;
+}
+
+
+    .information-row:last-child {
+        border-bottom: none;
+    }
+
+
+/* =========================================================
+           LABEL
+           ========================================================= */
+
+.information-label {
+    width: 45%;
+    color: #6b7280;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+
+    .information-label i {
+        width: 25px;
+        color: #2563eb;
+        margin-right: 8px;
+    }
+
+
+/* =========================================================
+           VALUE
+           ========================================================= */
+
+.information-value {
+    width: 50%;
+    text-align: right;
+    color: #1f2937;
+    font-size: 14px;
+    font-weight: 600;
+    word-break: break-word;
+}
+
+
+/* =========================================================
+           RESPONSIVE
+           ========================================================= */
+
+@@media (max-width: 992px) {
+
+    .profile-page {
+        flex-direction: column;
+    }
+
+    .profile-sidebar {
+        width: 100%;
+        min-width: 100%;
+    }
+
+    .profile-content {
+        width: 100%;
+        padding: 30px;
+    }
+}
+
+
+@@media (max-width: 576px) {
+
+    .profile-content {
+        padding: 20px;
+    }
+
+    .information-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+    }
+
+    .information-label,
+    .information-value {
+        width: 100%;
+        text-align: left;
+    }
+}

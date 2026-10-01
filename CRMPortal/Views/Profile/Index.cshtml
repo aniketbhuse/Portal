@@ -1,0 +1,309 @@
+﻿@{
+    ViewData["Title"] = "My Profile";
+
+    var user = ViewBag.User;
+    var employee = ViewBag.Employee;
+    var roleName = ViewBag.RoleName;
+}
+
+<link rel="stylesheet"
+      href="~/css/site.css"
+      asp-append-version="true" />
+
+<div class="container-fluid mt-4 mb-5">
+
+    <!-- =========================================================
+         PROFILE PAGE
+         ========================================================= -->
+
+    <div class="profile-page">
+
+        <!-- =====================================================
+             LEFT PROFILE SECTION
+             ===================================================== -->
+
+        <div class="profile-sidebar">
+
+            <div class="profile-avatar">
+                <i class="bi bi-person-fill"></i>
+            </div>
+
+            <h3 class="profile-name">
+                @user.FullName
+            </h3>
+
+            <p class="profile-email">
+                @user.Email
+            </p>
+
+            <span class="profile-role">
+                @roleName
+            </span>
+
+
+            @if (employee != null)
+            {
+                <div class="profile-employee-code">
+
+                    <i class="bi bi-person-badge me-2"></i>
+
+                    Employee Code:
+                    <strong>@employee.EmployeeCode</strong>
+
+                </div>
+            }
+
+            <div class="profile-divider"></div>
+
+            <!-- Greeting -->
+
+            <div class="profile-welcome">
+
+                <i class="bi bi-sun-fill"></i>
+
+                <div>
+
+                    <div id="profileGreeting"
+                         class="welcome-title">
+                        Good Morning
+                    </div>
+
+                    <div class="welcome-subtitle">
+                        Welcome to your profile
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =====================================================
+             RIGHT INFORMATION SECTION
+             ===================================================== -->
+
+        <div class="profile-content profile-hide">
+
+            <!-- =================================================
+                 PERSONAL INFORMATION
+                 ================================================= -->
+
+            <div class="profile-section">
+
+                <div class="section-title">
+
+                    <div class="section-icon">
+                        <i class="bi bi-person-lines-fill"></i>
+                    </div>
+
+                    <div>
+                        <h4>Personal Information</h4>
+                        <span>Basic personal details</span>
+                    </div>
+
+                </div>
+
+
+                <div class="information-list">
+
+                    <div class="information-row">
+
+                        <div class="information-label">
+                            <i class="bi bi-person"></i>
+                            Full Name
+                        </div>
+
+                        <div class="information-value">
+                            @user.FullName
+                        </div>
+
+                    </div>
+
+
+                    <div class="information-row">
+
+                        <div class="information-label">
+                            <i class="bi bi-envelope"></i>
+                            Email
+                        </div>
+
+                        <div class="information-value">
+                            @user.Email
+                        </div>
+
+                    </div>
+
+
+                    <div class="information-row">
+
+                        <div class="information-label">
+                            <i class="bi bi-shield-check"></i>
+                            Role
+                        </div>
+
+                        <div class="information-value">
+                            @roleName
+                        </div>
+
+                    </div>
+
+
+                    @if (employee != null)
+                    {
+                        <div class="information-row">
+
+                            <div class="information-label">
+                                <i class="bi bi-person-badge"></i>
+                                Employee Code
+                            </div>
+
+                            <div class="information-value">
+                                @employee.EmployeeCode
+                            </div>
+
+                        </div>
+                    }
+
+                </div>
+
+            </div>
+
+
+            @if (employee != null)
+            {
+                <!-- =============================================
+                     EMPLOYMENT INFORMATION
+                     ============================================= -->
+
+                <div class="profile-section">
+
+                    <div class="section-title">
+
+                        <div class="section-icon">
+                            <i class="bi bi-briefcase-fill"></i>
+                        </div>
+
+                        <div>
+                            <h4>Employment Information</h4>
+                            <span>Company and employment details</span>
+                        </div>
+
+                    </div>
+
+
+                    <div class="information-list">
+
+                        <!-- Department -->
+
+                        <div class="information-row">
+
+                            <div class="information-label">
+                                <i class="bi bi-building"></i>
+                                Department
+                            </div>
+
+                            <div class="information-value">
+                                @employee.Department
+                            </div>
+
+                        </div>
+
+
+                        <!-- Designation -->
+
+                        <div class="information-row">
+
+                            <div class="information-label">
+                                <i class="bi bi-person-workspace"></i>
+                                Designation
+                            </div>
+
+                            <div class="information-value">
+                                @employee.Designation
+                            </div>
+
+                        </div>
+
+
+                        <!-- Joining Date -->
+
+                        <div class="information-row">
+
+                            <div class="information-label">
+                                <i class="bi bi-calendar-event"></i>
+                                Joining Date
+                            </div>
+
+                            <div class="information-value">
+                                @employee.JoiningDate.ToString("dd-MMM-yyyy")
+                            </div>
+
+                        </div>
+
+
+                        <!-- Employment Type -->
+
+                        <div class="information-row">
+
+                            <div class="information-label">
+                                <i class="bi bi-person-workspace"></i>
+                                Employment Type
+                            </div>
+
+                            <div class="information-value">
+                                @employee.EmploymentType
+                            </div>
+
+                        </div>
+
+
+                        <!-- Reporting Manager -->
+
+                        <div class="information-row">
+
+                            <div class="information-label">
+                                <i class="bi bi-person-check"></i>
+                                Reporting Manager
+                            </div>
+
+                            <div class="information-value">
+                                @employee.ReportingManager
+                            </div>
+
+                        </div>
+
+
+                        <!-- Shift -->
+
+                        <div class="information-row">
+
+                            <div class="information-label">
+                                <i class="bi bi-clock"></i>
+                                Shift
+                            </div>
+
+                            <div class="information-value">
+                                @employee.Shift
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+            }
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<style>
+    .profile-hide{
+        display: none;
+    }
+</style>

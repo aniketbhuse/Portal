@@ -2,8 +2,10 @@
 using CRMPortal.Models;
 using CRMPortal.Services;
 using CRMPortal.ViewModels;
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 
 namespace CRMPortal.Controllers
 {
@@ -11,65 +13,131 @@ namespace CRMPortal.Controllers
     {
         private readonly AppDbContext _context;
         private readonly IWebHostEnvironment _environment;
+        private readonly ErrorLogService _errorLogService;
 
-        public EmployeeController(AppDbContext context, IWebHostEnvironment environment )
+        public EmployeeController(
+            AppDbContext context,
+            IWebHostEnvironment environment,
+            ErrorLogService errorLogService)
         {
             _context = context;
             _environment = environment;
+            _errorLogService = errorLogService;
         }
 
-        public IActionResult Dashboard()
+
+        // =========================================================
+        // EMPLOYEE DASHBOARD
+        // =========================================================
+
+        public async Task<IActionResult> Dashboard()
         {
             try
             {
-                // Check Employee Role
+                // ==========================================
+                // CHECK EMPLOYEE ROLE
+                // ==========================================
+
                 if (HttpContext.Session.GetInt32("RoleId") != 2)
                 {
                     return RedirectToAction("Login", "Account");
                 }
 
-                // Get EmployeeId from Session
-                int employeeId = HttpContext.Session
-                    .GetInt32("EmployeeId").Value;
 
-                // Get Employee
-                var employee = _context.MasterEmployee
-                    .FirstOrDefault(x =>
+                // ==========================================
+                // GET EMPLOYEE ID FROM SESSION
+                // ==========================================
+
+                int? employeeIdSession =
+                    HttpContext.Session.GetInt32("EmployeeId");
+
+                if (!employeeIdSession.HasValue)
+                {
+                    return RedirectToAction("Login", "Account");
+                }
+
+                int employeeId = employeeIdSession.Value;
+
+
+                // ==========================================
+                // GET EMPLOYEE
+                // ==========================================
+
+                var employee = await _context.MasterEmployee
+                    .FirstOrDefaultAsync(x =>
                         x.EmployeeId == employeeId &&
                         !x.IsDeleted);
 
                 if (employee == null)
                 {
                     TempData["Error"] = "Employee not found.";
+
                     return RedirectToAction("Login", "Account");
                 }
 
-                // Today's date
+
+                // ==========================================
+                // TODAY'S DATE
+                // ==========================================
+
                 DateOnly today =
                     DateOnly.FromDateTime(DateTime.Today);
 
-                // Get today's login tracker
-                var login = _context.EmployeeLoginTracker
-                    .FirstOrDefault(x =>
+
+                // ==========================================
+                // GET TODAY'S LOGIN TRACKER
+                // ==========================================
+
+                var login = await _context.EmployeeLoginTracker
+                    .FirstOrDefaultAsync(x =>
                         x.EmployeeId == employeeId &&
                         x.LoginDate == today &&
                         !x.IsDeleted);
 
+
+                // ==========================================
+                // IF TODAY'S RECORD EXISTS
+                // ==========================================
+
                 if (login != null)
                 {
-                    // Sign In Time
+                    // ------------------------------
+                    // SIGN IN TIME
+                    // ------------------------------
+
                     ViewBag.SignInTime =
                         login.SignInTime?.ToString("hh:mm tt");
 
-                    // Sign Out Time
+
+                    // ------------------------------
+                    // SIGN OUT TIME
+                    // ------------------------------
+
                     ViewBag.SignOutTime =
                         login.SignOutTime?.ToString("hh:mm tt");
 
-                    // Session Status
+
+                    // ------------------------------
+                    // SESSION STATUS
+                    // ------------------------------
+
                     ViewBag.SessionStatus =
                         login.SessionStatus;
 
-                    // Sign In DateTime for JavaScript Timer
+
+                    // ------------------------------
+                    // TOTAL WORKING HOURS
+                    // ------------------------------
+
+                    ViewBag.TotalWorkingHours =
+                        login.TotalWorkingHours;
+
+
+                    // ------------------------------
+                    // SIGN IN DATETIME
+                    // Used by JavaScript timer
+                    // ------------------------------
+
                     if (login.SignInTime.HasValue)
                     {
                         ViewBag.SignInDateTime =
@@ -80,152 +148,347 @@ namespace CRMPortal.Controllers
                     {
                         ViewBag.SignInDateTime = "";
                     }
+
+
+                    // ------------------------------
+                    // SIGN OUT DATETIME
+                    // Used for 1-hour UI reset
+                    // ------------------------------
+
+                    if (login.SignOutTime.HasValue)
+                    {
+                        ViewBag.SignOutDateTime =
+                            login.SignOutTime.Value
+                                .ToString("yyyy-MM-ddTHH:mm:ss");
+                    }
+                    else
+                    {
+                        ViewBag.SignOutDateTime = "";
+                    }
                 }
                 else
                 {
-                    // No attendance record for today
+                    // ==========================================
+                    // NO RECORD FOR TODAY
+                    // ==========================================
 
-                    ViewBag.SignInTime = null;
+                    ViewBag.SignInTime = "";
 
-                    ViewBag.SignOutTime = null;
+                    ViewBag.SignOutTime = "";
 
                     ViewBag.SessionStatus =
                         "Not Signed In";
 
+                    ViewBag.TotalWorkingHours = "";
+
                     ViewBag.SignInDateTime = "";
+
+                    ViewBag.SignOutDateTime = "";
                 }
+
 
                 return View(employee);
             }
             catch (Exception ex)
             {
-                TempData["Error"] = ex.Message;
+                await _errorLogService.LogErrorAsync(
+                    ex,
+                    nameof(EmployeeController),
+                    nameof(Dashboard));
+
+                TempData["Error"] =
+                    "Something went wrong while loading the dashboard.";
 
                 return RedirectToAction("Login", "Account");
             }
         }
 
-        // Session SignIn/ SignOut code 
+
+        // =========================================================
+        // EMPLOYEE SIGN IN
+        // =========================================================
 
         [HttpPost]
-        public IActionResult EmployeeSignIn()
+        public async Task<IActionResult> EmployeeSignIn()
         {
             try
             {
+                // ==========================================
                 // Get EmployeeId from Session
-                int employeeId = HttpContext.Session.GetInt32("EmployeeId").Value;
+                // ==========================================
 
-                DateOnly today = DateOnly.FromDateTime(DateTime.Today);
+                int? employeeIdSession =
+                    HttpContext.Session.GetInt32("EmployeeId");
 
-                bool alreadySignedIn = _context.EmployeeLoginTracker.Any(x =>
-                    x.EmployeeId == employeeId &&
-                    x.LoginDate == today &&
-                    !x.IsDeleted);
-
-                if (alreadySignedIn)
+                if (!employeeIdSession.HasValue)
                 {
-                    TempData["Error"] = "You have already signed in today.";
-                    return RedirectToAction("Dashboard");
-                }
-
-                var employee = _context.MasterEmployee
-                    .FirstOrDefault(x => x.EmployeeId == employeeId && !x.IsDeleted);
-
-                if (employee == null)
-                {
-                    TempData["Error"] = "Employee not found.";
                     return RedirectToAction("Login", "Account");
                 }
 
-                EmployeeLoginTracker tracker = new EmployeeLoginTracker();
+                int employeeId =
+                    employeeIdSession.Value;
 
-                tracker.EmployeeId = employee.EmployeeId;
-                tracker.EmployeeCode = employee.EmployeeCode;
-                tracker.FullName = employee.FullName;
-                tracker.LoginDate = today;
-                tracker.SignInTime = DateTime.Now;
-                tracker.SessionStatus = "Signed In";
-                tracker.CreatedDate = DateTime.Now;
-                tracker.UpdatedDate = DateTime.Now;
-                tracker.ModifiedDate = DateTime.Now;
-                tracker.IsDeleted = false;
+
+                // ==========================================
+                // TODAY
+                // ==========================================
+
+                DateOnly today =
+                    DateOnly.FromDateTime(DateTime.Today);
+
+
+                // ==========================================
+                // CHECK ALREADY SIGNED IN
+                // ==========================================
+
+                bool alreadySignedIn =
+                    await _context.EmployeeLoginTracker
+                        .AnyAsync(x =>
+                            x.EmployeeId == employeeId &&
+                            x.LoginDate == today &&
+                            !x.IsDeleted);
+
+                if (alreadySignedIn)
+                {
+                    TempData["Error"] =
+                        "You have already signed in today.";
+
+                    return RedirectToAction("Dashboard");
+                }
+
+
+                // ==========================================
+                // GET EMPLOYEE
+                // ==========================================
+
+                var employee =
+                    await _context.MasterEmployee
+                        .FirstOrDefaultAsync(x =>
+                            x.EmployeeId == employeeId &&
+                            !x.IsDeleted);
+
+                if (employee == null)
+                {
+                    TempData["Error"] =
+                        "Employee not found.";
+
+                    return RedirectToAction("Login", "Account");
+                }
+
+
+                // ==========================================
+                // CREATE LOGIN TRACKER
+                // ==========================================
+
+                EmployeeLoginTracker tracker =
+                    new EmployeeLoginTracker();
+
+                tracker.EmployeeId =
+                    employee.EmployeeId;
+
+                tracker.EmployeeCode =
+                    employee.EmployeeCode;
+
+                tracker.FullName =
+                    employee.FullName;
+
+                tracker.LoginDate =
+                    today;
+
+                tracker.SignInTime =
+                    DateTime.Now;
+
+                tracker.SessionStatus =
+                    "Signed In";
+
+                tracker.CreatedDate =
+                    DateTime.Now;
+
+                tracker.UpdatedDate =
+                    DateTime.Now;
+
+                tracker.ModifiedDate =
+                    DateTime.Now;
+
+                tracker.IsDeleted =
+                    false;
+
+
+                // ==========================================
+                // SAVE
+                // ==========================================
 
                 _context.EmployeeLoginTracker.Add(tracker);
-                _context.SaveChanges();
 
-                TempData["Success"] = "Sign In recorded successfully.";
+                await _context.SaveChangesAsync();
+
+
+                TempData["Success"] =
+                    "Sign In recorded successfully.";
 
                 return RedirectToAction("Dashboard");
             }
             catch (Exception ex)
             {
-                TempData["Error"] = ex.Message;
+                await _errorLogService.LogErrorAsync(
+                    ex,
+                    nameof(EmployeeController),
+                    nameof(EmployeeSignIn));
+
+                TempData["Error"] =
+                    "Something went wrong while signing in.";
+
                 return RedirectToAction("Dashboard");
             }
         }
 
+
+        // =========================================================
+        // EMPLOYEE SIGN OUT
+        // =========================================================
+
         [HttpPost]
-        public IActionResult EmployeeSignOut()
+        public async Task<IActionResult> EmployeeSignOut()
         {
             try
             {
-                // Get EmployeeId from Session
-                int employeeId = HttpContext.Session.GetInt32("EmployeeId").Value;
+                // ==========================================
+                // GET EMPLOYEE ID FROM SESSION
+                // ==========================================
 
-                DateOnly today = DateOnly.FromDateTime(DateTime.Today);
+                int? employeeIdSession =
+                    HttpContext.Session.GetInt32("EmployeeId");
 
-                var tracker = _context.EmployeeLoginTracker
-                    .FirstOrDefault(x =>
-                        x.EmployeeId == employeeId &&
-                        x.LoginDate == today &&
-                        !x.IsDeleted);
+                if (!employeeIdSession.HasValue)
+                {
+                    return RedirectToAction("Login", "Account");
+                }
+
+                int employeeId =
+                    employeeIdSession.Value;
+
+
+                // ==========================================
+                // TODAY
+                // ==========================================
+
+                DateOnly today =
+                    DateOnly.FromDateTime(DateTime.Today);
+
+
+                // ==========================================
+                // GET TODAY'S TRACKER
+                // ==========================================
+
+                var tracker =
+                    await _context.EmployeeLoginTracker
+                        .FirstOrDefaultAsync(x =>
+                            x.EmployeeId == employeeId &&
+                            x.LoginDate == today &&
+                            !x.IsDeleted);
 
                 if (tracker == null)
                 {
-                    TempData["Error"] = "Please Sign In first.";
+                    TempData["Error"] =
+                        "Please Sign In first.";
+
                     return RedirectToAction("Dashboard");
                 }
+
+
+                // ==========================================
+                // ALREADY SIGNED OUT
+                // ==========================================
 
                 if (tracker.SignOutTime != null)
                 {
-                    TempData["Error"] = "You have already signed out today.";
+                    TempData["Error"] =
+                        "You have already signed out today.";
+
                     return RedirectToAction("Dashboard");
                 }
 
-                // Update Sign Out Time
-                tracker.SignOutTime = DateTime.Now;
 
-                // Update Status
-                tracker.SessionStatus = "Signed Out";
+                // ==========================================
+                // SIGN OUT TIME
+                // ==========================================
 
-                // Calculate Working Hours
-                tracker.TotalWorkingHours = Convert.ToDecimal(
-                    Math.Round(
-                        (tracker.SignOutTime.Value - tracker.SignInTime.Value).TotalHours,
-                        2));
+                DateTime signOutTime =
+                    DateTime.Now;
 
-                tracker.UpdatedDate = DateTime.Now;
-                tracker.ModifiedDate = DateTime.Now;
+                tracker.SignOutTime =
+                    signOutTime;
 
-                _context.SaveChanges();
 
-                TempData["Success"] = "Sign Out recorded successfully.";
+                // ==========================================
+                // SESSION STATUS
+                // ==========================================
+
+                tracker.SessionStatus =
+                    "Signed Out";
+
+
+                // ==========================================
+                // CALCULATE WORKING HOURS
+                // ==========================================
+
+                if (tracker.SignInTime.HasValue)
+                {
+                    tracker.TotalWorkingHours =
+                        Convert.ToDecimal(
+                            Math.Round(
+                                (
+                                    signOutTime -
+                                    tracker.SignInTime.Value
+                                ).TotalHours,
+                                2));
+                }
+
+
+                // ==========================================
+                // UPDATE DATES
+                // ==========================================
+
+                tracker.UpdatedDate =
+                    DateTime.Now;
+
+                tracker.ModifiedDate =
+                    DateTime.Now;
+
+
+                // ==========================================
+                // SAVE
+                // ==========================================
+
+                await _context.SaveChangesAsync();
+
+
+                TempData["Success"] =
+                    "Sign Out recorded successfully.";
 
                 return RedirectToAction("Dashboard");
             }
             catch (Exception ex)
             {
-                TempData["Error"] = ex.Message;
+                await _errorLogService.LogErrorAsync(
+                    ex,
+                    nameof(EmployeeController),
+                    nameof(EmployeeSignOut));
+
+                TempData["Error"] =
+                    "Something went wrong while signing out.";
+
                 return RedirectToAction("Dashboard");
             }
         }
 
 
-        // ================= Get Apply Leave =================
-
+        // =========================================================
+        // GET APPLY LEAVE
+        // =========================================================
 
         [HttpGet]
-        public IActionResult ApplyLeave()
+        public async Task<IActionResult> ApplyLeave()
         {
             try
             {
@@ -234,68 +497,135 @@ namespace CRMPortal.Controllers
                     return RedirectToAction("Login", "Account");
                 }
 
-                int userId = HttpContext.Session.GetInt32("UserId").Value;
 
-                ApplyLeaveViewModel model = new ApplyLeaveViewModel();
+                int? userIdSession =
+                    HttpContext.Session.GetInt32("UserId");
 
-                // Leave Type Dropdown
-                model.LeaveTypes = _context.LeaveTypes
-                    .Select(x => new SelectListItem
-                    {
-                        Value = x.LeaveTypeId.ToString(),
-                        Text = x.LeaveTypeName
-                    })
-                    .ToList();
+                if (!userIdSession.HasValue)
+                {
+                    return RedirectToAction("Login", "Account");
+                }
 
-                // Leave History
-                model.MyLeaves = _context.LeaveRequests
-                    .Where(x => x.UserId == userId)
-                    .OrderByDescending(x => x.CreatedDate)
-                    .ToList();
+                int userId =
+                    userIdSession.Value;
+
+
+                ApplyLeaveViewModel model =
+                    new ApplyLeaveViewModel();
+
+
+                // ==========================================
+                // LEAVE TYPE DROPDOWN
+                // ==========================================
+
+                model.LeaveTypes =
+                    await _context.LeaveTypes
+                        .Select(x => new SelectListItem
+                        {
+                            Value =
+                                x.LeaveTypeId.ToString(),
+
+                            Text =
+                                x.LeaveTypeName
+                        })
+                        .ToListAsync();
+
+
+                // ==========================================
+                // LEAVE HISTORY
+                // ==========================================
+
+                model.MyLeaves =
+                    await _context.LeaveRequests
+                        .Where(x =>
+                            x.UserId == userId)
+                        .OrderByDescending(x =>
+                            x.CreatedDate)
+                        .ToListAsync();
+
 
                 // ==========================================
                 // LEAVE BALANCE CALCULATION
                 // Company Policy: 1.5 Paid Leave every month
                 // ==========================================
 
-                int currentYear = DateTime.Now.Year;
-                int currentMonth = DateTime.Now.Month;
+                int currentYear =
+                    DateTime.Now.Year;
 
-                model.MonthlyLeaveEarned = 1.5M;
+                int currentMonth =
+                    DateTime.Now.Month;
 
-                // Total PL earned till current month
-                model.AnnualLeaveBalance = currentMonth * 1.5M;
 
-                // Approved Paid Leave (Casual + Sick Leave only)
-                model.LeaveUsedThisYear = _context.LeaveRequests
-                    .Where(x =>
-                        x.UserId == userId &&
-                        x.Status == "Approved" &&
-                        x.FromDate.Year == currentYear &&
-                        (x.LeaveTypeId == 1 || x.LeaveTypeId == 2))
-                    .Sum(x => (decimal?)x.TotalDays) ?? 0;
+                model.MonthlyLeaveEarned =
+                    1.5M;
 
-                // Remaining PL Balance
+
+                // ==========================================
+                // TOTAL PL EARNED TILL CURRENT MONTH
+                // ==========================================
+
+                model.AnnualLeaveBalance =
+                    currentMonth * 1.5M;
+
+
+                // ==========================================
+                // APPROVED PAID LEAVE
+                // Casual + Sick Leave only
+                // ==========================================
+
+                model.LeaveUsedThisYear =
+                    await _context.LeaveRequests
+                        .Where(x =>
+                            x.UserId == userId &&
+                            x.Status == "Approved" &&
+                            x.FromDate.Year == currentYear &&
+                            (
+                                x.LeaveTypeId == 1 ||
+                                x.LeaveTypeId == 2
+                            ))
+                        .SumAsync(x =>
+                            (decimal?)x.TotalDays) ?? 0;
+
+
+                // ==========================================
+                // REMAINING PL BALANCE
+                // ==========================================
+
                 model.RemainingLeaveBalance =
-                    model.AnnualLeaveBalance - model.LeaveUsedThisYear;
+                    model.AnnualLeaveBalance -
+                    model.LeaveUsedThisYear;
+
 
                 if (model.RemainingLeaveBalance < 0)
                 {
                     model.RemainingLeaveBalance = 0;
                 }
 
+
                 return View(model);
             }
             catch (Exception ex)
             {
-                TempData["Error"] = ex.Message;
+                await _errorLogService.LogErrorAsync(
+                    ex,
+                    nameof(EmployeeController),
+                    nameof(ApplyLeave));
+
+                TempData["Error"] =
+                    "Something went wrong while loading the leave page.";
+
                 return RedirectToAction("Dashboard");
             }
         }
 
 
+        // =========================================================
+        // POST APPLY LEAVE
+        // =========================================================
+
         [HttpPost]
-        public IActionResult ApplyLeave(ApplyLeaveViewModel model)
+        public async Task<IActionResult> ApplyLeave(
+            ApplyLeaveViewModel model)
         {
             try
             {
@@ -304,211 +634,366 @@ namespace CRMPortal.Controllers
                     return RedirectToAction("Login", "Account");
                 }
 
-                DateOnly today = DateOnly.FromDateTime(DateTime.Today);
 
-                if (model.FromDate < today || model.ToDate < today)
+                // ==========================================
+                // TODAY
+                // ==========================================
+
+                DateOnly today =
+                    DateOnly.FromDateTime(DateTime.Today);
+
+
+                // ==========================================
+                // DATE VALIDATION
+                // ==========================================
+
+                if (model.FromDate < today ||
+                    model.ToDate < today)
                 {
-                    TempData["Error"] = "Leave dates cannot be earlier than today.";
+                    TempData["Error"] =
+                        "Leave dates cannot be earlier than today.";
 
                     return RedirectToAction("ApplyLeave");
                 }
+
 
                 if (model.ToDate < model.FromDate)
                 {
-                    TempData["Error"] = "To Date cannot be earlier than From Date.";
+                    TempData["Error"] =
+                        "To Date cannot be earlier than From Date.";
 
                     return RedirectToAction("ApplyLeave");
                 }
+
+
+                // ==========================================
+                // GET USER ID
+                // ==========================================
 
                 int userId =
                     Convert.ToInt32(
                         HttpContext.Session.GetInt32("UserId"));
 
+
+                // ==========================================
+                // TOTAL DAYS
+                // ==========================================
+
                 decimal totalDays =
                     model.ToDate.DayNumber -
-                    model.FromDate.DayNumber + 1;
+                    model.FromDate.DayNumber +
+                    1;
+
+
+                // ==========================================
+                // CREATE LEAVE REQUEST
+                // ==========================================
 
                 LeaveRequests leaveRequest =
                     new LeaveRequests
                     {
                         UserId = userId,
 
-                        LeaveTypeId = model.LeaveTypeId,
+                        LeaveTypeId =
+                            model.LeaveTypeId,
 
-                        FromDate = model.FromDate,
+                        FromDate =
+                            model.FromDate,
 
-                        ToDate = model.ToDate,
+                        ToDate =
+                            model.ToDate,
 
-                        TotalDays = totalDays,
+                        TotalDays =
+                            totalDays,
 
-                        Reason = model.Reason,
+                        Reason =
+                            model.Reason,
 
-                        Status = "Pending",
+                        Status =
+                            "Pending",
 
-                        CreatedDate = DateTime.Now,
+                        CreatedDate =
+                            DateTime.Now,
 
-                        UpdatedDate = DateTime.Now
+                        UpdatedDate =
+                            DateTime.Now
                     };
 
-                _context.LeaveRequests.Add(leaveRequest);
 
-                _context.SaveChanges();
+                _context.LeaveRequests.Add(
+                    leaveRequest);
 
-                /*var adminUsers = _context.Users.Where(x => x.RoleId == 1).ToList();
 
-                foreach (var admin in adminUsers)
-                {
-                    string subject =
-                        "New Leave Request Submitted";
+                await _context.SaveChangesAsync();
 
-                    string body =
-                        $"Employee has applied for leave.\n\n" +
-                        $"Employee ID: {userId}\n" +
-                        $"From Date: {model.FromDate}\n" +
-                        $"To Date: {model.ToDate}\n" +
-                        $"Reason: {model.Reason}\n\n" +
-                        $"Please login to CRM and review.";
 
-                    _emailService.SendEmail(
-                        admin.Email,
-                        subject,
-                        body);
-                }*/
-
-                TempData["Success"] = "Leave request submitted successfully.";
+                TempData["Success"] =
+                    "Leave request submitted successfully.";
 
                 return RedirectToAction("ApplyLeave");
             }
             catch (Exception ex)
             {
-                TempData["Error"] = ex.Message;
+                await _errorLogService.LogErrorAsync(
+                    ex,
+                    nameof(EmployeeController),
+                    nameof(ApplyLeave));
+
+                TempData["Error"] =
+                    "Something went wrong while submitting the leave request.";
 
                 return RedirectToAction("ApplyLeave");
             }
         }
 
-        // ================= Upload file SEction =================
+
+        // =========================================================
+        // UPLOAD FILE
+        // =========================================================
 
         [HttpPost]
-        public IActionResult UploadCD(IFormFile File)
+        public async Task<IActionResult> UploadCD(
+            IFormFile File)
         {
             try
             {
-                if (File == null || File.Length == 0)
+                // ==========================================
+                // FILE VALIDATION
+                // ==========================================
+
+                if (File == null ||
+                    File.Length == 0)
                 {
-                    TempData["Error"] = "Please select a file.";
+                    TempData["Error"] =
+                        "Please select a file.";
 
                     return RedirectToAction("Dashboard");
                 }
 
-                string extension = Path.GetExtension(File.FileName).ToLower();
+
+                // ==========================================
+                // EXTENSION VALIDATION
+                // ==========================================
+
+                string extension =
+                    Path.GetExtension(
+                        File.FileName)
+                        .ToLower();
+
 
                 if (extension != ".xlsx" &&
                     extension != ".xls")
                 {
-                    TempData["Error"] = "Only Excel files (.xlsx or .xls) are allowed.";
+                    TempData["Error"] =
+                        "Only Excel files (.xlsx or .xls) are allowed.";
 
                     return RedirectToAction("Dashboard");
                 }
 
-                int userId = Convert.ToInt32(HttpContext.Session.GetInt32("UserId"));
 
-                string folderPath = Path.Combine(
+                // ==========================================
+                // USER ID
+                // ==========================================
+
+                int userId =
+                    Convert.ToInt32(
+                        HttpContext.Session.GetInt32("UserId"));
+
+
+                // ==========================================
+                // FOLDER PATH
+                // ==========================================
+
+                string folderPath =
+                    Path.Combine(
                         _environment.WebRootPath,
                         "Uploads",
                         "CDFiles");
 
+
                 if (!Directory.Exists(folderPath))
                 {
-                    Directory.CreateDirectory(folderPath);
+                    Directory.CreateDirectory(
+                        folderPath);
                 }
 
-                string fileName = Guid.NewGuid().ToString() + "_" + File.FileName;
 
-                string fullPath =Path.Combine( folderPath,fileName);
+                // ==========================================
+                // FILE NAME
+                // ==========================================
 
-                using (var stream =new FileStream(fullPath, FileMode.Create))
+                string fileName =
+                    Guid.NewGuid().ToString() +
+                    "_" +
+                    File.FileName;
+
+
+                string fullPath =
+                    Path.Combine(
+                        folderPath,
+                        fileName);
+
+
+                // ==========================================
+                // SAVE FILE ASYNC
+                // ==========================================
+
+                using (var stream =
+                       new FileStream(
+                           fullPath,
+                           FileMode.Create))
                 {
-                    File.CopyTo(stream);
+                    await File.CopyToAsync(stream);
                 }
 
-                EmployeeFiles employeeFile = new EmployeeFiles
+
+                // ==========================================
+                // SAVE FILE INFORMATION
+                // ==========================================
+
+                EmployeeFiles employeeFile =
+                    new EmployeeFiles
                     {
-                        UserId = userId,
-                        FileName = File.FileName,
-                        FilePath = fileName,
-                        FileSize = File.Length,
-                        UploadedDate = DateTime.Now
+                        UserId =
+                            userId,
+
+                        FileName =
+                            File.FileName,
+
+                        FilePath =
+                            fileName,
+
+                        FileSize =
+                            File.Length,
+
+                        UploadedDate =
+                            DateTime.Now
                     };
 
-                _context.EmployeeFiles.Add(employeeFile);
 
-                _context.SaveChanges();
+                _context.EmployeeFiles.Add(
+                    employeeFile);
 
-                TempData["Success"] = "File Uploaded Successfully.";
+
+                await _context.SaveChangesAsync();
+
+
+                TempData["Success"] =
+                    "File Uploaded Successfully.";
 
                 return RedirectToAction("Dashboard");
             }
             catch (Exception ex)
             {
-                TempData["Error"] = ex.Message;
+                await _errorLogService.LogErrorAsync(
+                    ex,
+                    nameof(EmployeeController),
+                    nameof(UploadCD));
+
+                TempData["Error"] =
+                    "Something went wrong while uploading the file.";
 
                 return RedirectToAction("Dashboard");
             }
         }
 
-        // ================= Upload Delete Section =================
 
-        public IActionResult DeleteFile(int id)
+        // =========================================================
+        // DELETE FILE
+        // =========================================================
+
+        public async Task<IActionResult> DeleteFile(
+            int id)
         {
             try
             {
-                if(HttpContext.Session.GetInt32("UserId") == null)
+                // ==========================================
+                // CHECK USER SESSION
+                // ==========================================
+
+                if (HttpContext.Session.GetInt32("UserId") == null)
                 {
-                    return RedirectToAction("Login", "Account");
+                    return RedirectToAction(
+                        "Login",
+                        "Account");
                 }
 
-                int userId = Convert.ToInt32(HttpContext.Session.GetInt32("UserId"));
 
-                var file = _context.EmployeeFiles
-                    .FirstOrDefault(x =>
-                        x.FileId == id &&
-                        x.UserId == userId);
+                int userId =
+                    Convert.ToInt32(
+                        HttpContext.Session.GetInt32("UserId"));
+
+
+                // ==========================================
+                // GET FILE
+                // ==========================================
+
+                var file =
+                    await _context.EmployeeFiles
+                        .FirstOrDefaultAsync(x =>
+                            x.FileId == id &&
+                            x.UserId == userId);
+
 
                 if (file == null)
                 {
                     TempData["Error"] =
                         "File not found.";
 
-                    return RedirectToAction("Dashboard");
+                    return RedirectToAction(
+                        "Dashboard");
                 }
 
+
+                // ==========================================
+                // FILE PATH
+                // ==========================================
+
                 string fullPath =
-            Path.Combine(
-                _environment.WebRootPath,
-                "Uploads",
-                "CDFiles",
-                file.FilePath);
+                    Path.Combine(
+                        _environment.WebRootPath,
+                        "Uploads",
+                        "CDFiles",
+                        file.FilePath);
+
+
+                // ==========================================
+                // DELETE PHYSICAL FILE
+                // ==========================================
 
                 if (System.IO.File.Exists(fullPath))
                 {
                     System.IO.File.Delete(fullPath);
                 }
 
+
+                // ==========================================
+                // DELETE DATABASE RECORD
+                // ==========================================
+
                 _context.EmployeeFiles.Remove(file);
 
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
+
 
                 TempData["Success"] =
                     "File deleted successfully.";
 
-                return RedirectToAction("Dashboard");
+                return RedirectToAction(
+                    "Dashboard");
             }
             catch (Exception ex)
             {
-                TempData["Error"] = ex.Message;
-                return RedirectToAction("Dashboard");
+                await _errorLogService.LogErrorAsync(
+                    ex,
+                    nameof(EmployeeController),
+                    nameof(DeleteFile));
 
+                TempData["Error"] =
+                    "Something went wrong while deleting the file.";
+
+                return RedirectToAction(
+                    "Dashboard");
             }
         }
     }

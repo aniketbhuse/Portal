@@ -31,43 +31,242 @@
 
 // Employee Login Timer - MARS CRM Portal
 
-function startEmployeeTimer(signInTime, sessionStatus) {
+function startEmployeeTimer(signInTime, sessionStatus, signOutTime) {
 
-    const timerElement = document.getElementById("workingTimer");
+    const timerElement =
+        document.getElementById("workingTimer");
 
-    // If employee is signed out, keep timer at 00:00:00
+    const signInDisplay =
+        document.getElementById("signInDisplay");
+
+    const signOutDisplay =
+        document.getElementById("signOutDisplay");
+
+    const sessionStatusDisplay =
+        document.getElementById("sessionStatusDisplay");
+
+    const totalWorkingHours =
+        document.getElementById("totalWorkingHours");
+
+
+    // ==========================================
+    // CLEAR EXISTING TIMER
+    // ==========================================
+
+    if (window.employeeTimerInterval) {
+
+        clearInterval(
+            window.employeeTimerInterval
+        );
+
+        window.employeeTimerInterval = null;
+    }
+
+
+    // ==========================================
+    // CLEAR EXISTING SIGN-OUT RESET TIMER
+    // ==========================================
+
+    if (window.employeeSignOutResetInterval) {
+
+        clearInterval(
+            window.employeeSignOutResetInterval
+        );
+
+        window.employeeSignOutResetInterval = null;
+    }
+
+
+    // ==========================================
+    // FUNCTION TO RESET EMPLOYEE UI
+    // ==========================================
+
+    function resetEmployeeUI() {
+
+        // Sign In
+        if (signInDisplay) {
+            signInDisplay.innerText = "--";
+        }
+
+        // Sign Out
+        if (signOutDisplay) {
+            signOutDisplay.innerText = "--";
+        }
+
+        // Status
+        if (sessionStatusDisplay) {
+            sessionStatusDisplay.innerText =
+                "Not Signed In";
+        }
+
+        // Working Timer
+        if (timerElement) {
+            timerElement.innerText =
+                "00:00:00";
+        }
+
+        // Total Working Hours
+        if (totalWorkingHours) {
+            totalWorkingHours.innerText =
+                "--";
+        }
+
+        console.log(
+            "Employee dashboard UI automatically reset."
+        );
+    }
+
+
+    // ==========================================
+    // IF EMPLOYEE IS SIGNED OUT
+    // ==========================================
+
     if (sessionStatus === "Signed Out") {
-        timerElement.innerText = "00:00:00";
+
+        // Keep timer stopped
+        if (timerElement) {
+            timerElement.innerText =
+                "00:00:00";
+        }
+
+
+        // ------------------------------------------
+        // Check Sign Out Time
+        // ------------------------------------------
+
+        if (signOutTime) {
+
+            const signOutDate =
+                new Date(signOutTime);
+
+
+            function checkSignOutReset() {
+
+                const now =
+                    new Date();
+
+                const difference =
+                    now.getTime() -
+                    signOutDate.getTime();
+
+                // 1 hour = 60 minutes
+                const oneHour =
+                    60 * 60 * 1000;
+
+
+                // --------------------------------------
+                // ONE HOUR COMPLETED
+                // --------------------------------------
+
+                if (difference >= oneHour) {
+
+                    resetEmployeeUI();
+
+                    clearInterval(
+                        window.employeeSignOutResetInterval
+                    );
+
+                    window.employeeSignOutResetInterval =
+                        null;
+                }
+            }
+
+
+            // Check immediately
+            checkSignOutReset();
+
+
+            // Check every 1 minute
+            window.employeeSignOutResetInterval =
+                setInterval(
+                    checkSignOutReset,
+                    60 * 1000
+                );
+        }
+
         return;
     }
 
-    // Not signed in
-    if (!signInTime || sessionStatus !== "Signed In") {
-        timerElement.innerText = "00:00:00";
+
+    // ==========================================
+    // EMPLOYEE NOT SIGNED IN
+    // ==========================================
+
+    if (
+        !signInTime ||
+        sessionStatus !== "Signed In"
+    ) {
+
+        if (timerElement) {
+            timerElement.innerText =
+                "00:00:00";
+        }
+
         return;
     }
 
-    const signInDate = new Date(signInTime);
+
+    // ==========================================
+    // EMPLOYEE SIGNED IN
+    // ==========================================
+
+    const signInDate =
+        new Date(signInTime);
+
 
     function updateTimer() {
 
-        const now = new Date();
-        const diff = now - signInDate;
+        const now =
+            new Date();
 
-        if (diff < 0) return;
+        const diff =
+            now.getTime() -
+            signInDate.getTime();
 
-        const hours = Math.floor(diff / 3600000);
-        const minutes = Math.floor((diff % 3600000) / 60000);
-        const seconds = Math.floor((diff % 60000) / 1000);
 
-        timerElement.innerText =
-            String(hours).padStart(2, "0") + ":" +
-            String(minutes).padStart(2, "0") + ":" +
-            String(seconds).padStart(2, "0");
+        if (diff < 0) {
+            return;
+        }
+
+
+        const hours =
+            Math.floor(
+                diff / 3600000
+            );
+
+        const minutes =
+            Math.floor(
+                (diff % 3600000) / 60000
+            );
+
+        const seconds =
+            Math.floor(
+                (diff % 60000) / 1000
+            );
+
+
+        if (timerElement) {
+
+            timerElement.innerText =
+                String(hours).padStart(2, "0") +
+                ":" +
+                String(minutes).padStart(2, "0") +
+                ":" +
+                String(seconds).padStart(2, "0");
+        }
     }
 
+
+    // Initial timer update
     updateTimer();
-    setInterval(updateTimer, 1000);
+
+
+    // Start timer
+    window.employeeTimerInterval =
+        setInterval(
+            updateTimer,
+            1000
+        );
 }
 
 
@@ -239,5 +438,45 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
     });
+
+});
+
+
+$(document).ready(function () {
+    $('.searchable-dropdown').select2({
+        placeholder: "Select",
+        allowClear: true,
+        width: '100%'
+    });
+});
+
+
+// =========================================================
+// PROFILE GREETING
+// =========================================================
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const greeting = document.getElementById("profileGreeting");
+
+    // Profile page does not have the greeting element
+    if (!greeting) {
+        return;
+    }
+
+    const hour = new Date().getHours();
+
+    if (hour >= 5 && hour < 12) {
+        greeting.innerText = "Good Morning";
+    }
+    else if (hour >= 12 && hour < 17) {
+        greeting.innerText = "Good Afternoon";
+    }
+    else if (hour >= 17 && hour < 21) {
+        greeting.innerText = "Good Evening";
+    }
+    else {
+        greeting.innerText = "Good Night";
+    }
 
 });

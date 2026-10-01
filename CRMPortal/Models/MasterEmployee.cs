@@ -32,6 +32,10 @@ namespace CRMPortal.Models
         [Required]
         public string MobileNumber { get; set; }
 
+        public string? EmergencyContactName { get; set; }
+
+        public string? EmergencyContact { get; set; }
+
         [Required]
         public string AddressLine1 { get; set; }
 

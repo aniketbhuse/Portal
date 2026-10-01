@@ -151,7 +151,7 @@
                                 </a>
                             </li>
 
-                            <li class="nav-item">
+                            <li class="nav-item hide-tabs">
                                 <a class="nav-link text-dark"
                                    asp-controller="Employee"
                                    asp-action="ApplyLeave">
@@ -195,10 +195,30 @@
                         @if (Context.Session.GetInt32("UserId") != null)
                         {
                             <li class="nav-item">
+
                                 <span class="nav-link text-primary fw-bold">
+
                                     Welcome,
                                     @Context.Session.GetString("FullName")
+
                                 </span>
+
+                            </li>
+
+
+                            <!-- PROFILE -->
+
+                            <li class="nav-item">
+
+                                <a class="nav-link profile-link"
+                                   asp-controller="Profile"
+                                   asp-action="Index"
+                                   title="My Profile">
+
+                                    <i class="bi bi-person-circle"></i>
+
+                                </a>
+
                             </li>
 
                             <li class="nav-item">
@@ -237,6 +257,9 @@
     padding: 8px 18px;
     font-weight: 600;
     transition: all 0.3s ease;
+}
+.hide-tabs{
+ display: none;
 }
 
 .logout-btn:hover {
