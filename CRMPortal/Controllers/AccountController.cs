@@ -12,18 +12,13 @@ namespace CRMPortal.Controllers
         private readonly AppDbContext _context;
         private readonly ErrorLogService _errorLogService;
 
-        public AccountController(
-            AppDbContext context,
-            ErrorLogService errorLogService)
+        public AccountController(AppDbContext context, ErrorLogService errorLogService)
         {
             _context = context;
             _errorLogService = errorLogService;
         }
 
-
-        // =========================================================
         // GET CLIENT IP ADDRESS
-        // =========================================================
         private string GetClientIpAddress()
         {
             try
@@ -54,10 +49,7 @@ namespace CRMPortal.Controllers
             }
         }
 
-
-        // =========================================================
         // LOGIN - GET
-        // =========================================================
         [HttpGet]
         public async Task<IActionResult> Login()
         {
@@ -67,119 +59,72 @@ namespace CRMPortal.Controllers
             }
             catch (Exception ex)
             {
-                await _errorLogService.LogErrorAsync(
-                    ex,
-                    nameof(AccountController),
-                    nameof(Login));
-
-                ViewBag.Error =
-                    "An unexpected error occurred while loading the login page.";
+                await _errorLogService.LogErrorAsync( ex, nameof(AccountController),nameof(Login));
+                ViewBag.Error = "An unexpected error occurred while loading the login page.";
 
                 return View();
             }
         }
 
-
-        // =========================================================
         // LOGIN - POST
-        // =========================================================
         [HttpPost]
         public async Task<IActionResult> Login(LoginViewModel model)
         {
             try
             {
-                // =====================================================
-                // MODEL VALIDATION
-                // =====================================================
                 if (!ModelState.IsValid)
                 {
                     return View(model);
                 }
-
-
-                // =====================================================
                 // FIND USER
-                // =====================================================
                 var user = await _context.Users
-                    .FirstOrDefaultAsync(x =>
-                        x.Email == model.Email &&
-                        x.Password == model.Password);
+                    .FirstOrDefaultAsync(x => x.Email == model.Email && x.Password == model.Password);
 
-
-                // =====================================================
                 // INVALID EMAIL / PASSWORD
-                // =====================================================
                 if (user == null)
                 {
-                    ViewBag.Error =
-                        "Invalid Email or Password";
-
+                    ViewBag.Error = "Invalid Email or Password";
                     return View(model);
                 }
 
-
-                // =====================================================
                 // GET CLIENT IP
-                // =====================================================
                 string ipAddress = GetClientIpAddress();
 
+                // EMPLOYEE PROFILE --- Only Employee requires MasterEmployee profile.
 
-                // =====================================================
-                // EMPLOYEE PROFILE
-                //
-                // Only Employee requires MasterEmployee profile.
-                // =====================================================
                 MasterEmployee? employee = null;
 
                 if (user.RoleId == 2)
                 {
-                    employee = await _context.MasterEmployee
-                        .FirstOrDefaultAsync(x =>
-                            x.Email == user.Email &&
+                    employee = await _context.MasterEmployee.FirstOrDefaultAsync(x => x.Email == user.Email &&
                             !x.IsDeleted);
 
                     if (employee == null)
                     {
-                        ViewBag.Error =
-                            "Employee profile not found.";
-
+                        ViewBag.Error = "Employee profile not found.";
                         return View(model);
                     }
                 }
 
 
-                // =====================================================
-                // EMPLOYEE ACTIVE LOGIN RESTRICTIONS
-                //
-                // These restrictions apply ONLY to RoleId = 2.
-                //
-                // Employee rules:
-                //
-                // 1. Same employee cannot login on another PC/browser.
-                //
-                // 2. Same PC cannot be used by another employee/user
-                //    while an employee session is active.
-                //
-                // Admin / Super Admin / HR are NOT restricted by
-                // these ActiveLogin rules.
-                // =====================================================
+               /*EMPLOYEE ACTIVE LOGIN RESTRICTIONS
+                 These restrictions apply ONLY to RoleId = 2.
+                 Employee rules:
+                 1.Same employee cannot login on another PC/ browser.
+                 2.Same PC cannot be used by another employee / user
+                    while an employee session is active.
+                 Admin / Super Admin / HR are NOT restricted by
+                 these ActiveLogin rules.*/
 
                 if (user.RoleId == 2)
                 {
-                    // =================================================
                     // CHECK 1 - SAME EMPLOYEE ALREADY LOGGED IN
-                    // =================================================
 
-                    var existingUserLogin =
-                        await _context.ActiveLogins
-                            .FirstOrDefaultAsync(x =>
-                                x.UserId == user.UserId);
-
+                    var existingUserLogin = await _context.ActiveLogins.FirstOrDefaultAsync(x => x.UserId == user.UserId);
 
                     if (existingUserLogin != null)
                     {
-                        ViewBag.Error =
-                            $"{user.FullName} is already logged in. " +
+                        ViewBag.Error =  $"{user.FullName} is already logged in. " +
                             "The same employee cannot login on another " +
                             "PC or browser until the current session is signed out.";
 
@@ -187,69 +132,35 @@ namespace CRMPortal.Controllers
                     }
 
 
-                    // =================================================
                     // CHECK 2 - SAME PC ALREADY HAS ACTIVE USER
-                    // =================================================
 
-                    var existingPcLogin =
-                        await _context.ActiveLogins
-                            .FirstOrDefaultAsync(x =>
-                                x.IpAddress == ipAddress);
-
+                    var existingPcLogin = await _context.ActiveLogins.FirstOrDefaultAsync(x => x.IpAddress == ipAddress);
 
                     if (existingPcLogin != null)
                     {
-                        // =============================================
-                        // FIND USER CURRENTLY USING THIS PC
-                        // =============================================
+                        var loggedInUser = await _context.Users.FirstOrDefaultAsync(x => x.UserId == existingPcLogin.UserId);
 
-                        var loggedInUser =
-                            await _context.Users
-                                .FirstOrDefaultAsync(x =>
-                                    x.UserId ==
-                                    existingPcLogin.UserId);
-
-
-                        string loggedInUserName =
-                            loggedInUser?.FullName ??
-                            "Another user";
-
-
-                        ViewBag.Error =
-                            $"{loggedInUserName} is already logged in on this PC. " +
-                            "Please logout from the current browser first.";
+                        string loggedInUserName = loggedInUser?.FullName ?? "Another user";
+                        ViewBag.Error = $"{loggedInUserName} is already logged in on this PC. " +
+                                         "Please logout from the current browser first.";
 
                         return View(model);
                     }
                 }
 
-
-                // =====================================================
                 // CREATE ASP.NET SESSION
-                // =====================================================
 
-                HttpContext.Session.SetInt32(
-                    "UserId",
-                    user.UserId);
+                HttpContext.Session.SetInt32("UserId", user.UserId);
 
-                HttpContext.Session.SetString(
-                    "FullName",
-                    user.FullName);
+                HttpContext.Session.SetString("FullName",user.FullName);
 
-                HttpContext.Session.SetInt32(
-                    "RoleId",
-                    user.RoleId);
+                HttpContext.Session.SetInt32("RoleId",user.RoleId);
 
-
-                // =====================================================
                 // CREATE ACTIVE LOGIN
-                //
                 // IMPORTANT:
                 // Only Employee needs ActiveLogins.
-                //
                 // Admin / Super Admin / HR will NOT create an
                 // ActiveLogins restriction record.
-                // =====================================================
 
                 if (user.RoleId == 2)
                 {
@@ -273,24 +184,13 @@ namespace CRMPortal.Controllers
                 }
 
 
-                // =====================================================
-                // ADMIN
-                // RoleId = 1
-                // =====================================================
-
+                // ADMIN RoleId = 1
                 if (user.RoleId == 1 || user.RoleId == 3)
                 {
-                    return RedirectToAction(
-                        "Dashboard",
-                        "Admin");
+                    return RedirectToAction("Dashboard","Admin");
                 }
 
-
-                // =====================================================
-                // HR
-                // RoleId = 5
-                // =====================================================
-
+                // HR RoleId = 5
                 else if (user.RoleId == 5)
                 {
                     return RedirectToAction(
@@ -298,32 +198,16 @@ namespace CRMPortal.Controllers
                         "HR");
                 }
 
-
-                // =====================================================
-                // EMPLOYEE
-                // RoleId = 2
-                // =====================================================
-
+                // EMPLOYEE  RoleId = 2
                 else if (user.RoleId == 2)
                 {
-                    // Employee profile was already checked above.
+                    HttpContext.Session.SetInt32("EmployeeId",employee!.EmployeeId);
 
-                    HttpContext.Session.SetInt32(
-                        "EmployeeId",
-                        employee!.EmployeeId);
+                    HttpContext.Session.SetString("EmployeeCode",employee.EmployeeCode);
 
-                    HttpContext.Session.SetString(
-                        "EmployeeCode",
-                        employee.EmployeeCode);
+                    HttpContext.Session.SetString("EmployeeFullName",employee.FullName);
 
-                    HttpContext.Session.SetString(
-                        "EmployeeFullName",
-                        employee.FullName);
-
-
-                    return RedirectToAction(
-                        "Dashboard",
-                        "Employee");
+                    return RedirectToAction("Dashboard", "Employee");
                 }
 
 
@@ -333,31 +217,22 @@ namespace CRMPortal.Controllers
 
                 else
                 {
-                    // Remove ActiveLogin only if one was created.
-                    // Currently only Employee creates ActiveLogin,
+                    // Remove ActiveLogin only if one was created.Currently only Employee creates ActiveLogin,
                     // so this is mostly a safety check.
 
-                    var loginToRemove =
-                        await _context.ActiveLogins
-                            .FirstOrDefaultAsync(x =>
+                    var loginToRemove = await _context.ActiveLogins.FirstOrDefaultAsync(x =>
                                 x.UserId == user.UserId &&
                                 x.SessionId ==
                                 HttpContext.Session.Id);
 
-
                     if (loginToRemove != null)
                     {
                         _context.ActiveLogins.Remove(loginToRemove);
-
                         await _context.SaveChangesAsync();
                     }
 
-
                     HttpContext.Session.Clear();
-
-
-                    TempData["Error"] =
-                        "Invalid Role.";
+                    TempData["Error"] = "Invalid Role.";
 
                     return RedirectToAction("Login");
                 }
@@ -368,23 +243,16 @@ namespace CRMPortal.Controllers
                 // LOG ERROR
                 // =====================================================
 
-                await _errorLogService.LogErrorAsync(
-                    ex,
-                    nameof(AccountController),
-                    nameof(Login));
+                await _errorLogService.LogErrorAsync(ex,nameof(AccountController),nameof(Login));
 
-
-                ViewBag.Error =
-                    "An unexpected error occurred while logging in. Please try again.";
+                ViewBag.Error = "An unexpected error occurred while logging in. Please try again.";
 
                 return View(model);
             }
         }
 
 
-        // =========================================================
         // LOGOUT
-        // =========================================================
         public async Task<IActionResult> Logout()
         {
             try
@@ -469,6 +337,80 @@ namespace CRMPortal.Controllers
                     "Account");
             }
         }
+
+
+
+        // =========================================================
+        // KEEP APPLICATION SESSION ALIVE
+        //
+        // This keeps the CRMPortal APPLICATION LOGIN alive.
+        //
+        // IMPORTANT:
+        // This is completely separate from Employee Attendance
+        // Sign In / Sign Out.
+        //
+        // It does NOT create or remove ActiveLogins.
+        // It does NOT sign the employee in/out of attendance.
+        // =========================================================
+
+        [HttpGet]
+        public IActionResult KeepSessionAlive()
+        {
+            try
+            {
+                // =====================================================
+                // CHECK APPLICATION LOGIN SESSION
+                // =====================================================
+
+                int? userId =
+                    HttpContext.Session.GetInt32("UserId");
+
+
+                // =====================================================
+                // SESSION DOES NOT EXIST
+                // =====================================================
+
+                if (!userId.HasValue)
+                {
+                    return Unauthorized();
+                }
+
+
+                // =====================================================
+                // REFRESH SESSION ACTIVITY
+                //
+                // Accessing/updating the session keeps the ASP.NET
+                // Core session active.
+                // =====================================================
+
+                HttpContext.Session.SetString(
+                    "LastActivity",
+                    DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
+
+
+                // =====================================================
+                // SUCCESS
+                // =====================================================
+
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                // =====================================================
+                // LOG ERROR
+                // =====================================================
+
+                _ = _errorLogService.LogErrorAsync(
+                    ex,
+                    nameof(AccountController),
+                    nameof(KeepSessionAlive));
+
+
+                return StatusCode(500);
+            }
+        }
+
+
 
 
         // =========================================================

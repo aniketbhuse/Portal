@@ -1,5 +1,4 @@
-﻿
-using CRMPortal.Models;
+﻿using CRMPortal.Models;
 
 namespace CRMPortal.ViewModels
 {
@@ -121,4 +120,3 @@ namespace CRMPortal.ViewModels
         public List<EmployeeAttendanceSummaryViewModel> EmployeeSummaryList { get; set; } = new();
     }
 }
-

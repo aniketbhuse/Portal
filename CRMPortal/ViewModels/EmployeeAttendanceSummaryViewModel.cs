@@ -10,7 +10,15 @@
 
         public decimal MonthlySalary { get; set; }
 
+        public decimal GrossSalary { get; set; }
+
         public decimal PerDaySalary { get; set; }
+
+        public int TotalDays { get; set; }
+
+        public int AgentWorkingDays { get; set; }
+
+        public decimal TotalPaidDays { get; set; }
 
         public int PresentDays { get; set; }
 
@@ -58,6 +66,10 @@
 
         public decimal SalaryDeduction { get; set; }
 
+        public decimal Deductions { get; set; }
+
         public decimal NetSalary { get; set; }
+
+        public decimal FinalAmount { get; set; }
     }
-}
+} 

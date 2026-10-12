@@ -442,13 +442,7 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 
-$(document).ready(function () {
-    $('.searchable-dropdown').select2({
-        placeholder: "Select",
-        allowClear: true,
-        width: '100%'
-    });
-});
+
 
 
 // =========================================================
@@ -480,3 +474,335 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 });
+
+
+
+
+// =========================================================
+// CRM PORTAL APPLICATION SESSION KEEP-ALIVE
+//
+// This keeps the APPLICATION LOGIN session alive.
+//
+// IMPORTANT:
+// This is NOT Employee Attendance Sign In / Sign Out.
+//
+// Employee Attendance:
+//     Sign In / Sign Out
+//
+// Application Login:
+//     UserId / RoleId / EmployeeId etc.
+// =========================================================
+
+(function () {
+
+    // Run every 5 minutes
+    const keepAliveInterval = 5 * 60 * 1000;
+
+
+    async function keepApplicationSessionAlive() {
+
+        try {
+
+            const response = await fetch(
+                '/Account/KeepSessionAlive',
+                {
+                    method: 'GET',
+                    credentials: 'same-origin',
+                    cache: 'no-store'
+                }
+            );
+
+
+            // =====================================================
+            // APPLICATION SESSION EXPIRED
+            // =====================================================
+
+            if (response.status === 401) {
+
+                console.warn(
+                    "CRMPortal application session has expired."
+                );
+
+                return;
+            }
+
+
+            // =====================================================
+            // SESSION SUCCESSFULLY REFRESHED
+            // =====================================================
+
+            if (response.ok) {
+
+                console.log(
+                    "CRMPortal application session refreshed."
+                );
+
+            }
+
+        }
+        catch (error) {
+
+            console.error(
+                "CRMPortal session keep-alive failed:",
+                error
+            );
+
+        }
+
+    }
+
+
+    // =========================================================
+    // START HEARTBEAT
+    // =========================================================
+
+    setInterval(
+        keepApplicationSessionAlive,
+        keepAliveInterval
+    );
+
+})();
+
+
+
+
+
+// =========================================================
+// YOUR EXISTING site.js CODE
+// =========================================================
+
+// Existing functions...
+
+
+// Example:
+// function startEmployeeTimer(...) {
+//     ...
+// }
+
+
+// =========================================================
+// OTHER EXISTING site.js CODE
+// =========================================================
+
+// Your other JavaScript...
+
+
+// =========================================================
+// CRM PORTAL APPLICATION SESSION KEEP-ALIVE
+// =========================================================
+
+(function () {
+
+    // =========================================================
+    // ONLY RUN FOR LOGGED-IN USERS
+    // =========================================================
+
+    if (!window.crmPortalLoggedIn) {
+        return;
+    }
+
+
+    // Run every 5 minutes
+    const keepAliveInterval = 5 * 60 * 1000;
+
+
+    async function keepApplicationSessionAlive() {
+
+        try {
+
+            const response = await fetch(
+                '/Account/KeepSessionAlive',
+                {
+                    method: 'GET',
+                    credentials: 'same-origin',
+                    cache: 'no-store'
+                }
+            );
+
+
+            if (response.status === 401) {
+
+                console.warn(
+                    "CRMPortal application session has expired."
+                );
+
+                return;
+            }
+
+
+            if (response.ok) {
+
+                console.log(
+                    "CRMPortal application session refreshed."
+                );
+
+            }
+
+        }
+        catch (error) {
+
+            console.error(
+                "CRMPortal session keep-alive failed:",
+                error
+            );
+
+        }
+
+    }
+
+
+    // =========================================================
+    // START SESSION HEARTBEAT
+    // =========================================================
+
+    setInterval(
+        keepApplicationSessionAlive,
+        keepAliveInterval
+    );
+
+})();
+
+$(document).ready(function () {
+
+    $('.searchable-dropdown').select2({
+        placeholder: "Select Employee",
+        allowClear: true,
+        width: '100%'
+    });
+
+});
+
+
+$(document).on("click", ".copy-btn", function () {
+
+    var value = $(this).data("copy");
+
+    navigator.clipboard.writeText(value).then(function () {
+
+        // show copied message
+
+    });
+
+});
+
+
+$(document).on("click", ".employee-details-link", function () {
+    debugger;
+    var employeeId = $(this).data("id");
+    debugger;
+    $.ajax({
+
+        url: '/HR/EmployeeDetails',
+        type: 'GET',
+        data: { id: employeeId },
+        
+        success: function (result) {
+
+            $("#employeeDetailsContainer").html(result);
+
+            var modal = new bootstrap.Modal(
+                document.getElementById("employeeDetailsModal")
+            );
+
+            modal.show();
+        },
+
+        error: function (xhr, status, error) {
+            debugger;
+            console.log("Status Code:", xhr.status);
+            console.log("Status:", status);
+            console.log("Error:", error);
+            console.log("Response:", xhr.responseText);
+
+            alert("Unable to load employee details. Status Code: " + xhr.status);
+        }
+    });
+
+});
+
+
+document.getElementById('employeeDetailsModal')
+    .addEventListener('hidden.bs.modal', function () {
+
+        // Remove any leftover backdrop
+        document.querySelectorAll('.modal-backdrop').forEach(function (backdrop) {
+            backdrop.remove();
+        });
+
+        // Remove Bootstrap's modal-open class
+        document.body.classList.remove('modal-open');
+
+        // Reset body styles
+        document.body.style.overflow = '';
+        document.body.style.paddingRight = '';
+
+    });
+
+
+
+
+function toggleSalary(button) {
+
+    const cardBody = button.closest(".card-body");
+
+    const salaryValue = cardBody.querySelector(".salary-value");
+
+    const icon = button.querySelector("i");
+
+    const isHidden = salaryValue.textContent.trim() === "₹ ••••••";
+
+    if (isHidden) {
+
+        // Show salary
+        salaryValue.textContent = salaryValue.dataset.value;
+
+        icon.classList.remove("bi-eye");
+        icon.classList.add("bi-eye-slash");
+
+        button.title = "Hide Salary";
+
+    } else {
+
+        // Hide salary
+        salaryValue.textContent = "₹ ••••••";
+
+        icon.classList.remove("bi-eye-slash");
+        icon.classList.add("bi-eye");
+
+        button.title = "Show Salary";
+    }
+}
+
+
+/* Employee Master page helpers.
+Your existing site.js still opens the modal and loads the partial view;
+nothing here changes that. This file only prevents the "black screen
+after closing the modal" problem. */
+
+(function () {
+    'use strict';
+
+    var modalEl = document.getElementById('employeeDetailsModal');
+    if (!modalEl) return;
+
+    // 1) Make the modal a direct child of <body>.
+    //    If a parent has transform / overflow / z-index, the dark backdrop can
+    //    end up on top of the modal and the page looks black and unclickable.
+    if (modalEl.parentElement !== document.body) {
+        document.body.appendChild(modalEl);
+    }
+
+    // 2) Safety net: after the modal is fully hidden, remove any leftover
+    //    backdrop and unlock the page scroll.
+    modalEl.addEventListener('hidden.bs.modal', function () {
+        if (document.querySelector('.modal.show')) return;
+
+        document.querySelectorAll('.modal-backdrop').forEach(function (b) {
+            b.remove();
+        });
+
+        document.body.classList.remove('modal-open');
+        document.body.style.overflow = '';
+        document.body.style.paddingRight = '';
+    });
+})();

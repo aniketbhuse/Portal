@@ -1,0 +1,206 @@
+﻿
+@model CRMPortal.Models.MasterEmployee
+
+<script src="~/js/site.js"></script>
+<script src="~/css/site.css"></script>
+
+
+<link rel="stylesheet" href="~/css/employee-details.css" asp-append-version="true" />
+
+@{
+    // ---------- helpers ----------
+    string Mask(string v) => string.IsNullOrWhiteSpace(v) || v.Length <= 4
+        ? v : new string('•', v.Length - 4) + v.Substring(v.Length - 4);
+
+    string Initials(string name)
+    {
+        if (string.IsNullOrWhiteSpace(name)) return "?";
+        var p = name.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        return p.Length == 1 ? p[0].Substring(0, 1).ToUpper()
+                             : (p[0].Substring(0, 1) + p[p.Length - 1].Substring(0, 1)).ToUpper();
+    }
+
+    void Field(string label, string value, string display = null, bool sensitive = false, bool full = false)
+    {
+        var has = !string.IsNullOrWhiteSpace(value);
+        var shown = has ? (display ?? value) : "-";
+        <div class="ed-field @(full ? "ed-field--full" : "")">
+            <span class="ed-label">@label</span>
+            <div class="ed-value">
+                @if (has && sensitive)
+                {
+                    <span class="ed-text ed-text--mono" data-masked="@Mask(shown)" data-plain="@shown">@Mask(shown)</span>
+                    <button type="button" class="ed-btn ed-reveal" title="Show / hide @label" aria-label="Show or hide @label">
+                        <i class="bi bi-eye"></i>
+                    </button>
+                }
+                else
+                {
+                    <span class="ed-text">@shown</span>
+                }
+
+                @if (has)
+                {
+                    <button type="button" class="ed-btn ed-copy" data-copy="@value" title="Copy @label" aria-label="Copy @label">
+                        <i class="bi bi-copy"></i>
+                    </button>
+                }
+            </div>
+        </div>
+    }
+
+    var status = (Model.EmployeeStatus ?? "").Trim();
+    var statusClass = status.ToLower() switch
+    {
+        "active" => "is-active",
+        "inactive" or "resigned" or "terminated" => "is-inactive",
+        "" => "is-neutral",
+        _ => "is-pending"
+    };
+    var dob     = Model.DateOfBirth == default ? null : Model.DateOfBirth.ToString("dd-MM-yyyy");
+    var joining = Model.JoiningDate == default ? null : Model.JoiningDate.ToString("dd-MM-yyyy");
+}
+
+<div class="ed-wrapper">
+
+    <!-- ================= HERO ================= -->
+    <header class="ed-hero">
+        <div class="ed-avatar" aria-hidden="true">@Initials(Model.FullName)</div>
+
+        <div class="ed-hero-info">
+            <h2 class="ed-name">@Model.FullName</h2>
+
+            <div class="ed-chips">
+                <span class="ed-chip"><i class="bi bi-person-badge"></i>@Model.EmployeeCode</span>
+
+                @if (!string.IsNullOrWhiteSpace(Model.Designation))
+                {
+                    <span class="ed-chip"><i class="bi bi-briefcase"></i>@Model.Designation</span>
+                }
+                @if (!string.IsNullOrWhiteSpace(Model.Department))
+                {
+                    <span class="ed-chip"><i class="bi bi-building"></i>@Model.Department</span>
+                }
+            </div>
+        </div>
+
+        @if (!string.IsNullOrWhiteSpace(status))
+        {
+            <span class="ed-status @statusClass"><i class="bi bi-circle-fill"></i>@status</span>
+        }
+    </header>
+
+    <!-- ================= PERSONAL ================= -->
+    <section class="ed-section">
+        <h3 class="ed-section-title"><span class="ed-icon"><i class="bi bi-person"></i></span>Personal information</h3>
+        <div class="ed-grid">
+            @{ Field("Employee code", Model.EmployeeCode); }
+            @{ Field("Full name", Model.FullName); }
+            @{ Field("Gender", Model.Gender); }
+            @{ Field("Date of birth", dob); }
+            @{ Field("Blood group", Model.BloodGroup); }
+            @{ Field("Marital status", Model.MaritalStatus); }
+        </div>
+    </section>
+
+    <!-- ================= CONTACT ================= -->
+    <section class="ed-section">
+        <h3 class="ed-section-title"><span class="ed-icon"><i class="bi bi-telephone"></i></span>Contact information</h3>
+        <div class="ed-grid">
+            @{ Field("Email", Model.Email); }
+            @{ Field("Mobile number", Model.MobileNumber); }
+            @{ Field("Address", Model.AddressLine1, full: true); }
+            @{ Field("Pincode", Model.Pincode?.ToString()); }
+        </div>
+    </section>
+
+    <!-- ================= EMPLOYMENT ================= -->
+    <section class="ed-section">
+        <h3 class="ed-section-title"><span class="ed-icon"><i class="bi bi-briefcase"></i></span>Employment information</h3>
+        <div class="ed-grid">
+            @{ Field("Department", Model.Department); }
+            @{ Field("Designation", Model.Designation); }
+            @{ Field("Joining date", joining); }
+            @{ Field("Employment type", Model.EmploymentType); }
+            @{ Field("Reporting manager", Model.ReportingManager); }
+            @{ Field("Shift", Model.Shift); }
+            @{ Field("Employee status", Model.EmployeeStatus); }
+            @{ Field("Salary", Model.Salary.ToString("N2"), display: "₹ " + Model.Salary.ToString("N2"), sensitive: true); }
+        </div>
+    </section>
+
+    <!-- ================= IDENTIFICATION ================= -->
+    <section class="ed-section">
+        <h3 class="ed-section-title"><span class="ed-icon"><i class="bi bi-card-text"></i></span>Identification details</h3>
+        <div class="ed-grid">
+            @{ Field("Aadhaar number", Model.AadhaarNumber, sensitive: true); }
+            @{ Field("PAN number", Model.PANNumber, sensitive: true); }
+        </div>
+    </section>
+
+    <!-- ================= BANK ================= -->
+    <section class="ed-section">
+        <h3 class="ed-section-title"><span class="ed-icon"><i class="bi bi-bank"></i></span>Bank details</h3>
+        <div class="ed-grid">
+            @{ Field("Bank name", Model.BankName); }
+            @{ Field("Account number", Model.AccountNumber, sensitive: true); }
+            @{ Field("IFSC code", Model.IFSCCode); }
+        </div>
+    </section>
+
+    <!-- ================= RECORD ================= -->
+    <section class="ed-section">
+        <h3 class="ed-section-title"><span class="ed-icon"><i class="bi bi-clock-history"></i></span>Record information</h3>
+        <div class="ed-grid">
+            @{ Field("Created", Model.CreatedDate.ToString("dd-MM-yyyy HH:mm")); }
+            @{ Field("Last updated", Model.UpdatedDate.ToString("dd-MM-yyyy HH:mm")); }
+        </div>
+    </section>
+
+    <div class="ed-toast" role="status" aria-live="polite"></div>
+</div>
+
+<script>
+    // Bound once, works even when this partial is loaded again via AJAX / modal
+    (function () {
+        if (window.__edBound) return;
+        window.__edBound = true;
+
+        let timer;
+        function toast(msg) {
+            const t = document.querySelector('.ed-toast');
+            if (!t) return;
+            t.textContent = msg;
+            t.classList.add('show');
+            clearTimeout(timer);
+            timer = setTimeout(() => t.classList.remove('show'), 1600);
+        }
+
+        async function copy(text) {
+            try { await navigator.clipboard.writeText(text); }
+            catch {
+                const ta = document.createElement('textarea');
+                ta.value = text; document.body.appendChild(ta);
+                ta.select(); document.execCommand('copy'); ta.remove();
+            }
+        }
+
+        document.addEventListener('click', async function (e) {
+            const c = e.target.closest('.ed-copy');
+            if (c) {
+                await copy(c.dataset.copy);
+                c.classList.add('done');
+                setTimeout(() => c.classList.remove('done'), 1200);
+                toast('Copied to clipboard');
+                return;
+            }
+            const r = e.target.closest('.ed-reveal');
+            if (r) {
+                const text = r.parentElement.querySelector('.ed-text');
+                const hidden = text.textContent === text.dataset.masked;
+                text.textContent = hidden ? text.dataset.plain : text.dataset.masked;
+                r.querySelector('i').className = hidden ? 'bi bi-eye-slash' : 'bi bi-eye';
+            }
+        });
+    })();
+</script>

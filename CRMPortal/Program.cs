@@ -29,12 +29,17 @@ builder.Services.AddDataProtection()
 
 builder.Services.AddSession(options =>
 {
+    // Server-side session remains valid as long as
+    // there is activity within this period.
     options.IdleTimeout = TimeSpan.FromHours(15);
 
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 
-    options.Cookie.MaxAge = TimeSpan.FromHours(15);
+    // Keep the browser session cookie for 24 hours.
+    // This is important because your employee working day
+    // can be longer than 15 hours.
+    options.Cookie.MaxAge = TimeSpan.FromHours(24);
 
     options.Cookie.Name = ".CRMPortal.Session";
     options.Cookie.SameSite = SameSiteMode.Lax;

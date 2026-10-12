@@ -7,10 +7,11 @@
 
     <script type="importmap"></script>
 
-    <link rel="stylesheet"
-          href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    
 
     <link rel="stylesheet"
           href="~/css/site.css"
@@ -20,6 +21,19 @@
           href="~/CRMPortal.styles.css"
           asp-append-version="true" />
 </head>
+
+@if (Context.Session.GetInt32("UserId") != null)
+{
+    <script>
+        window.crmPortalLoggedIn = true;
+    </script>
+}
+else
+{
+    <script>
+        window.crmPortalLoggedIn = false;
+    </script>
+}
 
 <body>
 
@@ -151,7 +165,7 @@
                                 </a>
                             </li>
 
-                            <li class="nav-item hide-tabs">
+                            <li class="nav-item">
                                 <a class="nav-link text-dark"
                                    asp-controller="Employee"
                                    asp-action="ApplyLeave">
@@ -164,32 +178,6 @@
 
                     <!-- RIGHT MENU -->
                     <ul class="navbar-nav ms-auto align-items-center" >
-
-                        <!-- ✅ SEARCH BOX ONLY FOR ADMIN -->
-                        @if (Context.Session.GetInt32("UserId") != null
-                            && Context.Session.GetInt32("RoleId") == 1)
-                        {
-                            <li class="nav-item me-3" style="display: none;">
-
-                                <form class="d-flex search-box"
-                                      asp-controller="Admin"
-                                      asp-action="Search"
-                                      method="get">
-
-                                    <input type="text"
-                                           name="query"
-                                           class="search-input"
-                                           placeholder="Search users..." />
-
-                                    <button type="submit"
-                                            class="search-btn">
-                                        Search
-                                    </button>
-
-                                </form>
-
-                            </li>
-                        }
 
                         <!-- USER INFO -->
                         @if (Context.Session.GetInt32("UserId") != null)

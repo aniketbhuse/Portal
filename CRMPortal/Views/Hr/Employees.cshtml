@@ -4,154 +4,101 @@
     ViewData["Title"] = "Employee Master";
 }
 
-<!-- ===================================================== -->
-<!-- SUCCESS MESSAGE -->
-<!-- ===================================================== -->
-@if (TempData["Success"] != null)
-{
-    <div class="alert alert-success alert-dismissible fade show">
-        <i class="fa-solid fa-circle-check me-2"></i>
-
-        @TempData["Success"]
-
-        <button type="button"
-                class="btn-close"
-                data-bs-dismiss="alert">
-        </button>
-    </div>
-}
-
-
-<!-- ===================================================== -->
-<!-- ERROR MESSAGE -->
-<!-- ===================================================== -->
-@if (TempData["Error"] != null)
-{
-    <div class="alert alert-danger alert-dismissible fade show">
-        <i class="fa-solid fa-circle-exclamation me-2"></i>
-
-        @TempData["Error"]
-
-        <button type="button"
-                class="btn-close"
-                data-bs-dismiss="alert">
-        </button>
-    </div>
-}
-
-
-<!-- ===================================================== -->
-<!-- FONT AWESOME -->
-<!-- ===================================================== -->
-
+<!-- Font Awesome -->
 <link rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
 
+<!-- Page styles -->
+<link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 
-<!-- ===================================================== -->
-<!-- PAGE CSS -->
-<!-- ===================================================== -->
-
-<link rel="stylesheet"
-      href="~/css/ApplyLeave.css"
-      asp-append-version="true" />
+<script src="~/js/site.js"></script>
 
 
-<!-- ===================================================== -->
-<!-- MAIN CONTAINER -->
-<!-- ===================================================== -->
+<div class="container-fluid em-page">
 
-<div class="container-fluid mt-3 top"
-     style="margin-left: -110px;">
+    <!-- ===================================================== -->
+    <!-- SUCCESS / ERROR MESSAGES -->
+    <!-- ===================================================== -->
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show">
+            <i class="fa-solid fa-circle-check me-2"></i>
+
+            @TempData["Success"]
+
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert">
+            </button>
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show">
+            <i class="fa-solid fa-circle-exclamation me-2"></i>
+
+            @TempData["Error"]
+
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert">
+            </button>
+        </div>
+    }
 
 
     <!-- ===================================================== -->
     <!-- SUMMARY CARDS -->
     <!-- ===================================================== -->
+    <div class="row g-3 mb-4 em-top">
 
-    <div class="row mb-3">
+        <!-- TOTAL EMPLOYEES -->
+        <div class="col-12 col-md-4">
+            <div class="dashboard-card em-stat em-stat--primary">
 
-        <div class="col-md-8">
-
-            <div class="row">
-
-
-                <!-- ================================================= -->
-                <!-- TOTAL EMPLOYEES -->
-                <!-- ================================================= -->
-
-                <div class="col-md-4">
-
-                    <div class="card shadow text-center dashboard-card">
-
-                        <div class="card-body">
-
-                            <i class="fa-solid fa-users summary-icon text-primary"></i>
-
-                            <h6>Total Employees</h6>
-
-                            <h2 class="text-primary">
-                                @ViewBag.TotalEmployees
-                            </h2>
-
-                        </div>
-
-                    </div>
-
+                <div class="summary-icon-wrapper text-primary">
+                    <i class="fa-solid fa-users"></i>
                 </div>
 
-
-                <!-- ================================================= -->
-                <!-- ACTIVE EMPLOYEES -->
-                <!-- ================================================= -->
-
-                <div class="col-md-4">
-
-                    <div class="card shadow text-center dashboard-card">
-
-                        <div class="card-body">
-
-                            <i class="fa-solid fa-user-check summary-icon text-success"></i>
-
-                            <h6>Active Employees</h6>
-
-                            <h2 class="text-success">
-                                @ViewBag.ActiveEmployees
-                            </h2>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-
-                <!-- ================================================= -->
-                <!-- INACTIVE EMPLOYEES -->
-                <!-- ================================================= -->
-
-                <div class="col-md-4">
-
-                    <div class="card shadow text-center dashboard-card">
-
-                        <div class="card-body">
-
-                            <i class="fa-solid fa-user-xmark summary-icon text-danger"></i>
-
-                            <h6>Inactive Employees</h6>
-
-                            <h2 class="text-danger">
-                                @ViewBag.InactiveEmployees
-                            </h2>
-
-                        </div>
-
-                    </div>
-
+                <div class="em-stat__body">
+                    <h6>Total Employees</h6>
+                    <h2 class="text-primary">@ViewBag.TotalEmployees</h2>
                 </div>
 
             </div>
+        </div>
 
+        <!-- ACTIVE EMPLOYEES -->
+        <div class="col-12 col-md-4">
+            <div class="dashboard-card em-stat em-stat--success">
+
+                <div class="summary-icon-wrapper text-success">
+                    <i class="fa-solid fa-user-check"></i>
+                </div>
+
+                <div class="em-stat__body">
+                    <h6>Active Employees</h6>
+                    <h2 class="text-success">@ViewBag.ActiveEmployees</h2>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- INACTIVE EMPLOYEES -->
+        <div class="col-12 col-md-4">
+            <div class="dashboard-card em-stat em-stat--danger">
+
+                <div class="summary-icon-wrapper text-danger">
+                    <i class="fa-solid fa-user-xmark"></i>
+                </div>
+
+                <div class="em-stat__body">
+                    <h6>Inactive Employees</h6>
+                    <h2 class="text-danger">@ViewBag.InactiveEmployees</h2>
+                </div>
+
+            </div>
         </div>
 
     </div>
@@ -160,30 +107,17 @@
     <!-- ===================================================== -->
     <!-- EMPLOYEE MASTER TABLE -->
     <!-- ===================================================== -->
+    <div class="em-card">
 
-    <div class="card shadow"
-         style="width: 120%;">
-
-
-        <!-- ================================================= -->
         <!-- TABLE HEADER -->
-        <!-- ================================================= -->
+        <div class="em-card__head">
 
-        <div class="card-header bg-primary text-white">
-
-            <h4 class="mb-0">
-
+            <h4 class="em-card__title">
                 <i class="fa-solid fa-users me-2"></i>
-
                 Employee Master List
-
             </h4>
 
-
-            <!-- ================================================= -->
             <!-- EXPORT BUTTON -->
-            <!-- ================================================= -->
-
             <a asp-action="ExportEmployeesToExcel"
                class="btn btn-success exporttoexcel">
 
@@ -196,120 +130,56 @@
         </div>
 
 
-        <!-- ================================================= -->
         <!-- TABLE BODY -->
-        <!-- ================================================= -->
-
-        <div class="card-body p-0">
+        <div class="em-card__body">
 
             <div class="table-responsive">
 
-                <table class="table table-bordered table-hover table-striped align-middle mb-0">
+                <table class="table table-hover align-middle mb-0 em-table">
 
-                    <thead class="table-dark">
+                    <thead>
 
                         <tr>
-                            <th>
-                                Action
-                            </th>
-                            <th>
-                                Status
-                            </th>
-                            <th>
-                                Employee Code
-                            </th>
-                            <th>
-                                Full Name
-                            </th>
-                            <th>
-                                Email
-                            </th>
-                            <th>
-                                Mobile Number
-                            </th>
-                            <th>
-                                Emergency Contact Name
-                            </th>
-                            <th>
-                                Emergency Contact
-                            </th>
-                            <th>
-                                Department
-                            </th>
-                            <th>
-                                Designation
-                            </th>
-                            <th>
-                                Gender
-                            </th>
-                            <th>
-                                Date Of Birth
-                            </th>
-                            <th>
-                                Joining Date
-                            </th>
-                            <th>
-                                Salary
-                            </th>
-                            <th>
-                                Blood Group
-                            </th>
-                            <th>
-                                Marital Status
-                            </th>
-                            <th>
-                                Address
-                            </th>
-                            <th>
-                                Pincode
-                            </th>
-                            <th>
-                                Employment Type
-                            </th>
-                            <th>
-                                Reporting Manager
-                            </th>
-                            <th>
-                                Shift
-                            </th>
-
-                            <th>
-                                Aadhaar Number
-                            </th>
-                            <th>
-                                PAN Number
-                            </th>
-                            <th>
-                                Bank Name
-                            </th>
-                            <th>
-                                Account Number
-                            </th>
-                            <th>
-                                IFSC Code
-                            </th>
-                            <th>
-                                Created
-                            </th>
-                            <th>
-                                Updated
-                            </th>
-
+                            <th>Action</th>
+                            <th>Status</th>
+                            <th>Employee Code</th>
+                            <th>Full Name</th>
+                            <th>Email</th>
+                            <th>Mobile Number</th>
+                            <th>Emergency Contact Name</th>
+                            <th>Emergency Contact</th>
+                            <th>Department</th>
+                            <th>Designation</th>
+                            <th>Gender</th>
+                            <th>Date Of Birth</th>
+                            <th>Joining Date</th>
+                            <th>Salary</th>
+                            <th>Blood Group</th>
+                            <th>Marital Status</th>
+                            <th>Address</th>
+                            <th>Pincode</th>
+                            <th>Employment Type</th>
+                            <th>Reporting Manager</th>
+                            <th>Shift</th>
+                            <th>Aadhaar Number</th>
+                            <th>PAN Number</th>
+                            <th>Bank Name</th>
+                            <th>Account Number</th>
+                            <th>IFSC Code</th>
+                            <th>Created</th>
+                            <th>Updated</th>
                         </tr>
 
                     </thead>
 
-
-                    <!-- ================================================= -->
-                    <!-- TABLE DATA -->
-                    <!-- ================================================= -->
 
                     <tbody>
 
                         @foreach (var item in Model)
                         {
                             <tr>
-                                <td style="min-width: 210px;">
+                                <td class="em-col-action">
+
                                     <a asp-action="EditEmployee"
                                        asp-route-id="@item.EmployeeId"
                                        class="btn btn-warning btn-sm">
@@ -319,6 +189,7 @@
                                         Edit
 
                                     </a>
+
                                     @if (item.IsDeleted)
                                     {
                                         <form asp-action="ActivateEmployee"
@@ -365,7 +236,6 @@
                                     @if (item.IsDeleted)
                                     {
                                         <!-- INACTIVE -->
-
                                         <span class="badge bg-danger">
 
                                             <i class="fa-solid fa-circle-xmark me-1"></i>
@@ -377,7 +247,6 @@
                                     else
                                     {
                                         <!-- ACTIVE -->
-
                                         <span class="badge bg-success">
 
                                             <i class="fa-solid fa-circle-check me-1"></i>
@@ -389,16 +258,17 @@
 
                                 </td>
 
+                                <td>@item.EmployeeCode</td>
+
                                 <td>
-                                    @item.EmployeeCode
+                                    <a href="javascript:void(0);"
+                                       class="employee-details-link"
+                                       data-id="@item.EmployeeId">
+                                        @item.FullName
+                                    </a>
                                 </td>
 
                                 <td>
-                                    @item.FullName
-                                </td>
-
-                                <td>
-
                                     <a href="mailto:@item.Email"
                                        class="text-decoration-none text-primary fw-semibold"
                                        title="Send Email to @item.FullName">
@@ -408,101 +278,31 @@
                                         @item.Email
 
                                     </a>
-
                                 </td>
 
-                                <td>
-                                    @item.MobileNumber
-                                </td>
-
-                                <td>
-                                    @item.EmergencyContactName
-                                </td>
-
-                                <td>
-                                    @item.EmergencyContact
-                                </td>
-
-                                <td>
-                                    @item.Department
-                                </td>
-
-                                <td>
-                                    @item.Designation
-                                </td>
-
-                                <td>
-                                    @item.Gender
-                                </td>
-
-                                <td>
-                                    @item.DateOfBirth
-                                </td>
-
-                                <td>
-                                    @item.JoiningDate
-                                </td>
-
-                                <td>
-                                    ₹ @item.Salary.ToString("N2")
-                                </td>
-
-                                <td>
-                                    @item.BloodGroup
-                                </td>
-
-                                <td>
-                                    @item.MaritalStatus
-                                </td>
-
-                                <td>
-                                    @item.AddressLine1
-                                </td>
-
-                                <td>
-                                    @item.Pincode
-                                </td>
-
-                                <td>
-                                    @item.EmploymentType
-                                </td>
-
-                                <td>
-                                    @item.ReportingManager
-                                </td>
-
-                                <td>
-                                    @item.Shift
-                                </td>
-
-                                <td>
-                                    @item.AadhaarNumber
-                                </td>
-
-                                <td>
-                                    @item.PANNumber
-                                </td>
-
-                                <td>
-                                    @item.BankName
-                                </td>
-
-                                <td>
-                                    @item.AccountNumber
-                                </td>
-
-                                <td>
-                                    @item.IFSCCode
-                                </td>
-
-                                <td>
-                                    @item.CreatedDate.ToString("dd-MM-yyyy")
-                                </td>
-
-                                <td>
-                                    @item.UpdatedDate.ToString("dd-MM-yyyy")
-                                </td>
-
+                                <td>@item.MobileNumber</td>
+                                <td>@item.EmergencyContactName</td>
+                                <td>@item.EmergencyContact</td>
+                                <td>@item.Department</td>
+                                <td>@item.Designation</td>
+                                <td>@item.Gender</td>
+                                <td>@item.DateOfBirth</td>
+                                <td>@item.JoiningDate</td>
+                                <td>₹ @item.Salary.ToString("N2")</td>
+                                <td>@item.BloodGroup</td>
+                                <td>@item.MaritalStatus</td>
+                                <td>@item.AddressLine1</td>
+                                <td>@item.Pincode</td>
+                                <td>@item.EmploymentType</td>
+                                <td>@item.ReportingManager</td>
+                                <td>@item.Shift</td>
+                                <td>@item.AadhaarNumber</td>
+                                <td>@item.PANNumber</td>
+                                <td>@item.BankName</td>
+                                <td>@item.AccountNumber</td>
+                                <td>@item.IFSCCode</td>
+                                <td>@item.CreatedDate.ToString("dd-MM-yyyy")</td>
+                                <td>@item.UpdatedDate.ToString("dd-MM-yyyy")</td>
                             </tr>
                         }
 
@@ -519,149 +319,39 @@
 </div>
 
 
-<!-- ========================================================= -->
-<!-- PAGE CSS -->
-<!-- ========================================================= -->
+<!-- ===================================================== -->
+<!-- EMPLOYEE DETAILS MODAL (partial view loads inside) -->
+<!-- ===================================================== -->
+<div class="modal fade" id="employeeDetailsModal" tabindex="-1">
 
-<style>
+    <div class="modal-dialog modal-xl modal-dialog-centered">
 
-    /* ========================================== */
-    /* GENERAL CARD */
-    /* ========================================== */
+        <div class="modal-content">
 
-    .card {
-        border-radius: 12px;
-    }
+            <div class="modal-header">
 
+                <h5 class="modal-title">
+                    Employee Details
+                </h5>
 
-    /* ========================================== */
-    /* SUMMARY ICON */
-    /* ========================================== */
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal">
+                </button>
 
-    .summary-icon {
-        font-size: 25px;
-        margin-bottom: 8px;
-    }
+            </div>
 
+            <div class="modal-body"
+                 id="employeeDetailsContainer">
 
-    /* ========================================== */
-    /* TABLE SCROLL AREA */
-    /* ========================================== */
+                <!-- Partial View loads here -->
 
-    .table-responsive {
-        overflow-x: auto;
-        overflow-y: auto;
-        max-height: 75vh;
-        position: relative;
-    }
+            </div>
 
+        </div>
 
-    /* ========================================== */
-    /* STICKY TABLE HEADER */
-    /* ========================================== */
+    </div>
 
-    .table thead {
-        position: sticky;
-        top: 0;
-        z-index: 20;
-    }
+</div>
 
 
-        .table thead th {
-            position: sticky;
-            top: 0;
-            z-index: 21;
-            background-color: #212529 !important;
-            color: #ffffff !important;
-            white-space: nowrap;
-            vertical-align: middle;
-            border-color: #454d55 !important;
-        }
-
-
-    /* ========================================== */
-    /* TABLE CELLS */
-    /* ========================================== */
-
-    .table td,
-    .table th {
-        white-space: nowrap;
-        vertical-align: middle;
-    }
-
-
-    /* ========================================== */
-    /* ROW HOVER */
-    /* ========================================== */
-
-    .table tbody tr:hover {
-        background: #eef7ff;
-        transition: .2s;
-    }
-
-
-    /* ========================================== */
-    /* BADGE */
-    /* ========================================== */
-
-    .badge {
-        font-size: 14px;
-    }
-
-
-    /* ========================================== */
-    /* TOP SPACING */
-    /* ========================================== */
-
-    .top {
-        margin-top: 70px;
-    }
-
-
-    /* ========================================== */
-    /* EXPORT BUTTON */
-    /* ========================================== */
-
-    .exporttoexcel {
-        margin-left: 89%;
-        margin-top: -35px;
-    }
-
-
-    /* ========================================== */
-    /* ACTION BUTTONS */
-    /* ========================================== */
-
-    .table td .btn {
-        margin-right: 3px;
-        margin-bottom: 2px;
-    }
-
-
-    /* ========================================== */
-    /* ACTIVATE BUTTON */
-    /* ========================================== */
-
-    .btn-success {
-        white-space: nowrap;
-    }
-
-
-    /* ========================================== */
-    /* INACTIVATE BUTTON */
-    /* ========================================== */
-
-    .btn-danger {
-        white-space: nowrap;
-    }
-
-
-    /* ========================================== */
-    /* EMAIL */
-    /* ========================================== */
-
-    .table td a {
-        white-space: nowrap;
-    }
-
-</style>

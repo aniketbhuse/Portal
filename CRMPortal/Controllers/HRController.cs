@@ -24,11 +24,11 @@ namespace CRMPortal.Controllers
         private readonly AppDbContext _context;
         private readonly IWebHostEnvironment _environment;
 
-        public HRController(AppDbContext context,IWebHostEnvironment environment)
+        public HRController(AppDbContext context, IWebHostEnvironment environment)
         {
             _context = context;
             _environment = environment;
-           
+
         }
 
         public IActionResult Dashboard()
@@ -77,6 +77,26 @@ namespace CRMPortal.Controllers
         }
 
         [HttpGet]
+        public async Task<IActionResult> EmployeeDetails(int id)
+        {
+            try
+            {
+                var employee = await _context.MasterEmployee.FirstOrDefaultAsync(x => x.EmployeeId == id);
+                if(employee == null)
+                {
+                    return NotFound();
+                }
+
+                return PartialView("_EmployeeDetails", employee);
+                
+            }
+            catch
+            {
+                return StatusCode(500);
+            }
+        }
+
+        [HttpGet]
         public async Task<IActionResult> Employees()
         {
             try
@@ -96,10 +116,10 @@ namespace CRMPortal.Controllers
                 // IsDeleted = 0 Active
                 // IsDeleted = 1 Inactive
                 // ==========================================
-                    var employees = await _context.MasterEmployee
-                 .OrderBy(x => x.IsDeleted)
-                 .ThenByDescending(x => x.EmployeeId)
-                 .ToListAsync();
+                var employees = await _context.MasterEmployee
+             .OrderBy(x => x.IsDeleted)
+             .ThenByDescending(x => x.EmployeeId)
+             .ToListAsync();
 
                 // ==========================================
                 // SUMMARY COUNTS
@@ -574,17 +594,18 @@ namespace CRMPortal.Controllers
 
                 string[] validStatuses =
                 {
-                    "Present",
-                    "PL",
-                    "HD",
-                    "H",
-                    "LWP",
-                    "ULWP",
-                    "SL",
-                    "NCNS",
-                    "Abscond",
-                    "Terminated"
-                };
+            "Present",
+            "PL",
+            "HD",
+            "H",
+            "CH",
+            "LWP",
+            "ULWP",
+            "SL",
+            "NCNS",
+            "Abscond",
+            "Terminated"
+        };
 
                 if (!validStatuses.Contains(attendance.Status))
                 {
@@ -593,23 +614,28 @@ namespace CRMPortal.Controllers
                 }
 
                 // =====================================================
-                // SANDWICH VALIDATION
+                // SANDWICH LEAVE VALIDATION
+                //
+                // SL CAN ONLY BE MARKED ON:
+                // SATURDAY OR SUNDAY
+                //
+                // No automatic Friday/Monday processing.
                 // =====================================================
 
                 if (attendance.Status == "SL")
                 {
-                    if (attendance.AttendanceDate.DayOfWeek != DayOfWeek.Friday &&
-                        attendance.AttendanceDate.DayOfWeek != DayOfWeek.Monday)
+                    if (attendance.AttendanceDate.DayOfWeek != DayOfWeek.Saturday &&
+                        attendance.AttendanceDate.DayOfWeek != DayOfWeek.Sunday)
                     {
                         TempData["Error"] =
-                            "Sandwich Leave can only be applied on Friday or Monday.";
+                            "Sandwich Leave can only be applied on Saturday or Sunday.";
 
                         return RedirectToAction("Dashboard");
                     }
                 }
 
                 // =====================================================
-                // CHECK DUPLICATE MAIN DATE
+                // CHECK DUPLICATE DATE
                 // =====================================================
 
                 bool exists = _context.EmployeeAttendance.Any(x =>
@@ -626,60 +652,51 @@ namespace CRMPortal.Controllers
                 }
 
                 // =====================================================
-                // DATE / STATUS PROCESSING
+                // ABSCOND
                 // =====================================================
 
-                if (attendance.Status == "SL")
+                if (attendance.Status == "Abscond")
                 {
-                    // IMPORTANT:
-                    // Do NOT add the main attendance first.
-                    //
-                    // ApplySandwichLeave itself will add:
-                    // Friday + Saturday + Sunday
-                    // OR
-                    // Saturday + Sunday + Monday
-
-                    ApplySandwichLeave(
-                        employee.EmployeeId,
-                        attendance.AttendanceDate,
-                        attendance.Remarks);
-                }
-                else if (attendance.Status == "Abscond")
-                {
-                    // First save Abscond date.
                     AddAttendanceRecord(
                         employee.EmployeeId,
                         attendance.AttendanceDate,
                         "Abscond",
                         attendance.Remarks);
 
-                    // Mark remaining month as Abscond.
                     ApplyRemainingMonthStatus(
                         employee.EmployeeId,
                         attendance.AttendanceDate,
                         "Abscond");
                 }
+
+                // =====================================================
+                // TERMINATED
+                // =====================================================
+
                 else if (attendance.Status == "Terminated")
                 {
-                    // First save Terminated date.
                     AddAttendanceRecord(
                         employee.EmployeeId,
                         attendance.AttendanceDate,
                         "Terminated",
                         attendance.Remarks);
 
-                    // Mark remaining month as Terminated.
                     ApplyRemainingMonthStatus(
                         employee.EmployeeId,
                         attendance.AttendanceDate,
                         "Terminated");
                 }
+
+                // =====================================================
+                // NORMAL ATTENDANCE
+                //
+                // SL IS NOW A NORMAL SINGLE-DAY RECORD.
+                // CH IS ALSO SAVED AS A NORMAL SINGLE-DAY RECORD.
+                // NO AUTOMATIC EXTRA DAYS ARE CREATED.
+                // =====================================================
+
                 else
                 {
-                    // =================================================
-                    // NORMAL ATTENDANCE
-                    // =================================================
-
                     attendance.CreatedDate = DateTime.Now;
                     attendance.UpdatedDate = DateTime.Now;
                     attendance.ModifiedDate = DateTime.Now;
@@ -976,10 +993,15 @@ namespace CRMPortal.Controllers
 
 
 
-        private EmployeeAttendanceSummaryViewModel CalculateEmployeeAttendance(MasterEmployee employee,DateOnly fromDate,DateOnly toDate, List<EmployeeAttendance> attendanceList,
-         List<LeaveRequests> approvedLeaveList)
+        private EmployeeAttendanceSummaryViewModel CalculateEmployeeAttendance(
+    MasterEmployee employee,
+    DateOnly fromDate,
+    DateOnly toDate,
+    List<EmployeeAttendance> attendanceList,
+    List<LeaveRequests> approvedLeaveList)
         {
-            EmployeeAttendanceSummaryViewModel result = new EmployeeAttendanceSummaryViewModel();
+            EmployeeAttendanceSummaryViewModel result =
+                new EmployeeAttendanceSummaryViewModel();
 
             try
             {
@@ -1039,12 +1061,31 @@ namespace CRMPortal.Controllers
                             result.OfficialHolidayCount++;
                             break;
 
+                        case "CH":
+                            // Company Holiday is also a paid holiday.
+                            result.OfficialHolidayCount++;
+                            break;
+
                         case "LWP":
                             result.LWPCount++;
                             break;
 
                         case "ULWP":
                             result.ULWPCount++;
+                            break;
+
+                        case "SL":
+
+                            // SL is counted only when explicitly marked
+                            // on Saturday or Sunday.
+                            if (attendance.AttendanceDate.DayOfWeek ==
+                                    DayOfWeek.Saturday ||
+                                attendance.AttendanceDate.DayOfWeek ==
+                                    DayOfWeek.Sunday)
+                            {
+                                result.SandwichCount++;
+                            }
+
                             break;
 
                         case "NCNS":
@@ -1111,35 +1152,6 @@ namespace CRMPortal.Controllers
                             break;
                     }
                 }
-
-
-                // =====================================================
-                // SANDWICH LEAVE
-                //
-                // Only Friday/Monday is considered the actual
-                // Sandwich Leave event.
-                //
-                // Saturday/Sunday generated SL records are not
-                // counted as separate events.
-                // =====================================================
-
-                var sandwichDates =
-                    uniqueAttendance
-                        .Where(x =>
-                            x.Status == "SL" &&
-                            (
-                                x.AttendanceDate.DayOfWeek ==
-                                    DayOfWeek.Friday
-                                ||
-                                x.AttendanceDate.DayOfWeek ==
-                                    DayOfWeek.Monday
-                            ))
-                        .Select(x => x.AttendanceDate)
-                        .Distinct()
-                        .ToList();
-
-                result.SandwichCount =
-                    sandwichDates.Count;
 
 
                 // =====================================================
@@ -1244,18 +1256,6 @@ namespace CRMPortal.Controllers
 
                 // =====================================================
                 // DETERMINE SALARY END DATE
-                //
-                // NORMAL:
-                // Full month salary.
-                //
-                // ABSCOND:
-                // Salary until previous day.
-                //
-                // TERMINATED:
-                // Salary including termination date.
-                //
-                // If both exist, the earlier applicable cutoff
-                // is used.
                 // =====================================================
 
                 DateOnly salaryEndDate =
@@ -1264,10 +1264,6 @@ namespace CRMPortal.Controllers
 
                 // =====================================================
                 // ABSCOND SALARY CUTOFF
-                //
-                // Example:
-                // Abscond = 15-Sep
-                // Salary = 01-Sep to 14-Sep
                 // =====================================================
 
                 if (abscondDate.HasValue)
@@ -1285,10 +1281,6 @@ namespace CRMPortal.Controllers
 
                 // =====================================================
                 // TERMINATED SALARY CUTOFF
-                //
-                // Example:
-                // Terminated = 15-Sep
-                // Salary = 01-Sep to 15-Sep
                 // =====================================================
 
                 if (terminatedDate.HasValue)
@@ -1319,17 +1311,6 @@ namespace CRMPortal.Controllers
 
                 // =====================================================
                 // SALARY BEFORE DEDUCTIONS
-                //
-                // CASE 1:
-                // NORMAL EMPLOYEE
-                // No Abscond and no Terminated.
-                //
-                // Result = FULL MONTHLY SALARY.
-                //
-                // CASE 2:
-                // ABSCOND OR TERMINATED.
-                //
-                // Result = salary according to cutoff date.
                 // =====================================================
 
                 decimal salaryBeforeDeductions;
@@ -1337,19 +1318,11 @@ namespace CRMPortal.Controllers
                 if (!abscondDate.HasValue &&
                     !terminatedDate.HasValue)
                 {
-                    // -------------------------------------------------
-                    // NORMAL EMPLOYEE
-                    // -------------------------------------------------
-
                     salaryBeforeDeductions =
                         monthlySalary;
                 }
                 else
                 {
-                    // -------------------------------------------------
-                    // ABSCOND / TERMINATED EMPLOYEE
-                    // -------------------------------------------------
-
                     salaryBeforeDeductions =
                         perDaySalary * salaryDays;
                 }
@@ -1404,7 +1377,11 @@ namespace CRMPortal.Controllers
 
 
                 // =====================================================
-                // SANDWICH EVENTS
+                // SANDWICH LEAVE COUNT
+                //
+                // ONLY EXPLICIT SATURDAY/SUNDAY SL RECORDS.
+                //
+                // Each SL = ONE FULL DAY deduction.
                 // =====================================================
 
                 int sandwichCount =
@@ -1413,10 +1390,9 @@ namespace CRMPortal.Controllers
                             x.Status == "SL" &&
                             (
                                 x.AttendanceDate.DayOfWeek ==
-                                    DayOfWeek.Friday
-                                ||
+                                    DayOfWeek.Saturday ||
                                 x.AttendanceDate.DayOfWeek ==
-                                    DayOfWeek.Monday
+                                    DayOfWeek.Sunday
                             ))
                         .Select(x =>
                             x.AttendanceDate)
@@ -1462,21 +1438,24 @@ namespace CRMPortal.Controllers
                 // =====================================================
                 // SANDWICH LEAVE DEDUCTION
                 //
-                // One Sandwich Leave event = 3 days deduction.
+                // ONE EXPLICIT SL DAY = ONE FULL DAY DEDUCTION.
+                //
+                // Saturday SL = 1 day
+                // Sunday SL   = 1 day
+                // Sat + Sun   = 2 days
                 // =====================================================
 
                 result.SandwichDeduction =
                     Math.Round(
                         sandwichCount *
-                        perDaySalary *
-                        3M,
+                        perDaySalary,
                         2);
 
 
                 // =====================================================
                 // NCNS DEDUCTION
                 //
-                // One NCNS = 3 days deduction.
+                // ONE NCNS = 3 DAYS DEDUCTION.
                 // =====================================================
 
                 result.NCNSDeduction =
@@ -1489,9 +1468,6 @@ namespace CRMPortal.Controllers
 
                 // =====================================================
                 // ABSCOND / TERMINATED DEDUCTION
-                //
-                // Their salary effect is already handled through
-                // salaryBeforeDeductions.
                 // =====================================================
 
                 result.AbscondDeduction =
@@ -1530,8 +1506,7 @@ namespace CRMPortal.Controllers
 
                 if (result.NetSalary < 0)
                 {
-                    result.NetSalary =
-                        0M;
+                    result.NetSalary = 0M;
                 }
 
 
@@ -1553,9 +1528,7 @@ namespace CRMPortal.Controllers
             }
         }
 
-        private void CopyCalculationToViewModel(
-           AttendanceReportViewModel model,
-           EmployeeAttendanceSummaryViewModel result)
+        private void CopyCalculationToViewModel(AttendanceReportViewModel model, EmployeeAttendanceSummaryViewModel result)
         {
             model.PresentDays =
                 result.PresentDays;
@@ -1638,7 +1611,7 @@ namespace CRMPortal.Controllers
 
 
 
-        private void CalculateWeekendInformation(DateOnly fromDate,DateOnly toDate,out int saturdayCount, out int sundayCount)
+        private void CalculateWeekendInformation(DateOnly fromDate, DateOnly toDate, out int saturdayCount, out int sundayCount)
         {
             saturdayCount = 0;
             sundayCount = 0;
@@ -1728,7 +1701,7 @@ namespace CRMPortal.Controllers
             return RedirectToAction("ViewAttendance");
         }
 
-        private void AddAttendanceRecord(int employeeId, DateOnly attendanceDate,string status,string? remarks = null)
+        private void AddAttendanceRecord(int employeeId, DateOnly attendanceDate, string status, string? remarks = null)
         {
             bool exists = _context.EmployeeAttendance.Any(x =>
                 x.EmployeeId == employeeId &&
@@ -1754,77 +1727,9 @@ namespace CRMPortal.Controllers
                 });
         }
 
-        private void ApplySandwichLeave(int employeeId,DateOnly leaveDate,string? remarks = null)
-        {
-            List<DateOnly> dates = new List<DateOnly>();
 
-            // ========================================================
-            // FRIDAY
-            // FRIDAY + SATURDAY + SUNDAY
-            // ========================================================
 
-            if (leaveDate.DayOfWeek == DayOfWeek.Friday)
-            {
-                dates.Add(leaveDate);
-                dates.Add(leaveDate.AddDays(1));
-                dates.Add(leaveDate.AddDays(2));
-            }
-
-            // ========================================================
-            // MONDAY
-            // SATURDAY + SUNDAY + MONDAY
-            // ========================================================
-
-            else if (leaveDate.DayOfWeek == DayOfWeek.Monday)
-            {
-                dates.Add(leaveDate.AddDays(-2));
-                dates.Add(leaveDate.AddDays(-1));
-                dates.Add(leaveDate);
-            }
-
-            else
-            {
-                return;
-            }
-
-            // ========================================================
-            // ADD ONLY IF NOT EXISTS
-            // ========================================================
-
-            foreach (DateOnly day in dates.Distinct())
-            {
-                bool exists = _context.EmployeeAttendance.Any(x =>
-                    x.EmployeeId == employeeId &&
-                    x.AttendanceDate == day &&
-                    !x.IsDeleted);
-
-                if (exists)
-                {
-                    // Do not create duplicate.
-                    continue;
-                }
-
-                _context.EmployeeAttendance.Add(
-                    new EmployeeAttendance
-                    {
-                        EmployeeId = employeeId,
-                        AttendanceDate = day,
-                        Status = "SL",
-                        Remarks = remarks,
-                        CreatedDate = DateTime.Now,
-                        UpdatedDate = DateTime.Now,
-                        ModifiedDate = DateTime.Now,
-                        IsDeleted = false
-                    });
-            }
-
-            // IMPORTANT:
-            // Do NOT call SaveChanges here.
-            //
-            // SaveAttendance() will save everything once.
-        }
-
-        private void ApplyRemainingMonthStatus( int employeeId,DateOnly startDate, string status)
+        private void ApplyRemainingMonthStatus(int employeeId, DateOnly startDate, string status)
         {
             DateOnly lastDay = new DateOnly(
                 startDate.Year,
@@ -1973,6 +1878,10 @@ namespace CRMPortal.Controllers
         {
             try
             {
+                // =====================================================
+                // ROLE VALIDATION
+                // =====================================================
+
                 if (HttpContext.Session.GetInt32("RoleId") != 5)
                 {
                     return RedirectToAction("Login", "Account");
@@ -1989,6 +1898,10 @@ namespace CRMPortal.Controllers
                 var attendanceModel =
                     model.EmployeeAttendance;
 
+                // =====================================================
+                // FIND ATTENDANCE
+                // =====================================================
+
                 var attendance =
                     await _context.EmployeeAttendance
                         .FirstOrDefaultAsync(x =>
@@ -2003,6 +1916,10 @@ namespace CRMPortal.Controllers
 
                     return RedirectToAction("ViewAttendance");
                 }
+
+                // =====================================================
+                // FIND EMPLOYEE
+                // =====================================================
 
                 var employee =
                     await _context.MasterEmployee
@@ -2025,17 +1942,17 @@ namespace CRMPortal.Controllers
 
                 string[] validStatuses =
                 {
-                    "Present",
-                    "PL",
-                    "HD",
-                    "H",
-                    "LWP",
-                    "ULWP",
-                    "SL",
-                    "NCNS",
-                    "Abscond",
-                    "Terminated"
-                };
+            "Present",
+            "PL",
+            "HD",
+            "H",
+            "LWP",
+            "ULWP",
+            "SL",
+            "NCNS",
+            "Abscond",
+            "Terminated"
+        };
 
                 if (!validStatuses.Contains(
                         attendanceModel.Status))
@@ -2050,6 +1967,32 @@ namespace CRMPortal.Controllers
                             attendanceId =
                                 attendanceModel.AttendanceId
                         });
+                }
+
+                // =====================================================
+                // SANDWICH LEAVE VALIDATION
+                //
+                // SL ONLY ON SATURDAY OR SUNDAY
+                // =====================================================
+
+                if (attendanceModel.Status == "SL")
+                {
+                    if (attendanceModel.AttendanceDate.DayOfWeek !=
+                            DayOfWeek.Saturday &&
+                        attendanceModel.AttendanceDate.DayOfWeek !=
+                            DayOfWeek.Sunday)
+                    {
+                        TempData["Error"] =
+                            "Sandwich Leave can only be applied on Saturday or Sunday.";
+
+                        return RedirectToAction(
+                            "EditAttendance",
+                            new
+                            {
+                                attendanceId =
+                                    attendanceModel.AttendanceId
+                            });
+                    }
                 }
 
                 // =====================================================
@@ -2079,30 +2022,6 @@ namespace CRMPortal.Controllers
                             attendanceId =
                                 attendanceModel.AttendanceId
                         });
-                }
-
-                // =====================================================
-                // SANDWICH VALIDATION
-                // =====================================================
-
-                if (attendanceModel.Status == "SL")
-                {
-                    if (attendanceModel.AttendanceDate.DayOfWeek !=
-                            DayOfWeek.Friday &&
-                        attendanceModel.AttendanceDate.DayOfWeek !=
-                            DayOfWeek.Monday)
-                    {
-                        TempData["Error"] =
-                            "Sandwich Leave can only be applied on Friday or Monday.";
-
-                        return RedirectToAction(
-                            "EditAttendance",
-                            new
-                            {
-                                attendanceId =
-                                    attendanceModel.AttendanceId
-                            });
-                    }
                 }
 
                 // =====================================================
@@ -3325,7 +3244,7 @@ namespace CRMPortal.Controllers
                 return RedirectToAction("Employees");
             }
         }
-       
+
         public IActionResult LoginTracker()
         {
             try
@@ -3707,7 +3626,5 @@ namespace CRMPortal.Controllers
                 return RedirectToAction("LoginTracker");
             }
         }
-
-        
     }
 }

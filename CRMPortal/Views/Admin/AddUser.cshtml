@@ -1,138 +1,164 @@
-﻿
-@model CRMPortal.ViewModels.AddUserViewModel
+﻿@model CRMPortal.ViewModels.AddUserViewModel
 
-<link rel="stylesheet"
-      href="~/css/site.css" />
+@{
+    // Edit mode = the form was filled by the EditUser action (UserId is present)
+    var isEdit = Model.Users != null && Model.Users.UserId > 0;
+
+    // One combined list for the table; role comes from which list the user is in
+    var allUsers = Model.AdminUsers.Select(u => (User: u, Role: "Admin"))
+        .Concat(Model.EmployeeUsers.Select(u => (User: u, Role: "Employee")))
+        .ToList();
+}
+
+<link rel="stylesheet" href="~/css/site.css" />
+<link rel="stylesheet" href="~/css/adduser.css" asp-append-version="true" />
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-
 <script src="~/js/site.js" asp-append-version="true"></script>
 
-<div class="page-container">
+<div class="user-admin">
 
-    <!-- Left Side -->
+    <!-- ===== Messages ===== -->
+    @if (TempData["Success"] != null)
+    {
+        <div class="ua-alert ua-alert--success">@TempData["Success"]</div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="ua-alert ua-alert--error">@TempData["Error"]</div>
+    }
+    @if (ViewBag.Error != null)
+    {
+        <div class="ua-alert ua-alert--error">@ViewBag.Error</div>
+    }
 
-    <div class="form-card">
+    <!-- ===== Add / Edit form (horizontal) ===== -->
+    <section class="ua-panel @(isEdit ? "is-editing" : "")">
 
-        <h2>Add New User</h2>
-        
-        @if (TempData["Success"] != null)
-        {
-            <div class="alert alert-success">
-                @TempData["Success"]
-            </div>
-        }
+        <header class="ua-panel__head">
+            <h2>@(isEdit ? "Edit user" : "Add new user")</h2>
+            @if (isEdit)
+            {
+                <span class="ua-chip">Editing @Model.Users.FullName</span>
+            }
+        </header>
 
-        @if (TempData["Error"] != null)
-        {
-            <div class="alert alert-danger">
-                @TempData["Error"]
-            </div>
-        }
+        <form method="post"
+              asp-action="@(isEdit ? "UpdateUser" : "AddUser")"
+              asp-controller="Admin"
+              class="ua-form">
 
-        @if (ViewBag.Error != null)
-        {
-            <div class="alert alert-danger">
-                @ViewBag.Error
-            </div>
-        }
-       
+            @if (isEdit)
+            {
+                <input type="hidden" asp-for="Users.UserId" />
+            }
 
-        <form method="post" asp-action="AddUser" asp-controller="Admin">
-
-            <div class="form-group">
-                <label>Full Name</label>
-                <input asp-for="Users.FullName" id="FullName" />
-            </div>
-
-            <div class="form-group">
-                <label>Email</label>
-                <input asp-for="Users.Email" id="Email" />
-            </div>
-
-            <div class="form-group">
-                <label>Password</label>
-                <input asp-for="Users.Password" id="Password" type="password" />
+            <div class="ua-field">
+                <label for="FullName">Full name</label>
+                <input asp-for="Users.FullName" id="FullName" placeholder="e.g. Priya Sharma" autocomplete="off" />
             </div>
 
-            <div class="form-group">
-                <label>Role</label>
+            <div class="ua-field">
+                <label for="Email">Email</label>
+                <input asp-for="Users.Email" id="Email" placeholder="name@company.com" autocomplete="off" />
+            </div>
+
+            <div class="ua-field">
+                <label for="Password">Password</label>
+                <input asp-for="Users.Password" id="Password" type="password"
+                       placeholder="@(isEdit ? "Leave blank to keep current" : "Create a password")"
+                       autocomplete="new-password" />
+            </div>
+
+            <div class="ua-field">
+                <label for="RoleId">Role</label>
                 <select asp-for="Users.RoleId" asp-items="Model.Roles" id="RoleId">
-                    <option value="">Select Role</option>
+                    <option value="">Select role</option>
                 </select>
             </div>
 
-            <button type="submit"
-                    id="btnAddUser"
-                    class="btn-save"
-                    disabled>
-                Add User
-            </button>
+            <div class="ua-actions">
+                <button type="submit" id="btnAddUser" class="ua-btn ua-btn--primary" disabled>
+                    @(isEdit ? "Update user" : "Add user")
+                </button>
 
+                @if (isEdit)
+                {
+                    <a asp-action="AddUser" asp-controller="Admin" class="ua-btn ua-btn--ghost">Cancel</a>
+                }
+            </div>
         </form>
+    </section>
 
-    </div>
+    <!-- ===== Users table ===== -->
+    <section class="ua-panel">
 
-    <!-- Right Side -->
+        <header class="ua-panel__head">
+            <h2>Users</h2>
+            <span class="ua-count">@allUsers.Count total</span>
+        </header>
 
-    <div class="user-section">
+        <div class="ua-table-wrap">
+            <table class="ua-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Full name</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th class="ua-col-action">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (!allUsers.Any())
+                    {
+                        <tr>
+                            <td colspan="5" class="ua-empty">No users yet. Add the first one above.</td>
+                        </tr>
+                    }
 
-        <div class="user-list-container">
+                    @{
+                        var i = 1;
+                    }
+                    @foreach (var row in allUsers)
+                    {
+                        var isCurrent = isEdit && Model.Users.UserId == row.User.UserId;
 
-            <h2>Admin Users</h2>
+                        <tr class="@(isCurrent ? "is-current" : "")">
+                            <td>@(i++)</td>
+                            <td class="ua-name">@row.User.FullName</td>
+                            <td>@row.User.Email</td>
+                            <td>
+                                <span class="ua-role ua-role--@row.Role.ToLower()">@row.Role</span>
+                            </td>
+                            <td class="ua-col-action">
+                                <a asp-action="EditUser"
+                                   asp-controller="Admin"
+                                   asp-route-id="@row.User.UserId"
+                                   class="ua-btn ua-btn--sm ua-btn--edit">Edit</a>
 
-            <div class="scroll-container">
-
-                @foreach (var item in Model.AdminUsers)
-                {
-                    <div class="user-card">
-
-                        <div>
-                            <h4>@item.FullName</h4>
-                            <p>@item.Email</p>
-                        </div>
-
-                        <a asp-action="DeleteUser"
-                           asp-route-id="@item.UserId"
-                           class="btn-delete">
-                            Delete
-                        </a>
-
-                    </div>
-                }
-
-            </div>
-
+                                <a asp-action="DeleteUser"
+                                   asp-controller="Admin"
+                                   asp-route-id="@row.User.UserId"
+                                   class="ua-btn ua-btn--sm ua-btn--delete"
+                                   onclick="return confirm('Delete @row.User.FullName?');">Delete</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
         </div>
-
-        <div class="user-list-container">
-
-            <h2 class="employee-heading">Employee Users</h2>
-
-            <div class="scroll-container">
-
-                @foreach (var item in Model.EmployeeUsers)
-                {
-                    <div class="user-card">
-
-                        <div>
-                            <h4>@item.FullName</h4>
-                            <p>@item.Email</p>
-                        </div>
-
-                        <a asp-action="DeleteUser"
-                           asp-route-id="@item.UserId"
-                           class="btn-delete">
-                            Delete
-                        </a>
-
-                    </div>
-                }
-
-            </div>
-
-        </div>
-
-    </div>
+    </section>
 
 </div>
+
+@if (isEdit)
+{
+    <script>
+        // Form is pre-filled in edit mode, so enable the button.
+        // Registered after site.js, so it runs after site.js's own ready handler.
+        $(function () {
+            $('#btnAddUser').prop('disabled', false);
+        });
+    </script>
+}
