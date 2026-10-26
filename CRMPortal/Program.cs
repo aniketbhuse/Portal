@@ -6,9 +6,7 @@ using System.IO;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ===========================
 // Add Services
-// ===========================
 
 builder.Services.AddControllersWithViews();
 
@@ -30,7 +28,6 @@ builder.Services.AddDataProtection()
 builder.Services.AddSession(options =>
 {
     // Server-side session remains valid as long as
-    // there is activity within this period.
     options.IdleTimeout = TimeSpan.FromHours(15);
 
     options.Cookie.HttpOnly = true;

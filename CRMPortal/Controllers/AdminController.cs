@@ -50,8 +50,7 @@ namespace CRMPortal.Controllers
         {
             int? roleId = HttpContext.Session.GetInt32("RoleId");
 
-            return HttpContext.Session.GetInt32("UserId") != null
-                   && (roleId == 1 || roleId == 3);
+            return HttpContext.Session.GetInt32("UserId") != null && (roleId == 1 || roleId == 3);
         }
 
         // ================= LOAD DATA =================
@@ -67,12 +66,12 @@ namespace CRMPortal.Controllers
                 .ToListAsync();
 
             model.AdminUsers = await _context.Users
-                .Where(x => x.RoleId == 1)
-                .ToListAsync();
+                 .Where(x => x.RoleId == 1)
+                 .ToListAsync();
 
             model.EmployeeUsers = await _context.Users
-                .Where(x => x.RoleId == 2)
-                .ToListAsync();
+                 .Where(x => x.RoleId == 2)
+                 .ToListAsync();
         }
 
         // ================= GET ADD USER =================
@@ -149,7 +148,7 @@ namespace CRMPortal.Controllers
         {
             try
             {
-                if (!IsAdminLoggedIn())
+                if (!IsAdminLoggedIn()) 
                     return RedirectToAction("Login", "Account");
 
                 var user = await _context.Users
@@ -208,8 +207,7 @@ namespace CRMPortal.Controllers
 
                 // Manual validation (same style as AddUser, which doesn't rely on ModelState).
                 // Password is optional while editing: blank = keep current password.
-                if (string.IsNullOrWhiteSpace(model.Users.FullName) ||
-                    string.IsNullOrWhiteSpace(model.Users.Email))
+                if (string.IsNullOrWhiteSpace(model.Users.FullName) || string.IsNullOrWhiteSpace(model.Users.Email))
                 {
                     return await ReloadEditForm(model, "Full name and email are required.");
                 }
@@ -220,8 +218,7 @@ namespace CRMPortal.Controllers
                     return await ReloadEditForm(model, "This role cannot be assigned.");
                 }
 
-                var user = await _context.Users
-                    .FirstOrDefaultAsync(x => x.UserId == model.Users.UserId);
+                var user = await _context.Users.FirstOrDefaultAsync(x => x.UserId == model.Users.UserId);
 
                 if (user == null)
                 {
@@ -507,11 +504,7 @@ namespace CRMPortal.Controllers
                     return RedirectToAction("Dashboard");
                 }
 
-                string fullPath = Path.Combine(
-                    _environment.WebRootPath,
-                    "Uploads",
-                    "CDFiles",
-                    file.FilePath);
+                string fullPath = Path.Combine(_environment.WebRootPath,"Uploads","CDFiles",file.FilePath);
 
                 if (!System.IO.File.Exists(fullPath))
                 {

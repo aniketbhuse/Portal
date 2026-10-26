@@ -831,9 +831,7 @@ namespace CRMPortal.Controllers
                     return RedirectToAction("ViewAttendance");
                 }
 
-                // =====================================================
                 // EMPLOYEE LIST
-                // =====================================================
 
                 model.EmployeeList =
                     _context.MasterEmployee
@@ -841,14 +839,11 @@ namespace CRMPortal.Controllers
                         .OrderBy(x => x.FullName)
                         .ToList();
 
-                // =====================================================
                 // ATTENDANCE LIST
-                // =====================================================
 
                 if (model.EmployeeId == 0)
                 {
-                    model.AttendanceList =
-                        _context.EmployeeAttendance
+                    model.AttendanceList =  _context.EmployeeAttendance
                             .Where(x =>
                                 x.AttendanceDate >= model.FromDate &&
                                 x.AttendanceDate <= model.ToDate &&
@@ -858,20 +853,16 @@ namespace CRMPortal.Controllers
                 }
                 else
                 {
-                    model.AttendanceList =
-                        _context.EmployeeAttendance
-                            .Where(x =>
-                                x.EmployeeId == model.EmployeeId &&
-                                x.AttendanceDate >= model.FromDate &&
-                                x.AttendanceDate <= model.ToDate &&
-                                !x.IsDeleted)
+                    model.AttendanceList = _context.EmployeeAttendance
+                            .Where(x => x.EmployeeId == model.EmployeeId &&
+                                        x.AttendanceDate >= model.FromDate &&
+                                        x.AttendanceDate <= model.ToDate &&
+                                       !x.IsDeleted)
                             .OrderBy(x => x.AttendanceDate)
                             .ToList();
                 }
 
-                // =====================================================
                 // APPROVED LEAVES
-                // =====================================================
 
                 var approvedLeaveList =
                     _context.LeaveRequests

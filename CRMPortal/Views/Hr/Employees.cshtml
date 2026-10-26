@@ -5,14 +5,12 @@
 }
 
 <!-- Font Awesome -->
-<link rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
 
 <!-- Page styles -->
 <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 
 <script src="~/js/site.js"></script>
-
 
 <div class="container-fluid em-page">
 
@@ -21,7 +19,7 @@
     <!-- ===================================================== -->
     @if (TempData["Success"] != null)
     {
-        <div class="alert alert-success alert-dismissible fade show">
+        <div class="alert alert-success alert-dismissible fade show em-top">
             <i class="fa-solid fa-circle-check me-2"></i>
 
             @TempData["Success"]
@@ -35,7 +33,7 @@
 
     @if (TempData["Error"] != null)
     {
-        <div class="alert alert-danger alert-dismissible fade show">
+        <div class="alert alert-danger alert-dismissible fade show em-top">
             <i class="fa-solid fa-circle-exclamation me-2"></i>
 
             @TempData["Error"]
@@ -51,12 +49,11 @@
     <!-- ===================================================== -->
     <!-- SUMMARY CARDS -->
     <!-- ===================================================== -->
-    <div class="row g-3 mb-4 em-top">
+    <div class="row g-3 mb-4 ">
 
         <!-- TOTAL EMPLOYEES -->
         <div class="col-12 col-md-4">
             <div class="dashboard-card em-stat em-stat--primary">
-
                 <div class="summary-icon-wrapper text-primary">
                     <i class="fa-solid fa-users"></i>
                 </div>
@@ -72,7 +69,6 @@
         <!-- ACTIVE EMPLOYEES -->
         <div class="col-12 col-md-4">
             <div class="dashboard-card em-stat em-stat--success">
-
                 <div class="summary-icon-wrapper text-success">
                     <i class="fa-solid fa-user-check"></i>
                 </div>
@@ -120,11 +116,8 @@
             <!-- EXPORT BUTTON -->
             <a asp-action="ExportEmployeesToExcel"
                class="btn btn-success exporttoexcel">
-
                 <i class="fa-solid fa-file-excel me-1"></i>
-
                 Export to Excel
-
             </a>
 
         </div>
@@ -132,13 +125,9 @@
 
         <!-- TABLE BODY -->
         <div class="em-card__body">
-
             <div class="table-responsive">
-
                 <table class="table table-hover align-middle mb-0 em-table">
-
                     <thead>
-
                         <tr>
                             <th>Action</th>
                             <th>Status</th>
@@ -169,10 +158,7 @@
                             <th>Created</th>
                             <th>Updated</th>
                         </tr>
-
                     </thead>
-
-
                     <tbody>
 
                         @foreach (var item in Model)
@@ -183,28 +169,22 @@
                                     <a asp-action="EditEmployee"
                                        asp-route-id="@item.EmployeeId"
                                        class="btn btn-warning btn-sm">
-
                                         <i class="fa-solid fa-pen-to-square"></i>
-
                                         Edit
-
                                     </a>
 
                                     @if (item.IsDeleted)
                                     {
                                         <form asp-action="ActivateEmployee"
                                               asp-route-id="@item.EmployeeId"
-                                              method="post"
-                                              style="display: inline;">
+                                              method="post" style="display: inline;">
 
                                             <button type="submit"
                                                     class="btn btn-success btn-sm"
                                                     onclick="return confirm('Are you sure you want to activate this employee?');">
 
                                                 <i class="fa-solid fa-user-check"></i>
-
                                                 Activate
-
                                             </button>
 
                                         </form>
@@ -213,19 +193,15 @@
                                     {
                                         <form asp-action="DeleteEmployee"
                                               asp-route-id="@item.EmployeeId"
-                                              method="post"
-                                              style="display: inline;">
+                                              method="post" style="display: inline;">
 
                                             <button type="submit"
                                                     class="btn btn-danger btn-sm"
                                                     onclick="return confirm('Are you sure you want to inactivate this employee?');">
 
                                                 <i class="fa-solid fa-user-slash"></i>
-
                                                 InActivate
-
                                             </button>
-
                                         </form>
                                     }
 
@@ -237,22 +213,16 @@
                                     {
                                         <!-- INACTIVE -->
                                         <span class="badge bg-danger">
-
                                             <i class="fa-solid fa-circle-xmark me-1"></i>
-
                                             Inactive
-
                                         </span>
                                     }
                                     else
                                     {
                                         <!-- ACTIVE -->
                                         <span class="badge bg-success">
-
                                             <i class="fa-solid fa-circle-check me-1"></i>
-
                                             Active
-
                                         </span>
                                     }
 
@@ -272,11 +242,8 @@
                                     <a href="mailto:@item.Email"
                                        class="text-decoration-none text-primary fw-semibold"
                                        title="Send Email to @item.FullName">
-
                                         <i class="fa-solid fa-envelope me-1"></i>
-
                                         @item.Email
-
                                     </a>
                                 </td>
 
@@ -318,31 +285,21 @@
 
 </div>
 
-
-<!-- ===================================================== -->
 <!-- EMPLOYEE DETAILS MODAL (partial view loads inside) -->
-<!-- ===================================================== -->
+
 <div class="modal fade" id="employeeDetailsModal" tabindex="-1">
-
     <div class="modal-dialog modal-xl modal-dialog-centered">
-
         <div class="modal-content">
-
             <div class="modal-header">
-
                 <h5 class="modal-title">
                     Employee Details
                 </h5>
 
-                <button type="button"
-                        class="btn-close"
-                        data-bs-dismiss="modal">
-                </button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
 
             </div>
 
-            <div class="modal-body"
-                 id="employeeDetailsContainer">
+            <div class="modal-body" id="employeeDetailsContainer">
 
                 <!-- Partial View loads here -->
 

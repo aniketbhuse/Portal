@@ -672,9 +672,7 @@ body {
 
 
 
-/* =========================================================
-           EXISTING STYLES
-           ========================================================= */
+/*      EXISTING STYLES */
 
 .table-hover tbody tr:hover {
     background-color: #f5f9ff;
@@ -693,9 +691,7 @@ body {
 }
 
 
-/* =========================================================
-           FLOATING BUBBLE BACKGROUND
-           ========================================================= */
+/*    FLOATING BUBBLE BACKGROUND */
 
 .floating-bubbles {
     position: fixed;
@@ -709,9 +705,7 @@ body {
 }
 
 
-/* =========================================================
-           COMMON BUBBLE
-           ========================================================= */
+/*    COMMON BUBBLE */
 
 .floating-bubble {
     position: absolute;
@@ -727,9 +721,7 @@ body {
 }
 
 
-/* =========================================================
-           BUBBLE ANIMATION
-           ========================================================= */
+/*  BUBBLE ANIMATION */
 
 @keyframes floatingBubbleAnimation {
 
@@ -766,9 +758,7 @@ body {
 }
 
 
-/* =========================================================
-           BUBBLE 1
-           ========================================================= */
+/* BUBBLE 1 */
 
 .bubble-1 {
     width: 55px;
@@ -779,9 +769,7 @@ body {
 }
 
 
-/* =========================================================
-           BUBBLE 2
-           ========================================================= */
+/*  BUBBLE 2 */
 
 .bubble-2 {
     width: 85px;
@@ -792,9 +780,7 @@ body {
 }
 
 
-/* =========================================================
-           BUBBLE 3
-           ========================================================= */
+/*  BUBBLE 3 */
 
 .bubble-3 {
     width: 45px;
@@ -805,9 +791,7 @@ body {
 }
 
 
-/* =========================================================
-           BUBBLE 4
-           ========================================================= */
+/*  BUBBLE 4 */
 
 .bubble-4 {
     width: 105px;
@@ -818,9 +802,7 @@ body {
 }
 
 
-/* =========================================================
-           BUBBLE 5
-           ========================================================= */
+/*   BUBBLE 5 */
 
 .bubble-5 {
     width: 60px;
@@ -831,9 +813,7 @@ body {
 }
 
 
-/* =========================================================
-           BUBBLE 6
-           ========================================================= */
+/*     BUBBLE 6 */
 
 .bubble-6 {
     width: 95px;
@@ -844,9 +824,7 @@ body {
 }
 
 
-/* =========================================================
-           BUBBLE 7
-           ========================================================= */
+/*  BUBBLE 7 */
 
 .bubble-7 {
     width: 48px;
@@ -857,9 +835,7 @@ body {
 }
 
 
-/* =========================================================
-           BUBBLE 8
-           ========================================================= */
+/*  BUBBLE 8 */
 
 .bubble-8 {
     width: 110px;
@@ -870,9 +846,7 @@ body {
 }
 
 
-/* =========================================================
-           BUBBLE 9
-           ========================================================= */
+/*  BUBBLE 9 */
 
 .bubble-9 {
     width: 65px;
@@ -883,9 +857,7 @@ body {
 }
 
 
-/* =========================================================
-           BUBBLE 10
-           ========================================================= */
+/* BUBBLE 10 */
 
 .bubble-10 {
     width: 80px;
@@ -896,9 +868,7 @@ body {
 }
 
 
-/* =========================================================
-           BUBBLE 11
-           ========================================================= */
+/* BUBBLE 11 */
 
 .bubble-11 {
     width: 40px;
@@ -909,9 +879,7 @@ body {
 }
 
 
-/* =========================================================
-           BUBBLE 12
-           ========================================================= */
+/* BUBBLE 12 */
 
 .bubble-12 {
     width: 72px;
@@ -922,9 +890,7 @@ body {
 }
 
 
-/* =========================================================
-           KEEP DASHBOARD ABOVE BUBBLES
-           ========================================================= */
+/* KEEP DASHBOARD ABOVE BUBBLES */
 
 .employee-dashboard-content {
     position: relative;
@@ -3204,3 +3170,114 @@ body:has(.em-page) {
         font-size: .95rem;
     }
 }
+
+
+
+.bubble-container {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: -1;
+}
+
+.bubble {
+    position: absolute;
+    bottom: -100px;
+    width: 30px;
+    height: 30px;
+    background: rgba(0, 119, 204, 0.18);
+    border-radius: 50%;
+    animation: floatBubble 12s infinite ease-in;
+}
+
+    /* Bubble positions and sizes */
+    .bubble:nth-child(1) {
+        left: 10%;
+        width: 20px;
+        height: 20px;
+        animation-duration: 10s;
+    }
+
+    .bubble:nth-child(2) {
+        left: 25%;
+        width: 40px;
+        height: 40px;
+        animation-duration: 14s;
+        animation-delay: 2s;
+    }
+
+    .bubble:nth-child(3) {
+        left: 40%;
+        animation-duration: 11s;
+        animation-delay: 4s;
+    }
+
+    .bubble:nth-child(4) {
+        left: 55%;
+        width: 50px;
+        height: 50px;
+        animation-duration: 16s;
+        animation-delay: 1s;
+    }
+
+    .bubble:nth-child(5) {
+        left: 70%;
+        width: 25px;
+        height: 25px;
+        animation-duration: 12s;
+        animation-delay: 3s;
+    }
+
+    .bubble:nth-child(6) {
+        left: 85%;
+        width: 35px;
+        height: 35px;
+        animation-duration: 15s;
+        animation-delay: 5s;
+    }
+
+    .bubble:nth-child(7) {
+        left: 35%;
+        width: 15px;
+        height: 15px;
+        animation-duration: 9s;
+        animation-delay: 6s;
+    }
+
+    .bubble:nth-child(8) {
+        left: 90%;
+        width: 45px;
+        height: 45px;
+        animation-duration: 13s;
+        animation-delay: 2s;
+    }
+
+/* Floating animation */
+@keyframes floatBubble {
+    0% {
+        transform: translateY(0) scale(1);
+        opacity: 0;
+    }
+
+    20% {
+        opacity: 0.7;
+    }
+
+    80% {
+        opacity: 0.5;
+    }
+
+    100% {
+        transform: translateY(-110vh) scale(1.3);
+        opacity: 0;
+    }
+}
+
+.Mars {
+    text-align: center;
+}
+
+

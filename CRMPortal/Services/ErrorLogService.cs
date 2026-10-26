@@ -15,10 +15,7 @@ namespace CRMPortal.Services
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public async Task LogErrorAsync(
-            Exception ex,
-            string controller,
-            string action)
+        public async Task LogErrorAsync(Exception ex,string controller, string action)
         {
             var httpContext = _httpContextAccessor.HttpContext;
 

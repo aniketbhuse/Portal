@@ -13,6 +13,7 @@ namespace CRMPortal.ViewModels
 
         public DateOnly ToDate { get; set; }
 
+        public string? EmployeeName { get; set; }
 
         // ==========================================
         // EMPLOYEE DATA

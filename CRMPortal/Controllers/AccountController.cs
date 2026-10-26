@@ -257,33 +257,19 @@ namespace CRMPortal.Controllers
         {
             try
             {
-                // =====================================================
                 // GET USER ID
-                // =====================================================
+                int? userId = HttpContext.Session.GetInt32("UserId");
 
-                int? userId =
-                    HttpContext.Session.GetInt32("UserId");
-
-
-                // =====================================================
                 // GET CURRENT SESSION ID
-                // =====================================================
+                string sessionId = HttpContext.Session.Id;
 
-                string sessionId =
-                    HttpContext.Session.Id;
-
-
-                // =====================================================
                 // REMOVE CURRENT ACTIVE LOGIN
-                //
                 // Only Employee will normally have an ActiveLogin.
                 // Admin / Super Admin / HR simply won't find one.
-                // =====================================================
 
                 if (userId.HasValue)
                 {
-                    var activeLogin =
-                        await _context.ActiveLogins
+                    var activeLogin = await _context.ActiveLogins
                             .FirstOrDefaultAsync(x =>
                                 x.UserId == userId.Value &&
                                 x.SessionId == sessionId);
@@ -292,66 +278,37 @@ namespace CRMPortal.Controllers
                     if (activeLogin != null)
                     {
                         _context.ActiveLogins.Remove(activeLogin);
-
                         await _context.SaveChangesAsync();
                     }
                 }
 
-
-                // =====================================================
                 // CLEAR SESSION
-                // =====================================================
-
                 HttpContext.Session.Clear();
 
-
-                TempData["Success"] =
-                    "Logged out successfully.";
-
-
-                return RedirectToAction(
-                    "Login",
-                    "Account");
+                TempData["Success"] = "Logged out successfully.";
+                return RedirectToAction("Login","Account");
             }
             catch (Exception ex)
             {
-                // =====================================================
                 // LOG ERROR
-                // =====================================================
-
-                await _errorLogService.LogErrorAsync(
-                    ex,
-                    nameof(AccountController),
-                    nameof(Logout));
-
+                await _errorLogService.LogErrorAsync(ex, nameof(AccountController), nameof(Logout));
 
                 HttpContext.Session.Clear();
 
-
-                TempData["Error"] =
-                    "An error occurred while logging out.";
-
-
-                return RedirectToAction(
-                    "Login",
-                    "Account");
+                TempData["Error"] =  "An error occurred while logging out.";
+                return RedirectToAction("Login","Account");
             }
         }
 
 
 
-        // =========================================================
+      
         // KEEP APPLICATION SESSION ALIVE
-        //
         // This keeps the CRMPortal APPLICATION LOGIN alive.
-        //
-        // IMPORTANT:
         // This is completely separate from Employee Attendance
         // Sign In / Sign Out.
-        //
         // It does NOT create or remove ActiveLogins.
         // It does NOT sign the employee in/out of attendance.
-        // =========================================================
 
         [HttpGet]
         public IActionResult KeepSessionAlive()
@@ -375,47 +332,25 @@ namespace CRMPortal.Controllers
                     return Unauthorized();
                 }
 
-
-                // =====================================================
                 // REFRESH SESSION ACTIVITY
-                //
                 // Accessing/updating the session keeps the ASP.NET
                 // Core session active.
-                // =====================================================
 
-                HttpContext.Session.SetString(
-                    "LastActivity",
-                    DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
-
-
-                // =====================================================
-                // SUCCESS
-                // =====================================================
+                HttpContext.Session.SetString("LastActivity", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
 
                 return Ok();
             }
             catch (Exception ex)
             {
-                // =====================================================
                 // LOG ERROR
-                // =====================================================
-
-                _ = _errorLogService.LogErrorAsync(
-                    ex,
-                    nameof(AccountController),
-                    nameof(KeepSessionAlive));
-
+                _ = _errorLogService.LogErrorAsync(ex, nameof(AccountController), nameof(KeepSessionAlive));
 
                 return StatusCode(500);
             }
         }
 
 
-
-
-        // =========================================================
         // FORGOT PASSWORD - GET
-        // =========================================================
         [HttpGet]
         public async Task<IActionResult> ForgotPassword()
         {
@@ -425,105 +360,60 @@ namespace CRMPortal.Controllers
             }
             catch (Exception ex)
             {
-                await _errorLogService.LogErrorAsync(
-                    ex,
-                    nameof(AccountController),
-                    nameof(ForgotPassword));
-
-
-                ViewBag.Error =
-                    "An unexpected error occurred while loading the page.";
-
+                await _errorLogService.LogErrorAsync(ex, nameof(AccountController), nameof(ForgotPassword));
+                ViewBag.Error = "An unexpected error occurred while loading the page.";
 
                 return View();
             }
         }
 
 
-        // =========================================================
         // FORGOT PASSWORD - POST
-        // =========================================================
         [HttpPost]
-        public async Task<IActionResult> ForgotPassword(
-            ForgotPasswordViewModel model)
+        public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel model)
         {
             try
             {
-                // =====================================================
                 // PASSWORD MATCH VALIDATION
-                // =====================================================
-
                 if (model.NewPassword != model.ConfirmPassword)
                 {
-                    ViewBag.Error =
-                        "Password and Confirm Password do not match.";
+                    ViewBag.Error = "Password and Confirm Password do not match.";
 
                     return View(model);
                 }
 
-
-                // =====================================================
                 // FIND USER
-                // =====================================================
+                var user = await _context.Users.FirstOrDefaultAsync(x => x.Email == model.Email);
 
-                var user =
-                    await _context.Users
-                        .FirstOrDefaultAsync(x =>
-                            x.Email == model.Email);
-
-
-                // =====================================================
                 // USER NOT FOUND
-                // =====================================================
 
                 if (user == null)
                 {
-                    ViewBag.Error =
-                        "Email does not exist.";
+                    ViewBag.Error = "Email does not exist.";
 
                     return View(model);
                 }
 
-
-                // =====================================================
                 // UPDATE PASSWORD
-                // =====================================================
+                user.Password = model.NewPassword;
 
-                user.Password =
-                    model.NewPassword;
-
-                user.UpdatedDate =
-                    DateTime.Now;
-
+                user.UpdatedDate = DateTime.Now;
 
                 await _context.SaveChangesAsync();
 
-
-                // =====================================================
                 // SUCCESS
-                // =====================================================
 
-                TempData["Success"] =
-                    "Password changed successfully.";
-
+                TempData["Success"] = "Password changed successfully.";
 
                 return RedirectToAction("Login");
             }
             catch (Exception ex)
             {
-                // =====================================================
                 // LOG ERROR
-                // =====================================================
 
-                await _errorLogService.LogErrorAsync(
-                    ex,
-                    nameof(AccountController),
-                    nameof(ForgotPassword));
+                await _errorLogService.LogErrorAsync(ex,nameof(AccountController),nameof(ForgotPassword));
 
-
-                ViewBag.Error =
-                    "An unexpected error occurred while changing the password. Please try again.";
-
+                ViewBag.Error = "An unexpected error occurred while changing the password. Please try again.";
 
                 return View(model);
             }
